@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import type { Extension } from '@codemirror/state'
   import { Play, Square, ListTree, WandSparkles, Pin, GitCompare, Keyboard, Brain, Sparkles, Bookmark, Share2, LayoutDashboard, ChartColumn, Map as MapIcon } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
@@ -275,32 +276,32 @@
         {#if executing}
           <Button size="sm" variant="danger" onclick={cancel}>
             <Square size={12} />
-            Stop
+            {$t('editor.stop')}
           </Button>
         {:else}
-          <Button size="sm" onclick={runFromToolbar} title="Run the selection or the statement at the cursor ({mod}+Enter)">
+          <Button size="sm" onclick={runFromToolbar} title={$t('editor.runSelection', { values: { mod } })}>
             <Play size={12} />
-            Run
+            {$t('editor.run')}
           </Button>
         {/if}
 
         <span class="mx-1 h-4 w-px bg-edge"></span>
 
-        <Button size="sm" variant="ghost" onclick={() => editor?.format()} title="Format SQL (Alt+F)" disabled={!sqlText.trim()}>
+        <Button size="sm" variant="ghost" onclick={() => editor?.format()} title={$t('editor.format')} disabled={!sqlText.trim()}>
           <WandSparkles size={13} />
-          Format
+          {$t('editor.format')}
         </Button>
-        <Button size="sm" variant="ghost" onclick={explain} title="Explain analyze" disabled={executing || !sqlText.trim()} loading={explaining}>
+        <Button size="sm" variant="ghost" onclick={explain} title={$t('editor.explain')} disabled={executing || !sqlText.trim()} loading={explaining}>
           {#if !explaining}<ListTree size={13} />{/if}
           Explain
         </Button>
 
-        <Button size="sm" variant="ghost" onclick={() => (saveOpen = true)} title="Save query" disabled={!sqlText.trim() || !profileId}>
+        <Button size="sm" variant="ghost" onclick={() => (saveOpen = true)} title={$t('editor.saveQuery')} disabled={!sqlText.trim() || !profileId}>
           <Bookmark size={13} />
           Save
         </Button>
 
-        <Button size="sm" variant="ghost" onclick={share} title="Share query and chart" disabled={!sqlText.trim()}>
+        <Button size="sm" variant="ghost" onclick={share} title={$t('editor.share')} disabled={!sqlText.trim()}>
           <Share2 size={13} />
           Share
         </Button>
@@ -331,8 +332,8 @@
           value={sqlText}
           language="sql"
           runScope="statement"
-          ariaLabel="SQL editor for {tab.title}"
-          placeholder="SELECT * FROM ..."
+          ariaLabel={$t('editor.ariaLabel', { values: { title: tab.title } })}
+          placeholder={$t('editor.placeholder')}
           onchange={(text) => duckActions().updateTabQuery(tabId, text)}
           onrun={run}
           onrunselection={run}
@@ -347,7 +348,7 @@
       class="group/split flex h-1 shrink-0 cursor-row-resize items-center justify-center transition-colors hover:bg-active {resizing ? 'bg-accent/60' : 'bg-edge-subtle'}"
       role="separator"
       aria-orientation="horizontal"
-      aria-label="Resize editor and results"
+      aria-label={$t('editor.resize')}
       onmousedown={onResizeStart}
       ondblclick={() => (splitPercent = 45)}
     >
@@ -389,23 +390,23 @@
             {#if !ui.hideBrain}
               <Button size="sm" variant="outline" onclick={fixWithBrain} loading={fixing}>
                 {#if !fixing}<Sparkles size={13} />{/if}
-                {fixing ? 'Duck Brain is thinking...' : 'Fix with Duck Brain'}
+                {fixing ? $t('editor.brainThinking') : $t('editor.fixWithBrain')}
               </Button>
             {/if}
           {/snippet}
           {#snippet actions(result)}
             <BrainResultActions {tabId} sql={sqlText} {result} onchartapplied={() => (resultView = 'charts')} />
-            <Button size="xs" variant="ghost" onclick={pinResult} title="Keep a copy of this result to compare against later">
+            <Button size="xs" variant="ghost" onclick={pinResult} title={$t('editor.pinResult')}>
               <Pin size={13} />
-              Pin result
+              {$t('editor.pin')}
             </Button>
             <Button size="xs" variant="ghost" onclick={() => (compareOpen = true)} disabled={pinCount === 0}>
               <GitCompare size={13} />
-              Compare{pinCount > 0 ? ` (${pinCount})` : ''}
+              {$t('editor.compare')}{pinCount > 0 ? ` (${pinCount})` : ''}
             </Button>
             <Button size="xs" variant="ghost" onclick={() => (addToDashboardOpen = true)}>
               <LayoutDashboard size={13} />
-              Add to dashboard
+              {$t('editor.addToDashboard')}
             </Button>
           {/snippet}
         </ResultPanel>

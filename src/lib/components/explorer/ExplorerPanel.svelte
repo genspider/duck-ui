@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { PanelLeftClose, PanelLeftOpen, RefreshCw, Search, Database, Upload } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import EmptyState from '../common/EmptyState.svelte'
@@ -109,7 +110,7 @@
 >
   {#if collapsed}
     <div class="flex h-9 items-center justify-center">
-      <Button icon variant="ghost" size="xs" onclick={() => setExplorerCollapsed(false)} title="Show explorer (⌘B)" aria-label="Show explorer" disabled={narrow}>
+      <Button icon variant="ghost" size="xs" onclick={() => setExplorerCollapsed(false)} title={$t('explorer.show')} aria-label={$t('explorer.show')} disabled={narrow}>
         <PanelLeftOpen size={14} />
       </Button>
     </div>
@@ -118,15 +119,15 @@
       <ConnectionSwitcher class="min-w-0" />
       <div class="ml-auto flex items-center">
         {#if canImport}
-          <Button icon variant="ghost" size="xs" onclick={() => (importerOpen = true)} title="Import data" aria-label="Import data">
+          <Button icon variant="ghost" size="xs" onclick={() => (importerOpen = true)} title={$t('explorer.import')} aria-label={$t('explorer.import')}>
             <Upload size={13} />
           </Button>
         {/if}
-        <Button icon variant="ghost" size="xs" onclick={refresh} title="Refresh schema" aria-label="Refresh schema" disabled={loading}>
+        <Button icon variant="ghost" size="xs" onclick={refresh} title={$t('explorer.refresh')} aria-label={$t('explorer.refresh')} disabled={loading}>
           <RefreshCw size={13} class={loading ? 'animate-spin' : ''} />
         </Button>
         {#if !drawer}
-          <Button icon variant="ghost" size="xs" onclick={() => setExplorerCollapsed(true)} title="Hide explorer (⌘B)" aria-label="Hide explorer">
+          <Button icon variant="ghost" size="xs" onclick={() => setExplorerCollapsed(true)} title={$t('explorer.hide')} aria-label={$t('explorer.hide')}>
             <PanelLeftClose size={14} />
           </Button>
         {/if}
@@ -138,22 +139,22 @@
       <input
         class="ds-input-sm pl-7"
         type="search"
-        placeholder="Search tables and columns"
-        aria-label="Search tables and columns"
+        placeholder={$t('explorer.search')}
+        aria-label={$t('explorer.search')}
         bind:value={search}
       />
     </div>
 
     <div class="min-h-0 flex-1 overflow-auto">
       {#if fetchError}
-        <EmptyState size="compact" icon={Database} title="Could not load schema" description={fetchError} primary={{ label: 'Retry', onclick: refresh }} />
+        <EmptyState size="compact" icon={Database} title={$t('explorer.noSchema')} description={fetchError} primary={{ label: $t('explorer.retry'), onclick: refresh }} />
       {:else if loading && databases.length === 0}
         <div class="flex justify-center py-8"><Spinner /></div>
       {:else if databases.length === 0}
         <EmptyState
           size="compact"
           icon={Database}
-          title="No data yet"
+          title={$t('explorer.noData')}
           description="Drop a file here, import one, or run CREATE TABLE."
           primary={canImport ? { label: 'Import data', onclick: () => (importerOpen = true) } : undefined}
         />
@@ -177,7 +178,7 @@
       class="absolute -right-0.5 top-0 z-10 h-full w-1 cursor-col-resize hover:bg-accent/50 {dragging ? 'bg-accent/50' : ''}"
       role="separator"
       aria-orientation="vertical"
-      aria-label="Resize explorer"
+      aria-label={$t('explorer.resize')}
       onmousedown={onResizeStart}
       ondblclick={() => setExplorerWidth(EXPLORER_DEFAULT_WIDTH)}
     ></div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte'
+  import { t } from 'svelte-i18n'
   import {
     Search, Plus, Table2, Moon, Sun, SquareTerminal, Home, NotebookPen, RefreshCw, PanelLeft, Bookmark, History, LayoutDashboard,
   } from 'lucide-svelte'
@@ -264,7 +265,7 @@
       style="box-shadow: var(--shadow-modal)"
       role="dialog"
       aria-modal="true"
-      aria-label="Command menu"
+      aria-label={$t('palette.title')}
       tabindex="-1"
       use:trapFocus
       onkeydown={onKeydown}
@@ -275,8 +276,8 @@
           bind:this={inputEl}
           bind:value={query}
           class="h-11 w-full bg-transparent text-sm text-fg placeholder:text-fg-4 focus:outline-none"
-          placeholder="Search tables, tabs and actions"
-          aria-label="Search tables, tabs and actions"
+          placeholder={$t('palette.search')}
+          aria-label={$t('palette.search')}
           autocomplete="off"
           spellcheck="false"
         />
