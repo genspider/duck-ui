@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tr } from '../../../lib/i18n/translate'
   import { Monitor, Moon, Sun } from 'lucide-svelte'
   import { setSetting } from '@/services/persistence/repositories/settingsRepository'
   import SectionHeader from '../common/SectionHeader.svelte'
@@ -6,9 +7,9 @@
   import { getThemeMode, setThemeMode, type ThemeMode } from '../../stores/theme.svelte'
 
   const options: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'system', label: 'System', icon: Monitor },
+    { value: 'dark', label: tr('theme.dark'), icon: Moon },
+    { value: 'light', label: tr('theme.light'), icon: Sun },
+    { value: 'system', label: tr('theme.system'), icon: Monitor },
   ]
 
   const mode = $derived(getThemeMode())
@@ -26,8 +27,8 @@
 </script>
 
 <section>
-  <SectionHeader title="Theme" description="System follows the appearance set in your operating system." />
-  <div class="flex flex-col gap-2" role="radiogroup" aria-label="Theme">
+  <SectionHeader title={tr('theme.title')} description={tr('theme.desc')} />
+  <div class="flex flex-col gap-2" role="radiogroup" aria-label={tr('theme.title')}>
     {#each options as option (option.value)}
       <label class="inline-flex items-center gap-2 text-[13px] text-fg-2 select-none" for="theme-{option.value}">
         <input

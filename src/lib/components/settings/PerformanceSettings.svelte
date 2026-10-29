@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { getSetting, setSetting } from '@/services/persistence/repositories/settingsRepository'
   import { DEFAULT_DUCKDB_MEMORY_LIMIT_MB } from '@/store/slices/duckdbSlice'
   import { RANGE_READS_SETTING, rangeReadsPreferred, setRangeReadsPreferred } from '@/services/duckdb/rangeReads'
@@ -51,9 +52,9 @@
     saving = true
     try {
       await setSetting(currentProfileId, 'duckdb', 'memory_limit_mb', JSON.stringify(clamped))
-      toast.success('Memory limit saved. Reload to apply.')
+      toast.success($t('perf.memorySaved'))
     } catch {
-      toast.error('Failed to save memory limit')
+      toast.error($t('perf.memorySaveFail'))
     } finally {
       saving = false
     }
@@ -67,7 +68,7 @@
     try {
       await setSetting(currentProfileId, 'duckdb', RANGE_READS_SETTING, JSON.stringify(enabled))
     } catch {
-      toast.error('Failed to save the remote file setting')
+      toast.error($t('perf.rangeSaveFail'))
     }
   }
 
@@ -81,9 +82,9 @@
     saving = true
     try {
       await setSetting(currentProfileId, 'duckdb', 'max_result_rows', JSON.stringify(clamped))
-      toast.success('Row limit saved')
+      toast.success($t('perf.rowsSaved'))
     } catch {
-      toast.error('Failed to save row limit')
+      toast.error($t('perf.rowsSaveFail'))
     } finally {
       saving = false
     }
@@ -94,9 +95,9 @@
   <FormField
     layout="row"
     controlWidth="full"
-    label="DuckDB memory limit (MB)"
+    label={$t('perf.memoryLimit')}
     for="memory-limit"
-    hint="Caps DuckDB heap usage. Raise this if large sorts or aggregations fail with out-of-memory errors; lower it on memory-constrained devices. Browser WASM practical ceiling is around 4 GB. Changes take effect after reload."
+    hint={$t('perf.memoryLimitHint')}
   >
     <div class="flex items-center gap-2">
       <Input
@@ -109,16 +110,16 @@
         class="max-w-[160px]"
         oninput={(e) => (memoryLimitMb = Number(e.currentTarget.value))}
       />
-      <Button size="md" variant="outline" disabled={saving || !currentProfileId} onclick={saveMemoryLimit}>Save</Button>
+      <Button size="md" variant="outline" disabled={saving || !currentProfileId} onclick={saveMemoryLimit}>{$t('common.save')}</Button>
     </div>
   </FormField>
 
   <FormField
     layout="row"
     controlWidth="full"
-    label="Maximum rows per result"
+    label={$t('perf.maxRows')}
     for="max-result-rows"
-    hint="A query returning more than this stops early and says so, instead of turning millions of rows into JavaScript objects and freezing the tab. Exports to Parquet bypass the limit and always write the complete result."
+    hint={$t('perf.maxRowsHint')}
   >
     <div class="flex items-center gap-2">
       <Input
@@ -131,16 +132,16 @@
         class="max-w-[160px]"
         oninput={(e) => (maxResultRowsDraft = Number(e.currentTarget.value))}
       />
-      <Button size="md" variant="outline" disabled={saving} onclick={saveMaxResultRows}>Save</Button>
+      <Button size="md" variant="outline" disabled={saving} onclick={saveMaxResultRows}>{$t('common.save')}</Button>
     </div>
   </FormField>
 
   <FormField
     layout="row"
     controlWidth="full"
-    label="Read remote files in ranges"
+    label={$t('perf.rangeReads')}
     for="range-reads"
-    hint="Fetches only the parts of a remote Parquet or DuckDB file a query needs, through DuckDB's httpfs extension (about 500 kB, downloaded once). A server that does not support ranges still works: the file is then downloaded whole. Turn off to always download remote files whole."
+    hint={$t('perf.rangeReadsHint')}
   >
     <label class="ds-checkbox-label">
       <input
@@ -150,7 +151,7 @@
         checked={rangeReads}
         onchange={(e) => saveRangeReads(e.currentTarget.checked)}
       />
-      <span class="text-sm">Enabled</span>
+      <span class="text-sm">{$t('perf.enabled')}</span>
     </label>
   </FormField>
 </div>

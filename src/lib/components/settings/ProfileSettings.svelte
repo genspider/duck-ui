@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tr } from '../../../lib/i18n/translate'
   import { Trash2, UserPlus } from 'lucide-svelte'
   import type { Profile } from '@/store/types'
   import Button from '../common/Button.svelte'
@@ -29,9 +30,9 @@
     saving = true
     try {
       await duckActions().updateProfile({ name: values.name, avatarEmoji: values.avatarEmoji })
-      toast.success('Profile updated')
+      toast.success(tr('profile.updated'))
     } catch {
-      toast.error('Failed to update profile')
+      toast.error(tr('profile.updateFail'))
     } finally {
       saving = false
     }
@@ -42,9 +43,9 @@
     try {
       await duckActions().createProfile(values.name, values.password, values.avatarEmoji)
       showCreate = false
-      toast.success(`Profile "${values.name}" created`)
+      toast.success(tr('profile.created', { name: values.name }))
     } catch {
-      toast.error('Failed to create profile')
+      toast.error(tr('profile.createFail'))
     } finally {
       creating = false
     }
@@ -80,9 +81,9 @@
       const { switchProfile: doSwitch, deleteProfile: doDelete } = duckActions()
       await doSwitch(other.id)
       await doDelete(deletingId)
-      toast.success('Profile deleted')
+      toast.success(tr('profile.deleted'))
     } catch {
-      toast.error('Failed to delete profile')
+      toast.error(tr('profile.deleteFail'))
     } finally {
       deleting = false
     }
@@ -97,14 +98,14 @@
         await doSwitch(switchTarget.id, password)
         await doDelete(pendingDeleteId)
         pendingDeleteId = null
-        toast.success('Profile deleted')
+        toast.success(tr('profile.deleted'))
         deleting = false
       } else {
         await doSwitch(switchTarget.id, password)
       }
       showPassword = false
     } catch {
-      toast.error(pendingDeleteId ? 'Failed to delete profile' : 'Incorrect password')
+      toast.error(pendingDeleteId ? tr('profile.deleteFail') : tr('profile.incorrectPassword'))
       pendingDeleteId = null
       deleting = false
     }
@@ -119,7 +120,7 @@
 <div class="flex flex-col gap-6">
   {#if currentProfile}
     <section>
-      <SectionHeader title="Your profile" description="Name and avatar shown across the app." />
+      <SectionHeader title={tr('profile.yourProfile')} description={tr('profile.yourProfileDesc')} />
       <!-- The editor seeds its fields once, so a different profile needs a fresh one. -->
       {#key currentProfile.id}
         <ProfileEditor
@@ -133,7 +134,7 @@
   {/if}
 
   <section class="border-t border-edge-subtle pt-6">
-    <SectionHeader title="Profiles" description="Each profile keeps its own connections, queries and settings.">
+    <SectionHeader title={tr('profile.profiles')} description={tr('profile.profilesDesc')}>
       {#snippet actions()}
         <Button size="sm" variant="outline" onclick={() => (showCreate = true)}>
           <UserPlus size={14} />
@@ -183,7 +184,7 @@
 
 <ConfirmDialog
   open={showDeleteConfirm}
-  title="Delete Profile"
+  title={tr('profile.deleteTitle')}
   description={`This will permanently delete "${currentProfile?.name ?? ''}" and all associated data including saved connections, query history, and AI configurations. This action cannot be undone.`}
   confirmLabel="Delete"
   destructive
@@ -191,7 +192,7 @@
   oncancel={() => (showDeleteConfirm = false)}
 />
 
-<Modal open={showCreate} title="Create Profile" size="sm" onclose={() => (showCreate = false)}>
+<Modal open={showCreate} title={tr('profile.createTitle')} size="sm" onclose={() => (showCreate = false)}>
   <ProfileEditor mode="create" loading={creating} onsave={createProfile} oncancel={() => (showCreate = false)} />
 </Modal>
 

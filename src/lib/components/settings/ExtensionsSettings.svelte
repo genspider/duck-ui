@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Download, Play, Puzzle, RefreshCw } from 'lucide-svelte'
   import { isUnavailableExtensionError, type ExtensionAction, type ExtensionInfo } from '@/lib/duckdbExtensions'
   import Badge from '../common/Badge.svelte'
@@ -98,14 +99,14 @@
           : 'In the browser they download from extensions.duckdb.org, so installing needs a network connection the first time. Not every extension is built for WASM.'}
       </p>
     </div>
-    <Button icon size="sm" variant="outline" disabled={refreshing} aria-label="Refresh extension list" onclick={refresh}>
+    <Button icon size="sm" variant="outline" disabled={refreshing} aria-label={$t('ext.refreshList')} onclick={refresh}>
       <RefreshCw size={14} class={refreshing ? 'animate-spin' : ''} />
     </Button>
   </div>
 
   {#if readOnly}
     <p class="rounded-md bg-surface-2 px-3 py-2 text-xs text-fg-2">
-      This connection is read-only, so extensions can be listed but not installed or loaded.
+      {$t('ext.readOnly')}
     </p>
   {/if}
 
@@ -116,11 +117,11 @@
   {#if extensions === null && !loadError}
     <div class="flex items-center gap-2 text-[13px] text-fg-3">
       <Spinner size="sm" />
-      Loading extensions...
+      {$t('ext.loading')}
     </div>
   {:else if extensions}
-    <label class="sr-only" for="extension-filter">Filter extensions</label>
-    <Input id="extension-filter" type="search" size="sm" bind:value={filter} placeholder="Filter extensions..." />
+    <label class="sr-only" for="extension-filter">{$t('ext.filter')}</label>
+    <Input id="extension-filter" type="search" size="sm" bind:value={filter} placeholder={$t('ext.filter') + '...'} />
     <ul class="divide-y divide-edge-subtle rounded-md border border-edge-subtle bg-surface">
       {#each visible as ext (ext.name)}
         {@const busy = pending[ext.name]}
@@ -129,13 +130,13 @@
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="font-mono text-[13px] text-fg">{ext.name}</span>
               {#if ext.loaded}
-                <Badge tone="brand">Loaded</Badge>
+                <Badge tone="brand">{$t('ext.loaded')}</Badge>
               {:else if ext.installed}
-                <Badge>Installed</Badge>
+                <Badge>{$t('ext.installed')}</Badge>
               {/if}
               {#if unavailable[ext.name]}
-                <Badge tone="warning" title="The extension repository has no build of this extension for this platform">
-                  {isRemote ? 'Unavailable' : 'Not available in WASM'}
+                <Badge tone="warning" title={$t('ext.noBuild')}>
+                  {isRemote ? $t('ext.unavailable') : $t('ext.notWasm')}
                 </Badge>
               {/if}
             </div>
