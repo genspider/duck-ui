@@ -1,0 +1,2786 @@
+发现 1967 处硬编码英文，其中 1967 处尚未翻译
+============================================================
+
+📄 src/App.svelte
+   [text] ('profile')
+  let pickerProfiles = $state
+   [text] {#if embed}
+   [text] {:else if stage === 'picker'}
+   [text] {:else if stage === 'engine' && initialized && !engineLoadin
+   [text] {:else if stage === 'engine' && engineError && !engineLoadin
+   [text] {$t('error.duckdbStartFailed')}
+   [text] {engineError}
+   [text] window.location.reload()}>{$t('common.tryAgain')}
+   [text] {:else}
+   [text] {stage === 'profile' ? $t('common.loadingProfile') : $t('com
+
+📄 src/lib/components/charts/BoxPlotChart.svelte
+   [text] room ? `${label.slice(0, room - 1)}…` : label
+  }
+   [text] {#if boxes.length === 0}
+   [text] No numeric values
+   [text] {:else if width > 0 && height > 0}
+   [text] {#each ticks as tick (tick)}
+   [text] {formatNumberWithSuffix(tick)}
+   [text] (hovered = null)}
+        >
+   [text] {#each box.outliers as value, j (j)}
+   [text] {/each}
+   [text] {fit(box.label)}
+   [text] {box.label}
+   [text] {name}
+   [text] {formatNumber(Number(value))}
+   [text] {/each}
+        {#if box.outliers.length}
+   [text] {box.outliers.length}
+   [text] {/if}
+   [text] {/if}
+  {/if}
+
+📄 src/lib/components/charts/ChartView.svelte
+   [text] void)}
+   [text] {label}
+   [text] onchange(!checked)}
+    >
+   [text] {/snippet}
+
+{#snippet chart()}
+   [text] {#if config.title}
+   [text] {config.title}
+   [text] {/if}
+   [text] {#if isPie}
+   [text] {:else if xy}
+   [text] {#if xy.series.length > 1}
+   [text] toggleSeries(s.column)}
+                >
+   [text] {s.label}
+   [text] {/each}
+   [text] {:else}
+   [text] Pick a column for the X axis and at least one value column.
+   [text] {/snippet}
+
+{#if !hasData}
+   [text] No data available for visualization
+   [text] {:else if readonly}
+   [text] {@render chart()}
+   [text] {#if typeInfo}
+          {@const Icon = typeInfo.icon}
+   [text] Chart type
+   [text] updateConfig({ type: value as ChartType })}
+        />
+   [text] updateConfig({ xAxis: value })}
+        />
+   [text] {#snippet trigger({ open, toggle: togglePanel })}
+   [text] {/snippet}
+        {#if valueColumns.length === 0}
+   [text] s.column === col)}
+   [text] toggleColumn(col)}
+                >
+   [text] {col}
+   [text] {#if info}
+   [text] {/snippet}
+   [text] Chart settings
+   [text] Sort by
+   [text] {#if config.transform?.sortBy}
+   [text] Sort order
+   [text] Limit rows
+   [text] updateConfig({ smooth: v }))}
+              {/if}
+   [placeholder] No title
+   [placeholder] No limit
+   [title] Chart settings
+   [title] Download as PNG
+   [title] Reset chart
+   [label] Value columns
+   [label] Chart settings
+   [label] Download chart as PNG
+   [label] Reset chart
+   [aria] Chart settings
+   [aria] Download chart as PNG
+   [aria] Reset chart
+
+📄 src/lib/components/charts/HeatmapChart.svelte
+   [text] chars ? `${label.slice(0, chars - 1)}…` : label
+  }
+   [text] {#if grid.cut}
+   [text] {/if}
+   [text] {#if grid.cells.length === 0}
+   [text] No numeric values
+   [text] {:else if width > 0 && height > 0}
+   [text] {#each grid.yLabels as label, yi (yi)}
+   [text] {fit(label, left - 8)}
+   [text] {#if showValues}
+   [text] {fit(label, cellW * xEvery - 4)}
+   [text] {/if}
+        {/each}
+   [text] {formatNumberWithSuffix(grid.min)}
+   [text] {formatNumberWithSuffix(grid.max)}
+   [text] {xLabel}
+   [text] {grid.xLabels[hovered.xi]}
+   [text] {yLabel}
+   [text] {grid.yLabels[hovered.yi]}
+   [text] {valueLabel}
+   [text] {value === null || value === undefined ? '' : formatNumber(v
+   [text] {/if}
+    {/if}
+
+📄 src/lib/components/charts/PieChart.svelte
+   [text] {#if total === 0}
+   [text] No data
+   [text] {:else}
+   [text] {#if arc.pct >= 0.05}
+   [text] {(arc.pct * 100).toFixed(0)}%
+   [text] {/if}
+   [text] {/each}
+        {#if donut}
+   [text] {formatNumberWithSuffix(total)}
+   [text] {#if hovered !== null && arcs[hovered]}
+   [text] {arcs[hovered].label}
+   [text] {#each arcs as arc, i (i)}
+   [text] (hovered = null)}
+        >
+   [text] {arc.label}
+   [text] {formatNumberWithSuffix(arc.value)}
+   [text] {(arc.pct * 100).toFixed(1)}%
+   [text] {/each}
+   [aria] {donut ? 'Donut' : 'Pie'} chart, total {formatNumber(total)}
+
+📄 src/lib/components/charts/Popover.svelte
+   [text] {@render trigger({ open, toggle })}
+  {#if open}
+   [text] {@render children()}
+   [text] {/if}
+
+📄 src/lib/components/charts/UPlotChart.svelte
+   [text] observer.disconnect()
+  })
+
+📄 src/lib/components/collaboration/ForkDialog.svelte
+   [text] (WASM_CONNECTION_ID)
+  let selected = $state
+   [text] >(new Set(untrack(() => tables)))
+  let progress = $state
+   [text] {#if rowLimit !== undefined}
+   [text] {/if}
+   [text] {#if tables.length === 0}
+   [text] This share lists no tables.
+   [text] toggle(table)}
+            />
+   [text] {table}
+   [text] {#if item}
+   [text] {#if item.status === 'transferring'}
+   [text] {item.error}
+   [text] {/each}
+   [text] {#if destinations.length > 1}
+   [text] {/if}
+
+    {#if finished}
+   [text] {#snippet footer()}
+   [text] {finished ? 'Close' : 'Cancel'}
+   [text] 0 ? `${selected.size} ` : ''}{selected.size === 1 ? 'table' 
+   [text] {/snippet}
+   [title] Fork “{capability.name}”
+
+📄 src/lib/components/collaboration/HostSession.svelte
+   [text] s.currentProfile?.name))
+
+  let sessionNameDraft = $state
+   [text] (null)
+  let tables = $state
+   [text] ([])
+  let selected = $state
+   [text] >(new Set())
+  let shareMode = $state
+   [text] {#snippet rowLimitField(id: string)}
+   [text] (rowLimit = Number(e.currentTarget.value))}
+    />
+   [text] {/snippet}
+
+{#if !hasInvite}
+   [text] (sessionNameDraft = e.currentTarget.value)}
+      />
+   [text] Data access
+   [text] {#each MODES as mode (mode.id)}
+   [text] (shareMode = mode.id)}
+          />
+   [text] {mode.label}
+   [text] {mode.hint}
+   [text] {/each}
+   [text] {#if shareMode === 'all'}
+   [text] {@render rowLimitField(`${uid}-limit-all`)}
+   [text] {/if}
+
+    {#if shareMode === 'selected'}
+   [text] {#if tables.length === 0}
+   [text] No tables to share on this connection.
+   [text] toggleTable(table.exposedName)}
+              />
+   [text] {table.exposedName}
+   [text] {@render rowLimitField(`${uid}-limit`)}
+   [text] {/if}
+   [text] {#if isTurnConfigured()}
+   [text] Test it
+   [text] {turnCheck.detail}
+   [text] {/if}
+
+    {#if session.error}
+   [text] {session.error}
+   [text] {:else}
+   [text] {#if copied}
+   [text] {#if isConnected}
+   [text] Connected · {people} {people === 1 ? 'person' : 'people'} in
+   [text] Each invite works once. To add someone else, create a new on
+   [text] duckActions().inviteAnotherGuest()} disabled={isStarting}>
+   [text] Invite someone else
+   [placeholder] Q3 analysis
+   [placeholder] Paste their connection code here
+   [label] Result limit (rows)
+   [label] Session name
+   [label] 1. Send them this link
+   [label] 2. Paste the code they send back
+
+📄 src/lib/components/collaboration/JoinByCode.svelte
+   [text] Invite link or code
+   [placeholder] Paste the invite link or code
+
+📄 src/lib/components/collaboration/JoinSessionDialog.svelte
+   [text] s.session))
+
+  let invite = $state
+   [text] (null)
+  let inviteCode = $state
+   [text] {
+      void (async () => {
+        const decoded = await de
+   [text] {#if invite}
+   [text] {#if !hasCode}
+   [text] This session can share workspace state with your browser.
+   [text] {#if session.error}
+   [text] {session.error}
+   [text] {/if}
+   [text] {:else}
+   [text] {#if copied}
+   [text] {#if isConnected}
+   [text] Connected to {host}
+   [text] Waiting for {host} to paste it...
+   [text] {/if}
+
+        {#if session.sharedCapabilities.length > 0}
+   [text] Shared data available
+   [text] {/each}
+   [text] {/if}
+
+        {#if session.error}
+   [text] {/if}
+
+    {#snippet footer()}
+      {#if !hasCode}
+   [text] Not now
+   [text] {isConnected ? 'Open workspace' : 'Hide'}
+   [text] {/if}
+    {/snippet}
+   [title] Join “{invite.sessionName}”
+   [desc] Hosted by {host}
+   [label] Send this code back to {host}
+
+📄 src/lib/components/collaboration/LiveSessionPage.svelte
+   [text] {#snippet sessionDetails()}
+   [text] {#if session.participants.length === 0}
+   [text] {isHost ? 'Waiting for someone to join...' : 'Connecting to 
+   [text] {person.displayName}
+   [text] {#if person.isHost}
+   [text] {/if}
+   [text] {/each}
+        {/if}
+   [text] Shared data
+   [text] {#if session.sharedCapabilities.length === 0}
+   [text] {capability.name}
+   [text] Read-only
+   [text] {#if session.role === 'guest'}
+   [text] (forking = capability)} aria-label="Fork {capability.name}">
+   [text] {:else if isHost}
+   [text] {/each}
+   [text] {/snippet}
+   [text] {#snippet meta()}
+    {#if phase === 'connected'}
+   [text] {:else if phase === 'waiting'}
+   [text] {:else if phase === 'dropped'}
+   [text] {isHost ? 'End session' : 'Leave'}
+   [text] {/if}
+  {/snippet}
+   [text] {#if !session.isWebRtcSupported}
+   [text] Try a current version of Chrome, Edge, Firefox or Safari.
+   [text] {#if session.error}
+   [text] {session.error}
+   [text] {:else if hosting}
+   [text] {@render sessionDetails()}
+   [text] {:else if guesting}
+   [text] {#if copied}
+   [text] {:else}
+   [text] {#each FACTS as fact (fact.title)}
+   [text] {fact.title}
+   [text] {fact.text}
+   [text] How live sessions work
+   [text] {#if forking}
+   [title] Remove from the session
+   [title] Live sharing isn't available
+   [title] The live session dropped
+   [title] Finish joining
+   [title] Host a session
+   [title] Join a session
+   [desc] Each invite works once, for one person.
+   [desc] The host pastes this code to connect the two browsers.
+   [desc] Invite someone into this workspace. You choose what data the
+   [desc] Paste the link or the code someone sent you. Nothing runs un
+   [label] Shared data
+   [label] Fork {capability.name}
+   [label] Withdraw access to {capability.name}
+   [aria] Remove {person.displayName} from the session
+   [aria] Shared data
+   [aria] Fork {capability.name}
+   [aria] Withdraw access to {capability.name}
+
+📄 src/lib/components/collaboration/SessionIndicator.svelte
+   [text] {@render children?.()}
+   [text] {#if phase === 'waiting'}
+   [text] {:else if phase === 'connected' && guests > 0}
+   [text] {guests}
+   [text] {/if}
+
+📄 src/lib/components/common/Badge.svelte
+   [text] {#if dot}
+   [text] {@render children()}
+   [text] {:else}
+
+📄 src/lib/components/common/Button.svelte
+   [text] {#if loading}
+   [text] {/if}
+  {@render children()}
+
+📄 src/lib/components/common/Combobox.svelte
+   [text] {selected?.label ?? placeholder}
+   [text] {#if open}
+   [text] (e.key === 'Escape' || e.key === 'Enter') && closeMenu()}
+  
+   [text] {#if filtered.length === 0}
+   [text] {emptyText}
+   [text] {:else}
+          {#each filtered as opt, idx (opt.value)}
+   [text] {opt.label}
+   [text] {#if opt.hint}
+   [text] {opt.hint}
+   [text] {/if}
+   [text] {#if value === opt.value}
+   [text] {/each}
+        {/if}
+   [placeholder] Type to search
+
+📄 src/lib/components/common/ConfirmDialog.svelte
+   [text] {#if description}
+   [text] {description}
+   [text] {/if}
+  {#snippet footer()}
+   [text] {cancelLabel}
+   [text] {confirmLabel}
+   [text] {/snippet}
+
+📄 src/lib/components/common/ContextMenu.svelte
+   [text] {
+      reposition()
+      highlightedIndex = firstEnabledIn
+   [text] {#if open}
+   [text] {
+      e.preventDefault()
+      closeMenu()
+    }}
+  >
+   [text] {#each items as item, i (item.id)}
+      {#if item.separator
+   [text] {:else}
+        {@const Icon = item.icon}
+   [text] activateIndex(i)}
+        >
+   [text] {#if Icon}
+   [text] {/if}
+   [text] {item.label}
+   [text] {#if item.shortcut}
+   [text] {item.shortcut}
+   [text] {/if}
+    {/each}
+
+📄 src/lib/components/common/DataTable.svelte
+   [text] number | string
+  }
+
+  export interface DataTableProps
+   [text] > {
+    columns: DataColumn
+   [text] , string]>
+    /** Trailing cell per row, for buttons. */
+  
+   [text] = $props()
+
+  let sortKey = $state
+   [text] (null)
+  let sortDir = $state
+   [text] {#if rows.length === 0}
+   [text] {:else}
+   [text] {#each columns as col (col.key)}
+   [text] {/if}
+                  {/if}
+   [text] {/if}
+   [text] {/each}
+          {#if actions}
+   [text] {#each sorted as row, i (rowKey ? rowKey(row, i) : i)}
+   [text] {/each}
+            {#if actions}
+   [text] {@render actions(row)}
+   [text] {/each}
+
+📄 src/lib/components/common/EmptyState.svelte
+   [text] {#if Icon}
+   [text] {/if}
+   [text] {title}
+   [text] {#if description}
+   [text] {description}
+   [text] {/if}
+  {#if primary || secondary || children}
+   [text] {#if primary}
+   [text] {primary.label}
+   [text] {/if}
+      {#if secondary}
+   [text] {secondary.label}
+   [text] {/if}
+      {#if children}{@render children()}{/if}
+
+📄 src/lib/components/common/FormField.svelte
+   [text] = { sm: 'max-w-[160px]', md: 'max-w-[320px]', lg: 'max-w-[48
+   [text] {#if layout === 'row'}
+   [text] {label}{#if required}
+   [text] {/if}
+   [text] {#if hint}
+   [text] {hint}
+   [text] {@render children()}
+      {#if error}
+   [text] {error}
+   [text] {:else}
+   [text] {@render children()}
+    {#if error}
+   [text] {:else if hint}
+
+📄 src/lib/components/common/InputDialog.svelte
+   [text] {#snippet footer()}
+   [text] {cancelLabel}
+   [text] onconfirm(value.trim())} {loading} disabled={!value.trim()}>
+   [text] {/snippet}
+
+📄 src/lib/components/common/Lazy.svelte
+   [text] {
+    void attempt
+    return load()
+  })
+   [text] {#await pending}
+   [text] {:then module}
+   [text] {:catch}
+   [text] This screen could not be loaded.
+   [text] attempt++}>Try again
+
+📄 src/lib/components/common/Markdown.svelte
+   [text] {@html html}
+
+📄 src/lib/components/common/Modal.svelte
+   [text] {#if open}
+   [text] e.stopPropagation()}
+    >
+      {#if title}
+   [text] {title}
+   [text] {#if description}
+   [text] {description}
+   [text] {/if}
+   [text] {@render children()}
+   [text] {#if footer}
+   [text] {@render footer()}
+
+📄 src/lib/components/common/PageBody.svelte
+   [text] = { md: 'max-w-6xl', lg: 'max-w-7xl', full: '' }
+   [text] {@render children()}
+
+📄 src/lib/components/common/PageHeader.svelte
+   [text] {title}
+   [text] {#if subtitle && subtitle !== title}
+   [text] {subtitle}
+   [text] {/if}
+   [text] {#if meta}
+   [text] {@render meta()}
+   [text] {/if}
+  {#if actions}
+   [text] {@render actions()}
+
+📄 src/lib/components/common/Panel.svelte
+   [text] = { none: '', sm: 'p-3', md: 'p-4' }
+   [text] {#if title || actions}
+   [text] {#if title}
+   [text] {title}
+   [text] {/if}
+        {#if description}
+   [text] {description}
+   [text] {/if}
+   [text] {#if actions}
+   [text] {@render actions()}
+   [text] {@render children()}
+
+📄 src/lib/components/common/SectionHeader.svelte
+   [text] {#if level === 'page'}
+   [text] {title}
+   [text] {:else}
+   [text] {/if}
+    {#if description}
+   [text] {description}
+   [text] {/if}
+   [text] {#if actions}
+   [text] {@render actions()}
+
+📄 src/lib/components/common/Select.svelte
+   [text] onchange?.(e.currentTarget.value)}
+  >
+    {#if placeholder}
+   [text] {placeholder}
+   [text] {/if}
+    {#each options as opt (opt.value)}
+   [text] {opt.label}
+   [text] {/each}
+
+📄 src/lib/components/common/Sheet.svelte
+   [text] {#if open}
+   [text] {#if title}
+   [text] {title}
+   [text] {#if description}
+   [text] {description}
+   [text] {/if}
+   [text] {@render children()}
+   [text] {#if footer}
+   [text] {@render footer()}
+
+📄 src/lib/components/common/Spinner.svelte
+   [text] = {
+    sm: 'h-4 w-4',
+    md: 'h-6 w-6',
+    lg: 'h-10 w-10
+
+📄 src/lib/components/common/Stat.svelte
+   [text] {label}
+   [text] {value}
+   [text] {#if hint}
+   [text] {hint}
+   [text] {/if}
+  {#if children}
+   [text] {@render children()}
+   [text] {/if}
+
+📄 src/lib/components/common/Tabs.svelte
+   [text] {#if variant === 'segmented'}
+   [text] {#each items as t (t.id)}
+   [text] onchange(t.id)}
+      >
+        {#if t.icon}
+   [text] {/if}
+        {t.label}
+        {#if t.count !== undefined}
+   [text] {t.count}
+   [text] {/if}
+   [text] {/each}
+   [text] {:else}
+
+📄 src/lib/components/common/Toast.svelte
+   [text] import { Toaster } from 'svelte-sonner'
+
+📄 src/lib/components/common/Tooltip.svelte
+   [text] (null)
+  let tipEl = $state
+   [text] e.key === 'Escape' && hide()}
+>
+  {@render children()}
+   [text] {#if open}
+   [text] {text}
+
+📄 src/lib/components/connections/ConnectionForm.svelte
+   [text] (defaultConnectionDraft())
+  let touched = $state
+   [text] touch('name')}
+      />
+   [text] {#if draft.scope === 'External'}
+   [text] Start HTTP server in DuckDB:
+   [text] {HTTP_SERVER_SNIPPET}
+   [text] touch('host')}
+        />
+   [text] {#if draft.authMode === 'password'}
+   [text] {/if}
+
+      {#if draft.authMode === 'api_key'}
+   [text] {/if}
+    {:else}
+   [text] Data persists in your browser across sessions.
+   [text] touch('path')}
+        />
+   [text] {/if}
+   [text] {#snippet footer()}
+   [text] {connecting ? 'Connecting...' : editMode ? 'Update' : 'Conne
+   [text] {/snippet}
+   [placeholder] My Database
+   [placeholder] my_database
+   [placeholder] Enter API key
+   [placeholder] my_data.db
+   [label] Connection Name
+   [label] Connection Type
+   [label] Host URL
+   [label] Database (optional)
+   [label] Database File
+
+📄 src/lib/components/connections/ConnectionSwitcher.svelte
+   [text] (null)
+  let menuEl = $state
+   [text] open && reposition()} />
+   [text] (open ? closeMenu() : openMenu())}
+  >
+    {#if loading}
+   [text] {:else}
+   [text] {/if}
+   [text] {activeConnection?.name ?? ''}
+   [text] {#if activeConnection}
+   [text] {activeConnection.scope}
+   [text] {#snippet dot(scope: string)}
+   [text] {/snippet}
+
+{#if open}
+   [text] Switch Connection
+   [text] switchTo(connection)}
+      >
+        {@render dot(connectio
+   [text] {connection.name}
+   [text] {connection.scope}
+   [text] {/each}
+   [text] {#if sessionConnections.length > 0}
+   [text] {@render dot(connection.scope)}
+   [text] {/each}
+    {/if}
+
+    {#if !ui.hideConnections}
+   [text] Manage Connections
+   [label] Switch connection
+   [aria] Switch connection
+
+📄 src/lib/components/connections/ConnectionsList.svelte
+   [text] {:else if connection.scope === 'Peer'}
+   [text] {:else}
+   [text] {/if}
+              {connection.name}
+   [text] {connection.scope}
+   [text] {connection.host || (connection.scope === 'WASM' ? 'Local' :
+   [text] {connection.database || (connection.scope === 'WASM' ? 'memo
+   [text] {connection.environment}
+   [text] {#if connection.environment !== 'BUILT_IN'}
+   [text] {isCurrent ? 'Connected' : 'Connect'}
+   [text] {/if}
+
+              {#if reason}
+   [text] onedit(connection.id)}
+                >
+   [text] (deleteTarget = connection)}
+                >
+   [text] {/if}
+   [text] {/each}
+
+📄 src/lib/components/connections/ConnectionsPage.svelte
+   [text] (null)
+  let editingValues = $state
+   [text] {#snippet actions()}
+   [text] (adding = true)}>
+   [text] Add connection
+   [text] {/snippet}
+   [text] duckActions().deleteConnection(id)}
+      />
+   [text] {
+    adding = false
+    attachingQuack = true
+  }}
+/>
+   [title] DuckDB servers and browser databases this profile can query
+   [title] Available connections
+   [desc] Every connection configured for this profile
+
+📄 src/lib/components/connections/QuackAttachments.svelte
+   [text] (null)
+  let detachTarget = $state
+   [text] {#snippet actions()}
+   [text] (attaching = true)}>
+   [text] {/snippet}
+
+  {#if attachments.length === 0}
+   [text] Nothing attached. Start a server with
+   [text] quack_serve
+   [text] and attach it here.
+   [text] {:else}
+   [text] {#each attachments as attachment (attachment.alias)}
+   [text] {attachment.alias}
+   [text] quack:{attachment.host}
+   [text] {#if attachment.status === 'attached'}
+   [text] {/if}
+   [text] reconnect(attachment.alias)}
+                  >
+   [text] (detachTarget = attachment)}
+                  >
+   [text] {attachment.error}
+   [text] {/if}
+          {/each}
+   [text] (attaching = false)}
+>
+   [text] On the server, with DuckDB 1.5.2 or later:
+   [text] {SERVER_SNIPPET}
+   [text] {#if error}
+   [text] {error}
+   [text] {#snippet footer()}
+   [text] (attaching = false)} disabled={busy}>Cancel
+   [text] {busy ? 'Attaching...' : 'Attach'}
+   [text] {/snippet}
+   [placeholder] localhost:9494
+   [title] Remote DuckDB (Quack)
+   [title] Detach database
+   [desc] Databases on a DuckDB server, attached next to your local da
+   [desc] Over Quack, DuckDB's client-server protocol. The token is st
+
+📄 src/lib/components/dashboard/AddToDashboardDialog.svelte
+   [text] {#each KINDS as option (option.kind)}
+   [text] (picked = option.kind)}
+          >
+            {option.labe
+   [text] {/each}
+   [text] {#if dashboards.length > 0}
+   [text] {#each dashboards as dashboard (dashboard.id)}
+   [text] addTo(dashboard.id)}>
+   [text] {dashboard.name}
+   [text] {/if}
+   [text] New dashboard
+   [text] e.key === 'Enter' && createAndAdd()}
+        />
+   [text] {#snippet footer()}
+   [text] {/snippet}
+   [placeholder] Q3 overview
+   [title] Add to dashboard
+   [desc] The query is saved, not the rows. The widget re-runs it so t
+
+📄 src/lib/components/dashboard/DashboardBlock.svelte
+   [text] inputs?: InputsStore
+    inputValues?: ReadonlyMap
+   [text] {#snippet placeholder(text: string)}
+   [text] {text}
+   [text] {/each}
+{/snippet}
+
+{#if block.kind === 'markdown'}
+   [text] {@html html}
+   [text] {:else if INPUT_COMPONENTS.has(block.tag)}
+   [text] {#if inputs && inputValues}
+   [text] {@render children(block.children)}
+   [text] {:else if block.tag === 'Details'}
+   [text] {propText(block.props.title) ?? 'Details'}
+   [text] {propText(block.props.title) ?? href}
+   [text] {#each block.children ?? [] as child, index (index)}
+   [text] {/each}
+   [text] needs data={query_name}`,
+  )}
+{:else if bound.state === 'lo
+   [text] {:else if bound.state === 'error'}
+   [text] {bound.error ?? 'Query failed'}
+   [text] {:else if block.tag === 'DownloadData'}
+   [text] download(result)}>
+   [text] {propText(block.props.title) ?? 'Download data'}
+   [text] {:else if block.tag === 'DataTable'}
+   [text] {#if grid}
+   [text] {/if}
+   [text] {propText(block.props.title) ?? config.column}
+   [text] {formatMetric(computeMetric(result, config), config)}
+   [text] {:else}
+   [text] {block.raw}
+   [label] Running query
+   [aria] Running query
+
+📄 src/lib/components/dashboard/DashboardChart.svelte
+   [text] = { bubble: 'scatter', funnel: 'bar' }
+  const NO_SERIES_HID
+   [text] !taken.includes(column) && isNumericColumn(result.data, colu
+   [text] {#if block.tag === 'BoxPlot' || block.tag === 'Heatmap'}
+   [text] {#if title}
+   [text] {title}
+   [text] {/if}
+   [text] {#if box}
+   [text] {:else if heat}
+   [text] {:else}
+   [text] &lt;{block.tag}&gt; needs a numeric column
+   [text] {:else if !DRAWABLE.has(chart.config.type)}
+   [text] &lt;{block.tag}&gt; has no renderer in this version yet
+   [text] {:else if isSparkline}
+   [text] {#if sparkline}
+   [text] {}} readonly />
+
+📄 src/lib/components/dashboard/DashboardInput.svelte
+   [text] results: ReadonlyMap
+   [text] {#if !name}
+   [text] &lt;{block.tag}&gt; needs a name=
+   [text] {:else}
+   [text] {title}
+   [text] {/if}
+    {/if}
+
+    {#if block.tag === 'Dropdown'}
+   [text] {:else if block.tag === 'ButtonGroup'}
+   [text] {#each options as option (option.value)}
+   [text] setScalar(option.value)}
+          >
+            {option.lab
+   [text] {/each}
+   [text] {:else if block.tag === 'TextInput'}
+   [text] {:else if block.tag === 'DateInput' || block.tag === 'DatePi
+   [text] {:else if block.tag === 'DateRange'}
+   [text] setRange('start', e.currentTarget.value)}
+        />
+   [text] setRange('end', e.currentTarget.value)}
+        />
+   [text] {:else if block.tag === 'Slider'}
+   [text] {scalar}
+   [text] {:else if block.tag === 'Checkbox'}
+   [text] setScalar(e.currentTarget.checked)}
+      />
+    {/if}
+   [label] {title ?? name} start
+   [label] {title ?? name} end
+   [aria] {title ?? name} start
+   [aria] {title ?? name} end
+
+📄 src/lib/components/dashboard/DashboardShareLoader.svelte
+   [text] {#if payload}
+   [text] {#if isViewer}
+   [text] {:else}
+   [text] {/if}
+   [text] {#snippet footer()}
+   [text] Not now
+   [text] {/snippet}
+   [title] Open “{payload.name}”
+
+📄 src/lib/components/dashboard/DashboardSourceEditor.svelte
+   [placeholder] # Title
+
+📄 src/lib/components/dashboard/DashboardTab.svelte
+   [text] = new Map()
+  const EMPTY_INPUTS: ReadonlyMap
+   [text] s.session.status))
+  let collabExtensions = $state.raw
+   [text] {
+    if (intervalSeconds
+   [text] {#if !dashboard}
+   [text] This dashboard is not available.
+   [text] It may still be loading, or it was deleted.
+   [text] {:else}
+   [text] {#if isEditing && canEdit}
+   [text] Dashboard name
+   [text] rename(e.currentTarget.value)}
+          />
+        {:else}
+   [text] {parsed.title ?? dashboard.name}
+   [text] {/if}
+   [text] {#if lastRefreshedAt !== null && hasQueries}
+   [text] Auto-refresh interval
+   [text] {#if !refreshing}
+   [text] {/if}
+        Refresh all
+   [text] (shareOpen = true)}>
+   [text] {#if !canEdit}
+   [text] Save editable copy
+   [text] {#if isEditing}
+   [text] {/if}
+          {isEditing ? 'Done' : 'Edit'}
+   [text] {#if resizing}
+   [title] Auto-refresh (paused while this tab is hidden)
+   [label] Resize source and preview
+   [aria] Resize source and preview
+
+📄 src/lib/components/dashboard/DashboardsPage.svelte
+   [text] (null)
+  let deleting = $state
+   [text] (null)
+
+  const menuItems = $derived
+   [text] {#snippet meta()}
+    {#if dashboards.length > 0}
+   [text] {dashboards.length}
+   [text] {/if}
+  {/snippet}
+  {#snippet actions()}
+   [text] New dashboard name
+   [text] e.key === 'Enter' && create()}
+      />
+   [text] {/snippet}
+   [text] {#if dashboards.length === 0}
+   [text] {:else}
+   [text] {#each dashboards as dashboard (dashboard.id)}
+   [text] openDashboard(dashboard)}>
+   [text] {dashboard.name}
+   [text] Updated {formatRelativeTime(dashboard.updatedAt)}
+   [text] openMenu(e, dashboard)}
+          >
+   [text] {/each}
+   [text] {/if}
+   [text] (menu = null)} />
+   [placeholder] New dashboard name
+   [title] Reports written as markdown, with live SQL
+   [title] No dashboards yet
+   [desc] The dashboard and its open tab are removed. This cannot be u
+   [label] {dashboard.name} options
+   [aria] {dashboard.name} options
+
+📄 src/lib/components/dashboard/MarkdownDashboard.svelte
+   [text] inputs?: InputsStore
+    inputValues?: ReadonlyMap
+   [text] }
+
+  let { blocks, results, inputs, inputValues }: Props = $
+   [text] {#if blocks.length === 0}
+   [text] An empty page. Switch to Edit and start writing.
+   [text] {:else}
+   [text] {#each blocks as block, index (index)}
+   [text] {/each}
+
+📄 src/lib/components/dashboard/ShareDashboardDialog.svelte
+   [text] | null>(null)
+  let copied = $state
+   [text] (null)
+  let copiedTimer: ReturnType
+   [text] (copied = null), 1500)
+    toast.success('Link copied')
+  }
+   [text] {#each ROLES as role (role.mode)}
+      {@const Icon = role.
+   [text] {role.title}
+   [text] {#if copied === role.mode}
+   [text] {:else}
+   [text] {/if}
+   [text] {role.caption}
+   [text] {/each}
+
+    {#if onsharelive}
+   [text] Start a live session
+   [title] Share “{dashboard.name}”
+
+📄 src/lib/components/duck-brain/AssistantMessage.svelte
+   [text] segment.type).lastIndexOf('sql'))
+   [text] {#if sql}
+  {#if prose}
+   [text] {/if}
+   [text] {:else if segment.html?.trim()}
+   [text] {@html segment.html}
+
+📄 src/lib/components/duck-brain/BrainResultActions.svelte
+   [text] s.duckBrain.providerConfigs))
+
+  let busy = $state
+   [text] controller?.abort())
+  let consentOpen = $state(false)
+  let
+   [text] (null)
+  let menu = $state
+   [text] {#if !getUiConfig().hideBrain}
+   [text] {#if busy}
+   [text] Duck Brain is thinking...
+    {:else}
+   [text] Duck Brain
+    {/if}
+   [text] {/if}
+   [text] (menu = null)} />
+   [text] (consentOpen = false)}
+  >
+   [text] {destination}
+   [text] the query text and column names and types
+   [text] per-column counts, null counts and numeric min / max / mean
+   [text] This is asked every time. Nothing is sent if you cancel.
+   [text] {#snippet footer()}
+   [text] (consentOpen = false)}>Cancel
+   [text] Send and explain
+   [text] {/snippet}
+   [text] {#snippet markdown(content: string)}
+   [text] import('./MarkdownContent.svelte')} props={{ content }} />
+ 
+   [text] {outcome.sql}
+   [text] {/if}
+
+{#snippet applyFooter()}
+   [text] (outcome = null)}>Close
+   [text] Apply to editor
+   [title] Send sample rows to {destination}?
+   [label] Stop Duck Brain
+   [aria] Stop Duck Brain
+
+📄 src/lib/components/duck-brain/DuckBrainCodeBlock.svelte
+   [text] () => clearTimeout(copiedTimer))
+   [text] {sql}
+   [text] {#if copied}
+   [text] Copied
+        {:else}
+   [text] {#if oninsert}
+   [text] oninsert(sql)}>
+   [text] {/if}
+
+      {#if onopenintab}
+   [text] onopenintab(sql)}>
+   [text] New tab
+   [text] {/if}
+
+      {#if onexecute}
+   [text] {#if running}
+   [text] Running...
+          {:else}
+   [text] Run
+          {/if}
+   [text] {/if}
+   [text] {#if queryResult && queryResult.status !== 'pending'}
+   [title] Replace the query in the current SQL tab
+   [title] Open this query in a new SQL tab
+
+📄 src/lib/components/duck-brain/DuckBrainInput.svelte
+   [text] ([])
+  let activeIndex = $state(0)
+  let mentionStart = $sta
+   [text] (null)
+  let scrollTop = $state(0)
+  let textarea = $state
+   [text] (null)
+  let form = $state
+   [text] {
+    e.preventDefault()
+    submit()
+  }}
+>
+   [text] {#if hasMentions}
+   [text] {#each parts as part}{#if part.type === 'mention'}
+   [text] @{part.value}
+   [text] {:else}{part.value}{/if}{/each}
+   [text] {/if}
+   [text] (scrollTop = e.currentTarget.scrollTop)}
+    >
+   [text] void insertSuggestion(suggestion)}
+    />
+   [text] {#if generating}
+   [text] onabort?.()}>
+   [text] {:else}
+   [text] {#if disabled}
+   [text] {#if baselineTokens !== undefined}
+   [label] Message Duck Brain
+   [label] Stop generating
+   [label] Send message
+   [aria] Message Duck Brain
+   [aria] Stop generating
+   [aria] Send message
+
+📄 src/lib/components/duck-brain/DuckBrainMessages.svelte
+   [text] (null)
+  let inner = $state
+   [text] {#if messages.length === 0 && !generating}
+   [text] Hi! I'm Duck Brain
+   [text] Ask me to write SQL queries for your data
+   [text] {:else}
+   [text] {#each messages as message (message.id)}
+   [text] {#if message.role === 'assistant'}
+   [text] {/if}
+   [text] {#if message.role === 'user'}
+   [text] {#if part.isColumn}
+   [text] {/if}{part.value}
+   [text] {:else}{part.value}{/if}{/each}
+   [text] {formatTime(message.timestamp)}
+   [text] {/each}
+
+        {#if generating}
+   [text] {#if streamingContent}
+   [text] {#if !pinned}
+   [label] Duck Brain is thinking
+   [aria] Duck Brain is thinking
+
+📄 src/lib/components/duck-brain/DuckBrainPanel.svelte
+   [text] {#snippet centered(body: Snippet)}
+   [text] {@render body()}
+   [text] {/snippet}
+   [text] Duck Brain
+   [text] {#if view === 'chat' && messages.length > 0}
+   [text] duckActions().clearBrainMessages()}>
+   [text] {/if}
+   [text] {#if view === 'no-webgpu'}
+    {#snippet body()}
+   [text] WebGPU Not Supported
+   [text] Initialize Duck Brain
+   [text] Model:
+   [text] {DEFAULT_MODEL.displayName}
+   [text] Size:
+   [text] {DEFAULT_MODEL.size}
+   [text] First load downloads the model. Future loads use cache.
+   [text] No AI configured yet
+   [text] {#if !getUiConfig().hideSettings}
+   [text] Open AI settings
+   [text] {downloadStatus || `${downloadProgress}%`}
+   [text] Failed to Load Model
+   [text] {error || 'An unknown error occurred'}
+   [text] Try Again
+   [text] {/snippet}
+    {@render centered(body)}
+  {:else}
+   [text] {#if availableProviders.length > 1}
+   [text] {:else}
+   [text] {#if providerDisplayInfo.isCloud}
+   [text] {providerDisplayInfo.name}
+   [text] {#if switchableModels && activeModelId}
+   [placeholder] Ask Duck Brain... (@ for tables)
+   [title] Clear chat
+   [label] Clear chat
+   [label] Close Duck Brain
+   [label] Model download
+   [aria] Clear chat
+   [aria] Close Duck Brain
+   [aria] Model download
+
+📄 src/lib/components/duck-brain/DuckBrainSheet.svelte
+   [text] {#if open}
+
+📄 src/lib/components/duck-brain/MarkdownContent.svelte
+   [text] {#if html}
+   [text] {@html html}
+
+📄 src/lib/components/duck-brain/ResultsArtifact.svelte
+   [text] {#if queryResult.status === 'running'}
+   [text] Executing query...
+   [text] {:else if queryResult.status === 'error'}
+   [text] Query failed
+   [text] {queryResult.error || 'Unknown error occurred'}
+   [text] {#if onretry}
+   [text] {/if}
+   [text] {:else if result && table}
+   [text] {#if result.truncated}
+
+📄 src/lib/components/duck-brain/SchemaAutocomplete.svelte
+   [text] {
+    if (!list || activeIndex
+   [text] {#if open && suggestions.length > 0}
+   [text] {#if suggestion.type === 'table'}
+   [text] {:else}
+   [text] {/if}
+   [text] {suggestion.name}
+   [text] {:else if suggestion.columnType}
+   [text] {suggestion.columnType}
+   [text] {/each}
+   [label] Tables and columns
+   [aria] Tables and columns
+
+📄 src/lib/components/duck-brain/StreamingMarkdown.svelte
+   [text] () => cancelAnimationFrame(frame))
+   [text] {#each blocks as html, i (i)}
+   [text] {@html html}
+   [text] {/each}
+   [text] {@html tailHtml}
+
+📄 src/lib/components/editor/ExplainPlanViewer.svelte
+   [text] upper.includes(key))?.[1] ?? '' }
+    }),
+  )
+   [text] {#if explainText.trim()}{#each lines as line}
+   [text] {line.text}
+   [text] {/each}{:else}No explain plan available{/if}
+   [desc] Query execution plan from DuckDB
+
+📄 src/lib/components/editor/ExportMenu.svelte
+   [text] !!s.db && !!s.connection))
+
+  let menu = $state
+   [title] Export the rows shown in the grid
+
+📄 src/lib/components/editor/QueryParamsBar.svelte
+   [text] {#if names.length > 0}
+  {#if params.disabled}
+   [text] `$${name}`).join(', ')} run as written
+   [text] {:else}
+   [text] ${name}
+   [text] setValue(name, e.currentTarget.value)}
+          />
+   [text] toggleText(name)}
+          >
+            {asText ? 'abc' : 
+   [text] {/each}
+   [text] ({ ...current, disabled: true }))}
+      >
+        Turn off
+   [label] Query parameters
+   [label] Value for ${name}
+   [aria] Query parameters
+   [aria] Value for ${name}
+
+📄 src/lib/components/editor/ResultCompareDialog.svelte
+   [text] {#snippet rowsGrid(rows: Record
+   [text] 0}
+    {@const grid = rowsToGrid(rows)}
+   [text] {:else}
+   [text] {empty}
+   [text] {/if}
+{/snippet}
+   [text] {#if pins.length === 0 || (pins.length
+   [text] {$t('compare.before')}
+   [text] {$t('compare.after')}
+   [text] {#if commonColumns.length > 0}
+   [text] Key columns. None selected compares whole rows.
+   [text] toggleKey(column)}
+              >
+                {column}
+   [text] {/each}
+   [text] {/if}
+
+      {#if outcome && 'error' in outcome}
+   [text] {outcome.error}
+   [text] {/if}
+
+      {#if diff}
+   [text] = 0 ? '+' : ''}{diff.rowCount.delta.toLocaleString()})
+   [text] +{diff.rows.added.length.toLocaleString()} added
+   [text] −{diff.rows.removed.length.toLocaleString()} removed
+   [text] {#if diff.rows.mode === 'keyed'}
+   [text] ~{diff.rows.changed.length.toLocaleString()} changed
+   [text] {/if}
+   [text] {diff.rows.unchangedCount.toLocaleString()} unchanged
+   [text] {#if isIdentical(diff)}
+   [text] {$t('compare.identical')}
+   [text] {#if diff.partial}
+   [text] 0 || diff.rows.duplicateKeys.right > 0}
+   [text] (view = id)} variant="segmented" />
+   [text] {$t('compare.noChangedRows')}
+   [text] changedShown.length}
+   [text] {#each changedShown as row}
+   [text] {#if isChanged}
+   [text] {formatCell(row.before[column])}
+   [text] {formatCell(row.after[column])}
+   [text] {#each schema.added as c (c.name)}
+   [text] + {c.name} {c.type}
+   [text] − {c.name} {c.type}
+   [text] ~ {c.name}: {c.from || '?'} → {c.to || '?'}
+   [text] {$t('compare.columnOrderDiffers')}
+   [text] {/if}
+    {/if}
+
+    {#if pins.length > 0}
+   [text] {$t('compare.pinnedResults', { values: { count: pins.length 
+   [text] {#each [...pins].reverse() as pin (pin.id)}
+   [text] {pinLabel(pin)}
+   [text] duckActions().removeResultPin(pin.id)}>
+   [title] Remove pin
+   [label] Remove pin
+   [aria] Remove pin
+
+📄 src/lib/components/editor/ResultGrid.svelte
+   [text] (null)
+  let filters = $state
+   [text] {#if engineBusy}
+   [text] {/if}
+   [text] *]:shrink-0">
+   [text] {#if inEngine}
+   [text] {formatNumber(shown.length)}
+   [text] of {formatNumber(data.length)} rows
+      {:else}
+   [text] {formatNumber(data.length)}
+   [text] {data.length === 1 ? 'row' : 'rows'}
+      {/if}
+   [text] {meta.length} {meta.length === 1 ? 'column' : 'columns'}
+   [text] {#if durationMs !== undefined}
+   [text] {formatQueryTime(durationMs)}
+   [text] {/if}
+
+    {#if inEngine}
+   [text] over the full result
+   [text] {/if}
+
+    {#if selectedCells > 0}
+   [text] {/if}
+
+    {#if narrowed}
+   [text] {/if}
+
+    {#if !compact}
+   [text] {#if search}
+   [text] (search = '')} aria-label="Clear search">
+   [text] Column stats
+   [text] c.name)} filteredRows={() => gridToRows(meta, shown)} />
+   [placeholder] Search rows
+   [title] Clear search and filters
+   [title] Thousands separators in numbers
+   [label] Search rows
+   [label] Clear search
+   [aria] Search rows
+   [aria] Clear search
+
+📄 src/lib/components/editor/ResultPanel.svelte
+   [text] /** Buttons on the right of the view switcher. */
+    action
+   [text] v.id === activeView))
+   [text] {#if executing}
+   [text] {#if progress && progress.elapsedMs > 1000}
+   [text] · {(progress.elapsedMs / 1000).toFixed(1)}s
+   [text] {/if}
+   [text] {#if progress?.columns?.length}
+   [text] {#each progress.columns.slice(0, 15) as name (name)}
+   [text] {name}
+   [text] {/each}
+   [text] {:else if !result}
+   [text] {:else if result.error}
+   [text] Query error
+   [text] {result.error}
+   [text] {#if errorActions}
+   [text] {@render errorActions(result)}
+   [text] {:else if result.data.length === 0}
+   [text] {:else if grid}
+   [text] {#if result.truncated}
+   [text] {:else if activeView === 'schema'}
+   [text] {:else}
+   [text] {#each views as v (v.id)}
+   [text] onviewchange(v.id)}
+        >
+   [text] {v.label}
+   [text] {/each}
+      {#if actions}
+   [text] {@render actions(result)}
+   [title] No results yet
+   [desc] Run a query to see its rows here.
+   [label] Result views
+   [aria] Result views
+
+📄 src/lib/components/editor/SchemaPanel.svelte
+   [text] Column Name
+   [text] {col.name}
+   [text] {col.type}
+   [text] {dt}
+   [text] {/each}
+
+📄 src/lib/components/editor/StatsPanel.svelte
+   [text] Null%
+   [text] {#each stats as col, i}
+   [text] {col.name}
+   [text] {col.displayType}
+   [text] {formatNumber(col.count)}
+   [text] {formatNumber(col.nulls)}
+   [text] {pct(col.nullPct)}
+   [text] {fmt(col.sum)}
+   [text] {/each}
+
+📄 src/lib/components/embed/EmbedFilters.svelte
+   [text] ({})
+  let selectOptions = $state.raw
+   [text] >({})
+  let filtering = $state(false)
+  let error = $state
+   [text] {label}
+   [text] {:else if param.type === 'search'}
+   [text] {:else}
+        {@const range = rangeOf(param.column)}
+   [text] {label} max
+   [text] {/if}
+   [text] {/each}
+  {#if hasActiveFilter}
+   [text] {/if}
+  {#if filtering}
+   [text] {#if error}
+   [text] {error}
+   [placeholder] Contains...
+
+📄 src/lib/components/embed/EmbedView.svelte
+   [text] s.maxResultRows))
+
+  let embed = $state.raw
+   [text] ({ status: 'loading' })
+  let liveChartConfig = $state.raw
+   [text] {
+      cancelled = true
+    }
+  })
+   [text] {#if embed.status === 'ready' && grid}
+   [text] {embed.title}
+   [text] {#if params.length > 0 && currentSession}
+   [text] {/if}
+   [text] (view = id)} size="sm" class="shrink-0 px-3" />
+   [text] {#if view === 'charts'}
+   [text] (liveChartConfig = config)}
+          />
+        {:else}
+   [text] {:else}
+   [text] {#if embed.status === 'loading' && engineError}
+   [text] DuckDB failed to start
+   [text] {engineError}
+   [text] {:else if embed.status === 'loading'}
+   [text] Running analysis...
+   [text] {:else if embed.status === 'needs-data'}
+   [text] This analysis needs data that isn't public
+   [text] read_parquet('https://...')
+   [text] ) embed fully.
+   [text] {:else if embed.status === 'error'}
+   [text] Query error
+   [text] {embed.message}
+   [text] Powered by Duck-UI
+   [text] Open in Duck-UI
+
+📄 src/lib/components/explorer/ColumnNode.svelte
+   [text] (null)
+  let distribution = $state.raw
+   [text] {column.name}
+   [text] {column.type}
+   [text] {#if open}
+   [text] {#if loading}
+   [text] Reading column statistics...
+   [text] {:else if failed}
+   [text] Could not read statistics for this column.
+   [text] {:else if !stats}
+   [text] No statistics available.
+   [text] {:else}
+   [text] {/if}
+   [label] {column.name} statistics
+   [aria] {column.name} statistics
+
+📄 src/lib/components/explorer/ColumnStatsBody.svelte
+   [text] value.toLocaleString(undefined, { maximumFractionDigits: dig
+   [text] {#snippet row(label: string, value: string)}
+   [text] {label}
+   [text] {value}
+   [text] {/snippet}
+
+{#if distribution?.kind === 'histogram' && histo
+   [text] {#each distribution.bins as count, i (i)}
+   [text] {/each}
+   [text] {stats.min}
+   [text] {stats.max}
+   [text] 0}
+  {@const top = distribution.values[0]?.count || 1}
+   [text] Top values
+   [text] {#each distribution.values as entry (entry.value)}
+   [text] {entry.value}
+   [text] {entry.count.toLocaleString()}
+   [text] {/if}
+   [text] {fillPercentage.toFixed(1)}%
+   [text] {#if numeric && stats.avg}
+   [text] {#if stats.q25 && stats.q50 && stats.q75}
+   [text] {/if}
+{:else if !numeric && stats.min && stats.max}
+   [text] {@render row('Min', stats.min)}
+    {@render row('Max', stat
+   [title] {count.toLocaleString()} rows
+
+📄 src/lib/components/explorer/ExplorerPanel.svelte
+   [text] (dropActive = false)}
+  ondrop={onDrop}
+>
+  {#if collapsed}
+   [text] {:else}
+   [text] {#if canImport}
+   [text] {/if}
+   [text] {#if !drawer}
+   [text] {#if fetchError}
+   [text] {:else if loading && databases.length === 0}
+   [text] {:else if databases.length === 0}
+   [text] (importerOpen = true) } : undefined}
+        />
+      {:else
+   [text] {#if canImport && foldersSupported}
+   [text] {/if}
+
+    {#if !drawer}
+   [text] setExplorerWidth(EXPLORER_DEFAULT_WIDTH)}
+    >
+   [text] {/if}
+  {/if}
+   [placeholder] Search tables and columns
+   [title] Import data
+   [title] Refresh schema
+   [title] Hide explorer (⌘B)
+   [title] Could not load schema
+   [title] No data yet
+   [label] Import data
+   [label] Refresh schema
+   [label] Hide explorer
+   [label] Search tables and columns
+   [label] Resize explorer
+   [aria] Import data
+   [aria] Refresh schema
+   [aria] Hide explorer
+   [aria] Search tables and columns
+   [aria] Resize explorer
+
+📄 src/lib/components/explorer/SchemaTree.svelte
+   [text] s.databases))
+
+  let expanded = $state
+   [text] >({})
+  let menu = $state
+   [text] (null)
+  let pendingDelete = $state
+   [text] toggle(db.name, true)}>
+   [text] {db.name}
+   [text] {db.tables.length}
+   [text] {#if dbOpen}
+   [text] {#if table.schema && table.schema !== 'main'}
+   [text] {table.schema}.
+   [text] {/if}{table.name}
+   [text] {formatCompactNumber(table.rowCount)}
+   [text] {#if tableOpen}
+   [text] {/each}
+   [text] {/if}
+   [text] {:else}
+   [text] No tables
+   [text] (menu = null)} />
+   [title] {table.schema}.{table.name}
+   [label] Database schema
+   [aria] Database schema
+
+📄 src/lib/components/folders/FileNode.svelte
+   [text] {#if entry.type === 'folder'}
+   [text] {#if loading}
+   [text] {:else if expanded}
+   [text] {:else}
+   [text] {/if}
+   [text] {entry.name}
+   [text] {#if expanded && children.length > 0}
+   [text] {#each children as child (child.path)}
+   [text] {/each}
+   [text] {/if}
+  {:else}
+    {@const file = entry}
+   [text] {#if spreadsheets.includes(extension)}
+   [text] {:else if json.includes(extension)}
+   [text] {:else if columnar.includes(extension)}
+   [text] {:else if databases.includes(extension)}
+   [text] {file.name}
+   [text] {formatBytes(file.size)}
+   [label] Import {file.name}
+   [aria] Import {file.name}
+
+📄 src/lib/components/folders/FolderBrowser.svelte
+   [text] (null)
+  let popover = $state.raw
+   [text] {#if canImport}
+  {#if !isFileSystemSupported}
+   [text] File System Access not supported.
+   [text] Use Chrome or Edge 86+.
+   [text] {:else}
+   [text] {#if mountedFolders.length > 0}
+   [text] {#each mountedFolders as folder (folder.id)}
+   [text] {/each}
+   [text] No folders mounted
+   [text] Add folder
+   [text] {/if}
+   [text] (menu = null)} />
+   [title] Add folder
+   [label] Add folder
+   [aria] Add folder
+
+📄 src/lib/components/folders/ImportOptionsPopover.svelte
+   [text] {#if open}
+   [text] Import options
+   [text] {fileName}
+   [text] e.key === 'Enter' && submit()}
+      />
+   [text] (importMode = mode)} />
+   [text] {importMode === 'table' ? 'Import' : 'Link'}
+   [placeholder] table_name
+   [label] Import options for {fileName}
+   [aria] Import options for {fileName}
+
+📄 src/lib/components/folders/MountedFolderNode.svelte
+   [text] {#if loading}
+   [text] {:else if expanded}
+   [text] {:else}
+   [text] {/if}
+   [text] {folder.name}
+   [text] {#if !folder.hasPermission}
+   [text] {#if expanded && files.length > 0}
+   [text] {#each files as entry (entry.path)}
+   [text] {/each}
+   [text] {/if}
+
+  {#if expanded && files.length === 0 && !loading}
+   [text] No supported files found
+   [title] Click to grant permission
+   [label] Permission required
+   [label] {folder.name} actions
+   [aria] Permission required
+   [aria] {folder.name} actions
+
+📄 src/lib/components/history/QueryHistoryPage.svelte
+   [text] s.queryHistory))
+
+  let entries = $state.raw
+   [text] ('all')
+  let copiedId = $state
+   [text] {#snippet meta()}
+    {#if total > 0}
+   [text] {formatNumber(total)}
+   [text] {/if}
+  {/snippet}
+  {#snippet actions()}
+   [text] (status = id as HistoryStatus)} variant="segmented" />
+   [text] (confirmOpen = true)} disabled={total === 0 && !filtered}>
+   [text] {/snippet}
+   [text] {#if loading}
+   [text] {:else if entries.length === 0}
+   [text] {:else}
+   [text] {#each entries as item (item.id)}
+   [text] {#if item.error}
+   [text] {/if}
+   [text] {clip(item.sql_text, 400)}
+   [text] {formatTimestamp(item.executed_at)}
+   [text] {#if item.duration_ms !== null}
+   [text] {formatQueryTime(item.duration_ms)}
+   [text] {clip(item.error.split('\n')[0], 200)}
+   [text] {#if copiedId === item.id}
+   [text] {/each}
+   [text] {#if entries.length
+   [text] {formatNumber(entries.length)} of {formatNumber(total)}
+   [text] {/if}
+  {/if}
+   [placeholder] Search queries and errors
+   [title] Every query this profile has run
+   [title] Open in a new tab
+   [title] Clear query history?
+   [desc] This permanently deletes the whole history of this profile, 
+   [label] Search history
+   [label] Open in a new tab
+   [aria] Search history
+   [aria] Open in a new tab
+
+📄 src/lib/components/importer/CsvOptionsPanel.svelte
+   [text] parseInt(raw, 10) || undefined
+   [text] {showOptions ? 'Hide options' : 'Show options'}
+   [text] {#if showOptions}
+   [text] {#each toggles as toggle (toggle.key)}
+   [text] {toggle.label}
+   [text] {/each}
+   [text] onchange('delimiter', e.currentTarget.value)}
+        />
+   [text] Advanced options
+   [text] onchange('quote', e.currentTarget.value)}
+            />
+   [text] onchange('escape', e.currentTarget.value)}
+            />
+   [text] onchange('skip', toCount(e.currentTarget.value))}
+          
+   [text] onchange('nullStr', e.currentTarget.value)}
+          />
+   [text] onchange('dateFormat', e.currentTarget.value)}
+            /
+   [text] onchange('timestampFormat', e.currentTarget.value)}
+        
+   [text] {/if}
+   [placeholder] Delimiter character
+   [placeholder] Empty values treated as NULL
+   [placeholder] ISO 8601
+   [label] Quote character
+   [label] Escape character
+   [label] Skip rows
+   [label] Sample size
+   [label] NULL string
+   [label] Date format
+   [label] Timestamp format
+
+📄 src/lib/components/importer/ErrorAlertList.svelte
+   [text] {#if warning}
+   [text] {:else}
+   [text] {/if}
+        {warning ? 'Warning' : 'Error'}
+   [text] {#if suggestion}
+   [text] Suggestion:
+   [text] {suggestion}
+   [text] {/if}
+   [text] {/each}
+
+📄 src/lib/components/importer/FileDetails.svelte
+   [text] {file.name}
+   [text] {formatFileSize(file.size)}
+   [text] {lastModified}
+   [text] {fileType}
+   [text] {#if status.status === 'error'}
+   [text] {/if}
+   [text] ontablenamechange(e.currentTarget.value)}
+        />
+   [text] {#if fileType === 'csv' && csvOptions}
+   [text] Uploading... {status.progress}%
+   [text] {/if}
+
+      {#if status.status === 'success'}
+   [text] Successfully imported
+   [text] {/if}
+
+      {#if status.status === 'error' && status.error}
+   [text] {status.error}
+   [placeholder] Enter table name
+   [title] File size
+   [title] Last modified
+   [title] Remove file
+   [label] Retry {file.name}
+   [label] Remove {file.name}
+   [label] Table name
+   [label] Upload progress for {file.name}
+   [aria] Retry {file.name}
+   [aria] Remove {file.name}
+   [aria] Upload progress for {file.name}
+
+📄 src/lib/components/importer/FileImporter.svelte
+   [text] ([])
+  let importMode = $state
+   [text] {#if url.isPreviewMode && url.previewData}
+   [text] {:else}
+   [text] (activeTab = id)} />
+      {#if activeTab === 'upload'}
+   [text] (importMode = mode)} {errors} />
+      {:else if activeTab =
+   [text] (importMode = mode)} {errors} />
+      {:else}
+   [text] (importMode = mode)} {errors} />
+      {/if}
+    {/if}
+
+📄 src/lib/components/importer/ImportModeSwitch.svelte
+   [text] {#each options as option (option.mode)}
+   [text] onchange(option.mode)}
+    >
+   [text] {option.text}
+   [text] {/each}
+
+📄 src/lib/components/importer/PreviewPanel.svelte
+   [text] 50 ? `...${url.previewFileName.slice(-47)}` : url.previewFil
+   [text] Preview: {shortName}
+   [text] Table name:
+   [text] {url.previewTableName}
+   [text] {#if url.isUrlImporting}
+        Importing...
+      {:else}
+   [text] Import table
+      {/if}
+   [text] {#if errors.length > 0}
+   [text] {/if}
+
+📄 src/lib/components/importer/QueryTab.svelte
+   [text] Import from query result
+   [text] Save as
+   [text] Example queries
+   [text] {#each examples as example (example.label)}
+   [text] {example.label}
+   [text] {example.sql}
+   [text] {/each}
+   [text] {#if errors.length > 0}
+   [text] {/if}
+   [text] {#if query.isQueryImporting}
+      Executing query...
+    {:
+   [text] Execute and import
+    {/if}
+   [placeholder] my_table
+   [label] Save as
+
+📄 src/lib/components/importer/SchemaEditor.svelte
+   [text] Schema customization
+   [text] Customize column names, types, and visibility before importi
+   [text] {#if url.isSchemaCustomizing}
+   [text] Hide
+      {:else}
+   [text] Customize
+      {/if}
+   [text] Original name
+   [text] New name
+   [text] {#each url.schemaColumns as col (col.originalName)}
+   [text] {col.originalName}
+   [text] {/each}
+   [text] {/if}
+   [placeholder] Column name
+   [label] Include {col.originalName}
+   [aria] Include {col.originalName}
+
+📄 src/lib/components/importer/UploadTab.svelte
+   [text] {#if local.isDragActive}
+   [text] {$t('upload.dropHere')}
+   [text] {:else}
+   [text] {$t('upload.dragOr')}
+   [text] fileInput?.click()}>{$t('common.selectFiles')}
+   [text] {$t('upload.supportedFormats')}
+   [text] {$t('upload.maxFileSize')} {formatFileSize(MAX_FILE_SIZE)}
+   [text] {/if}
+   [text] {#if local.hasFilesToImport}
+   [text] {$t('upload.filesToImport')}
+   [text] {$t('common.mode')}:
+   [text] {#if importMode === 'view'}
+   [text] {$t('upload.viewModeHint')}
+   [text] {/if}
+      {#each local.files as file (file.name)}
+   [text] local.retryFileUpload(file.name)}
+        />
+      {/each}
+   [text] {/if}
+
+  {#if errors.length > 0}
+   [text] {/if}
+
+  {#if local.hasFilesToImport}
+   [text] {#if local.isUploading}
+   [text] {$t('common.cancel')}
+
+📄 src/lib/components/importer/UrlTab.svelte
+   [text] Import from URL
+   [text] Import mode
+   [text] {#if errors.length > 0}
+   [text] {/if}
+   [text] {#if url.isPreviewing}
+        Loading preview...
+      {:el
+   [text] Preview
+      {/if}
+   [text] {#if url.isUrlImporting}
+        Importing...
+      {:else}
+   [text] Import directly
+      {/if}
+   [placeholder] my_table
+   [label] File URL
+
+📄 src/lib/components/layout/CommandPalette.svelte
+   [text] void
+  }
+
+  const GROUP_LABEL: Record
+   [text] s.currentProfileId))
+
+  let savedQueries = $state.raw
+   [text] ([])
+  let recentQueries = $state.raw
+   [text] {#if open}
+   [text] {#if flat.length === 0}
+   [text] No match for "{query}"
+   [text] {:else}
+          {#each grouped as g (g.group)}
+   [text] {GROUP_LABEL[g.group]}
+   [text] {g.items.length}
+   [text] (selectedIdx = idx)}
+              >
+   [text] {item.label}
+   [text] {#if item.sub}
+   [text] {item.sub}
+   [text] {/if}
+   [text] {#if item.shortcut}
+   [text] {item.shortcut}
+   [text] {/each}
+          {/each}
+        {/if}
+   [text] navigate ·
+   [text] run ·
+   [placeholder] Search tables, tabs and actions
+   [label] Command menu
+   [label] Search tables, tabs and actions
+   [aria] Command menu
+   [aria] Search tables, tabs and actions
+
+📄 src/lib/components/layout/ContextPanel.svelte
+   [text] {#snippet pageNav()}
+   [text] {group.label}
+   [text] {meta.label}
+   [text] 0}
+            {@const current = getSection()}
+   [text] {#each sections as s (s.id)}
+   [text] {s.label}
+   [text] {/each}
+   [text] {/if}
+        {/each}
+   [text] {#if group.id === 'settings'}
+   [text] v{__DUCK_UI_VERSION__}
+   [text] {/if}
+   [text] {/snippet}
+
+{#if mobile}
+   [text] {#if isDrawerOpen()}
+   [text] {#if isOnWorkspace()}
+   [text] {:else}
+        {@render pageNav()}
+      {/if}
+   [text] {/if}
+{:else}
+   [text] {#if !isOnWorkspace()}
+   [text] {@render pageNav()}
+
+📄 src/lib/components/layout/PageRouter.svelte
+   [text] > }>
+
+  const PAGES: Record
+   [text] {#key route}
+  {#if route !== 'workspace'}
+
+📄 src/lib/components/layout/Shell.svelte
+   [text] {#if !isOnWorkspace()}
+   [text] {/if}
+   [text] (dropEdge = null)}
+    ondrop={onTabDrop}
+  >
+   [text] {#if split}
+   [text] {#if dropEdge}
+   [text] (dropEdge = null)} />
+
+{#if resizing}
+   [text] {#if brainRequested}
+   [text] import('../duck-brain/DuckBrainSheet.svelte')} props={{}} />
+   [label] Resize panes
+   [aria] Resize panes
+
+📄 src/lib/components/layout/Sidebar.svelte
+   [text] {#snippet marker()}
+   [text] {/snippet}
+   [text] {#if mobile}
+   [text] {/if}
+   [text] {#if !mobile}
+   [text] {#if activeGroup.id === 'query'}{@render marker()}{/if}
+   [text] openGroup(group)}>
+        {#if active}{@render marker()}{/i
+   [text] {:else}
+   [text] {#if active}{@render marker()}{/if}
+   [text] {/if}
+  {/each}
+
+  {#if !mobile}
+   [text] {/if}
+
+  {#if !mobile}
+   [text] {/if}
+
+  {#if isUpdateAvailable()}
+   [text] {#if getTheme() === 'dark'}
+   [text] {#if profile && settingsGroup}
+   [title] Open panel
+   [title] Search or run a command (⌘K)
+   [title] Query workspace (⌥N for a new query)
+   [title] A new version of Duck-UI is ready. Click to reload into it
+   [title] Toggle theme
+   [label] Open panel
+   [label] Command menu
+   [label] Toggle theme
+   [label] Profile: {profile.name}
+   [aria] Open panel
+   [aria] Command menu
+   [aria] Toggle theme
+   [aria] Profile: {profile.name}
+
+📄 src/lib/components/layout/TabBar.svelte
+   [text] s.executingTabs))
+
+  let dragId = $state
+   [text] (null)
+  let dropId = $state
+   [text] (null)
+  let renamingId = $state
+   [text] onDrop(e, tab)}
+        ondragend={onDragEnd}
+      >
+   [text] {#if !home}
+          {#if renamingId === tab.id}
+   [text] e.stopPropagation()}
+            />
+          {:else}
+   [text] {tab.title}
+   [text] {/if}
+          {#if isRunning(tab.id)}
+   [text] {/if}
+   [text] {/each}
+   [title] New query (⌥N)
+   [title] New notebook
+   [label] Tab name
+   [label] Close {tab.title}
+   [label] New query
+   [label] New notebook
+   [aria] Tab name
+   [aria] Close {tab.title}
+   [aria] New query
+   [aria] New notebook
+
+📄 src/lib/components/layout/TabContent.svelte
+   [text] focus(tab.id)}
+  >
+    {#if tab.type === 'home'}
+   [text] {:else if tab.type === 'sql'}
+   [text] {:else if tab.type === 'notebook'}
+   [text] {:else if tab.type === 'table'}
+   [text] {:else if tab.type === 'dashboard'}
+   [text] goTo('live') }} />
+    {/if}
+
+📄 src/lib/components/map/GeoMapView.svelte
+   [text] contributors'
+
+  let maplibrePromise: Promise
+   [text] (null)
+  let map: MapLibreMap | null = null
+  let selectedCo
+   [text] (undefined)
+  let mapReady = $state(false)
+  let mapError = 
+   [text] {#if geometryColumns.length > 1}
+   [text] Geometry column
+   [text] (selectedColumn = value)}
+      />
+    {:else}
+   [text] {column}
+   [text] {/if}
+   [text] {featureCount.toLocaleString()} {featureCount === 1 ? 'featu
+   [text] {#if conversion.skipped > 0}
+   [text] {conversion.skipped.toLocaleString()} not drawn
+   [text] {/if}
+    {#if result.truncated}
+   [text] first {result.rowCount.toLocaleString()} rows
+   [text] {/if}
+    {#if basemapOff}
+   [text] Basemap unavailable, offline view
+   [text] {#if mapError}
+   [text] The map couldn't be displayed.
+   [text] {mapError}
+   [text] {:else if !mapReady}
+   [text] Loading map…
+
+📄 src/lib/components/notebook/AddCellMenu.svelte
+   [text] {@render children()}
+
+📄 src/lib/components/notebook/CellResults.svelte
+   [text] {#snippet failed(error: unknown, reset: () => void)}
+   [text] {error instanceof Error ? error.message : 'Render error'}
+   [text] {/snippet}
+   [text] (view = id)} variant="segmented" size="sm" />
+   [text] {#if view === 'chart'}
+   [text] {:else}
+   [text] {/if}
+
+📄 src/lib/components/notebook/NotebookCell.svelte
+   [text] {#if cellType === 'sql'}
+   [text] PY
+      {:else if cellType === 'markdown'}
+   [text] MD
+      {:else}
+        {cellType.toUpperCase()}
+      {/if
+   [text] {#if running && pythonLive?.status}
+   [text] {pythonLive.status}
+   [text] {/if}
+   [text] [{cellIndex + 1}]
+   [text] {#if cellType === 'python' && running}
+   [text] {#if isCode}
+   [text] {#if running}
+   [text] {:else}
+   [text] {/if}
+
+      {#if canCollapse}
+   [text] duckActions().removeNotebookCell(tabId, cell.id)}
+        di
+   [text] {#if isCodeCell(cellType)}
+   [text] {:else if !isKnownCellType(cellType)}
+   [text] {cell.content}
+   [text] {:else if editing}
+   [text] {#if markdownHtml}
+   [text] {@html markdownHtml}
+   [text] Empty markdown cell. Click to edit.
+   [text] {#if sqlResult && !cell.collapsed}
+   [text] {#if sqlResult.error}
+   [text] {sqlResult.error}
+   [text] {:else if sqlResult.data.length > 0}
+   [text] {/if}
+
+  {#if hasPythonOutput && !cell.collapsed}
+   [placeholder] Write markdown here...
+   [title] Change cell type
+   [title] Run cell (Shift+Enter)
+   [label] Cell type {cellType}. Click to change
+   [label] Run cell
+   [label] Move cell up
+   [label] Move cell down
+   [label] Edit markdown cell {cellIndex + 1}
+   [aria] Cell type {cellType}. Click to change
+   [aria] Run cell
+   [aria] Move cell up
+   [aria] Move cell down
+   [aria] Edit markdown cell {cellIndex + 1}
+
+📄 src/lib/components/notebook/NotebookTab.svelte
+   [text] listParameterNames(cell.content))),
+  ])
+
+  const runningCel
+   [text] ()
+  let pythonLive = $state
+   [text] cell.type === 'python' && runningCells.has(cell.id)))
+  cons
+   [text] {#each cells as cell, index (cell.id)}
+   [text] {/each}
+
+📄 src/lib/components/notebook/NotebookToolbar.svelte
+   [text] {#if !running}
+   [text] {/if}
+    {running ? 'Running...' : 'Run All'}
+   [text] Add Cell
+   [text] {#if kernel}
+   [text] {kernelLabel}
+   [text] {/if}
+   [text] {cellCount} cell{cellCount !== 1 ? 's' : ''}
+
+📄 src/lib/components/notebook/PythonOutput.svelte
+   [text] {#if stdout}
+   [text] {stdout}
+   [text] {/if}
+  {#if stderr}
+   [text] {stderr}
+   [text] {/if}
+  {#if output?.error}
+   [text] {output.error}
+   [text] {/if}
+  {#if output?.text !== undefined}
+   [text] {output.text}
+   [text] {/if}
+  {#if output?.table}
+    {#if output.table.data.lengt
+   [text] {#if output.table.truncated}
+   [text] {/if}
+    {:else}
+   [text] Empty DataFrame ({output.table.columns.length} columns).
+   [text] {/if}
+  {/if}
+  {#each output?.images ?? [] as image, index 
+   [text] {/each}
+  {#if isEmpty}
+   [text] {/if}
+
+📄 src/lib/components/profile/ProfileAvatar.svelte
+   [text] {#if avatarEmoji === 'logo'}
+   [text] {:else}
+   [text] {avatarEmoji}
+
+📄 src/lib/components/profile/ProfileEditor.svelte
+   [text] 0 && password.length
+   [text] {#each AVATAR_OPTIONS as option}
+   [text] (avatarEmoji = option)}
+        >
+   [text] {/each}
+   [text] {#if mode === 'create'}
+   [text] Password protection
+   [text] {#if passwordEnabled}
+   [text] {/if}
+  {/if}
+   [text] {#if oncancel}
+   [text] {/if}
+   [text] {mode === 'create' ? 'Create profile' : 'Save'}
+   [placeholder] Your name
+   [label] Confirm password
+
+📄 src/lib/components/profile/ProfilePicker.svelte
+   [text] {profiles.length === 0 ? 'Welcome to Duck-UI' : 'Choose prof
+   [text] {#if error}
+   [text] {error}
+   [text] {/if}
+
+    {#if profiles.length > 0}
+   [text] {#each profiles as profile (profile.id)}
+   [text] {profile.name}
+              {#if profile.hasPassword}
+   [text] {/if}
+   [text] Active {formatRelativeTime(profile.lastActive)}
+   [text] {/each}
+   [text] {#if busy}
+   [text] (creating = true)} disabled={busy}>
+   [text] New profile
+   [text] {:else}
+   [text] (creating = true)}>
+   [text] (creating = false)}>
+   [text] (creating = false)} />
+   [text] (locked = null)}
+>
+   [text] (locked = null)}>Cancel
+   [title] New profile
+   [desc] Enter the profile password.
+   [label] Password protected
+   [aria] Password protected
+
+📄 src/lib/components/saved-queries/SaveQueryDialog.svelte
+   [text] {#snippet footer()}
+   [text] {/snippet}
+   [placeholder] Query name
+   [placeholder] What does this query do?
+   [title] Save query
+   [label] Description (optional)
+
+📄 src/lib/components/saved-queries/SavedQueriesPage.svelte
+   [text] s.savedQueriesVersion))
+
+  let queries = $state.raw
+   [text] ([])
+  let loading = $state(true)
+  let editingId = $state
+   [text] (sql.length > 100 ? `${sql.slice(0, 100)}...` : sql)
+   [text] {#snippet meta()}
+    {#if queries.length > 0}
+   [text] {queries.length}
+   [text] {/if}
+  {/snippet}
+   [text] {#if loading}
+   [text] {:else if queries.length === 0}
+   [text] {:else}
+   [text] {#each queries as query (query.id)}
+   [text] {#if editingId === query.id}
+   [text] onRenameKeydown(e, query.id)}
+              />
+   [text] {preview(query.sql_text)}
+   [text] openQuery(query)}>
+   [text] {query.name}
+   [text] {formatRelativeTime(query.updated_at)}
+   [text] {/if}
+   [text] openMenu(e, query)}
+          >
+   [text] {/each}
+   [title] Saved queries
+   [title] Queries you kept for later
+   [title] No saved queries yet
+   [desc] Save a query from the editor toolbar and it shows up here.
+   [label] Rename {query.name}
+   [label] {query.name} options
+   [aria] Rename {query.name}
+   [aria] {query.name} options
+
+📄 src/lib/components/settings/AISettings.svelte
+   [text] s.duckBrain))
+  const aiProvider = $derived
+   [text] >({})
+  let apiKeys = $state
+   [text] {#snippet keyToggle(id: string)}
+   [text] (showKey[id] = !showKey[id])}
+  >
+    {#if showKey[id]}
+   [text] {:else}
+   [text] {/if}
+   [text] {/snippet}
+   [text] {#each providers as provider (provider.value)}
+   [text] duckActions().setAIProvider(provider.value)}
+          >
+   [text] {provider.label}
+   [text] {/each}
+   [text] {#if aiProvider === 'openai-compatible'}
+   [text] {#each LOCAL_PRESETS as preset (preset.label)}
+   [text] {preset.label}
+   [text] (foundModels = null)}
+            />
+   [text] {#if !listing}
+   [text] {/if}
+                Find models
+   [text] {#if foundModels && foundModels.length > 0}
+   [text] (optional)
+   [text] {@render keyToggle('compatible')}
+   [text] {testing ? 'Testing connection...' : 'Test & save'}
+   [text] {#if compatible?.baseUrl && compatible?.modelId}
+   [text] Using {compatible.modelId}
+   [text] OLLAMA_ORIGINS=https://duckui.com
+   [text] (or your own origin). localhost works out of the box.
+   [text] {CLOUD_LABEL[provider]} API key
+   [text] {@render keyToggle(provider)}
+   [text] saveCloudKey(provider)}>
+                Save
+   [text] changeCloudModel(provider, value)}
+            />
+   [text] {#if providerConfigs[provider]?.apiKey}
+   [text] {/if}
+
+      {#if aiProvider === 'webllm'}
+   [text] Experimental.
+   [text] (webllmOpen = !webllmExpanded)}
+    >
+   [text] In-browser models (experimental)
+   [text] {#if webllmExpanded}
+   [text] {#if brain.isWebGPUSupported === false}
+   [text] {/if}
+
+        {#if isDownloading}
+   [text] {brain.downloadProgress}%
+   [text] {brain.downloadStatus}
+   [text] {brain.error}
+   [text] {model.displayName}
+   [text] {#if isActive}
+   [text] {model.description}
+   [text] {model.size}
+   [text] Context: {model.contextLength.toLocaleString()} tokens
+   [text] {:else if !isLoadingThis}
+   [text] Models cache in this browser's storage.
+   [text] {#if !clearing}
+   [text] {/if}
+            Clear cache
+   [placeholder] Pick a model
+   [placeholder] llama3.2, qwen2.5-coder, ...
+   [placeholder] Only if the server requires one
+   [title] Duck Brain provider
+   [label] Model download progress
+   [aria] Model download progress
+
+📄 src/lib/components/settings/ExtensionsPage.svelte
+   [text] s.currentSession?.id))
+   [text] {#snippet meta()}
+    {#if connection}
+   [text] {connection.name}
+   [text] {/if}
+  {/snippet}
+   [text] {#key sessionId ?? 'none'}
+   [text] {/key}
+   [title] DuckDB extensions for the active connection
+
+📄 src/lib/components/settings/ExtensionsSettings.svelte
+   [text] s.currentConnection?.name))
+
+  let extensions = $state.raw
+   [text] (null)
+  let loadError = $state
+   [text] (null)
+  let refreshing = $state(false)
+  let pending = $sta
+   [text] >({})
+  let unavailable = $state
+   [text] DuckDB extensions
+   [text] Extensions available to
+   [text] {connectionName ?? 'the active connection'}
+   [text] {#if readOnly}
+   [text] {/if}
+
+  {#if loadError}
+   [text] {loadError}
+   [text] {/if}
+
+  {#if extensions === null && !loadError}
+   [text] Loading extensions...
+   [text] {:else if extensions}
+   [text] Filter extensions
+   [text] {ext.name}
+   [text] {#if ext.loaded}
+   [text] {:else if ext.installed}
+   [text] {/if}
+              {#if unavailable[ext.name]}
+   [text] {/if}
+   [text] {#if ext.description}
+   [text] {ext.description}
+   [text] {#if !ext.installed}
+   [text] {#if busy !== 'install'}
+   [text] {/if}
+                Install
+   [text] {/if}
+            {#if !ext.loaded}
+   [text] run('load', ext.name)}
+              >
+                {#if 
+   [text] {/if}
+                Load
+   [text] {/each}
+      {#if visible.length === 0}
+   [text] No extensions match "{filter}".
+   [placeholder] Filter extensions...
+   [label] Refresh extension list
+   [aria] Refresh extension list
+
+📄 src/lib/components/settings/GeneralSettings.svelte
+   [text] {#each options as option (option.value)}
+   [text] changeTheme(option.value)}
+        />
+   [text] {option.label}
+   [text] {/each}
+   [desc] System follows the appearance set in your operating system.
+
+📄 src/lib/components/settings/PasswordDialog.svelte
+   [text] {profile.name}
+   [text] {#snippet footer()}
+   [text] {$t('common.cancel')}
+   [text] {$t('profile.unlock')}
+   [text] {/snippet}
+
+📄 src/lib/components/settings/PerformanceSettings.svelte
+   [text] s.maxResultRows))
+
+  let memoryLimitMb = $state
+   [text] (memoryLimitMb = Number(e.currentTarget.value))}
+      />
+   [text] (maxResultRowsDraft = Number(e.currentTarget.value))}
+      
+   [text] saveRangeReads(e.currentTarget.checked)}
+      />
+   [label] DuckDB memory limit (MB)
+   [label] Maximum rows per result
+   [label] Read remote files in ranges
+
+📄 src/lib/components/settings/ProfileSettings.svelte
+   [text] (null)
+  let showPassword = $state(false)
+  let pendingDelet
+   [text] {#if currentProfile}
+   [text] {#key currentProfile.id}
+   [text] {/key}
+   [text] {/if}
+   [text] {#snippet actions()}
+   [text] (showCreate = true)}>
+   [text] {/snippet}
+   [text] {#if otherProfiles.length > 0}
+   [text] {#each otherProfiles as profile (profile.id)}
+   [text] switchProfile(profile)}
+            >
+   [text] {profile.name}
+   [text] {/each}
+   [text] {:else}
+   [text] No other profiles yet.
+   [text] Danger Zone
+   [text] (showDeleteConfirm = true)}
+    >
+   [text] {#if profiles.length
+   [text] Cannot delete the only profile. Create another profile first
+   [text] (showDeleteConfirm = false)}
+/>
+   [text] (showCreate = false)}>
+   [text] (showCreate = false)} />
+   [text] {#if switchTarget}
+   [title] Your profile
+   [desc] Name and avatar shown across the app.
+   [desc] Each profile keeps its own connections, queries and settings
+
+📄 src/lib/components/settings/ProjectImportDialog.svelte
+   [text] s.currentProfileId))
+
+  let plan = $state.raw
+   [text] (null)
+  let error = $state
+   [text] (null)
+  let importing = $state(false)
+
+  const rows = $deri
+   [text] {#if error}
+   [text] {error}
+   [text] {:else if !plan}
+   [text] Reading...
+   [text] {:else if rows.length === 0}
+   [text] No queries, notebooks or dashboards found in this file.
+   [text] {:else}
+   [text] {#each rows as row, index (index)}
+   [text] {row.kind}
+   [text] {row.name}
+   [text] {/each}
+   [text] {/if}
+
+  {#snippet footer()}
+   [text] {/snippet}
+   [title] Import project
+
+📄 src/lib/components/settings/ProjectTransfer.svelte
+   [text] s.currentProfileId))
+
+  let inputEl = $state
+   [text] (null)
+  let importFile = $state
+   [text] Export saved queries, notebooks and dashboards as a zip of p
+   [text] .sql
+   [text] .md
+   [text] Export project
+   [text] inputEl?.click()}>
+   [text] Import project
+   [title] Project files
+   [label] Project zip file
+   [aria] Project zip file
+
+📄 src/lib/components/settings/SettingsPage.svelte
+   [text] s.id === section)?.label ?? '')
+   [text] {#if section === 'general'}
+   [text] {:else if section === 'ai'}
+   [text] {:else if section === 'performance'}
+   [text] {:else if section === 'project'}
+   [text] {:else}
+   [text] {/if}
+
+📄 src/lib/components/share/CopyField.svelte
+   [text] e.currentTarget.select()}
+  >
+   [text] {#if copied}
+   [text] {:else if !busy}
+   [text] {/if}
+
+📄 src/lib/components/share/DeepLinkLoader.svelte
+   [text] {#if request}
+   [text] {#each request.sources as source (source.url)}
+   [text] {source.url}
+   [text] → attaches as {source.name}
+   [text] {/each}
+   [text] {#if request.sql}
+   [text] {request.sql}
+   [text] {/if}
+   [text] {#snippet footer()}
+   [text] {/snippet}
+   [title] Open shared data?
+   [desc] This link wants to load remote data into your Duck-UI sessio
+
+📄 src/lib/components/share/ShareDialog.svelte
+   [text] (null)
+  let building = $state(false)
+  let copied = $state
+   [text] (null)
+  let params = $state.raw
+   [text] ([])
+  let badgeDataUrl = $state
+   [text] (null)
+  let badgeFormat = $state
+   [text] {#snippet chip(Icon: typeof Check, text: string)}
+   [text] {text}
+   [text] {/snippet}
+   [text] 1 ? 's' : ''}`)}
+      {/if}
+   [text] (section = id)} size="sm" />
+
+    {#if section === 'link'}
+   [text] links && copy(links.appUrl, 'link')}
+        />
+   [text] Share in chat or social. It opens the full Duck-UI editor.
+   [text] {:else if section === 'embed'}
+   [text] iframe, works anywhere
+   [text] links && copy(links.iframeSnippet, 'iframe')}
+          />
+   [text] {#if columns.length > 0}
+   [text] Interactive filters (optional)
+   [text] p.column === col.name)}
+   [text] toggleParam(col.name, col.type)}
+                    />
+   [text] {col.name}
+   [text] {#if active}
+   [text] Control for {col.name}
+   [text] {/if}
+   [text] {/each}
+   [text] {:else}
+   [text] Open in Duck-UI
+   [text] Data URL(s), comma separated
+   [text] {#if detectedSources.length === 0 && !badgeDataUrl}
+   [text] {/if}
+          {#if needsFormat}
+   [text] {#if deepLink && badgeMarkdown}
+   [text] Deep link
+   [text] Renders as
+   [text] {#if reproduces}
+   [text] Heads up: this query reads a
+   [text] locally-imported table
+   [text] read_parquet('https://...')
+   [title] Share this analysis
+   [desc] Anyone who opens this gets the query and chart, reconstructe
+   [label] share link
+   [label] iframe snippet
+   [label] deep link
+
+📄 src/lib/components/table/FilterPopover.svelte
+   [text] ('eq')
+  let value = $state('')
+  let panelEl = $state
+   [text] (null)
+  let inputEl = $state
+   [text] {column}
+   [text] {#each operators as op}
+   [text] {OPERATOR_LABELS[op]}
+   [text] {/each}
+   [text] {#if !isUnaryOperator(operator)}
+   [text] { if (e.key === 'Enter') apply() }}
+      />
+      {#if valu
+   [text] This column is numeric. Enter a number.
+   [text] {/if}
+    {/if}
+   [text] {#if current}
+   [text] {/if}
+   [label] Close filter
+   [aria] Close filter
+
+📄 src/lib/components/table/TableCell.svelte
+   [text] {#if isNull}
+   [text] {:else if displayType === 'bool'}
+   [text] {String(value)}
+   [text] {:else if isUrl}
+   [text] {formatted}
+   [text] {:else if displayType === 'json'}
+   [text] {:else if displayType === 'number' || displayType === 'date'
+   [text] {:else}
+   [text] {/if}
+
+📄 src/lib/components/table/TableHeader.svelte
+   [text] 0 ? (part / whole) * 100 : 0
+    return percent > 0 && perce
+   [text] {#if filled === 0}
+   [text] {stat.count > 0 ? 'all null' : ''}
+   [text] {:else if stat.bins}
+      {@const peak = Math.max(...stat.b
+   [text] {#each stat.bins as count, b (b)}
+   [text] 0 ? Math.max(12, (count / peak) * 100) : 0}%">
+   [text] {/each}
+   [text] {:else if stat.displayType === 'bool'}
+   [text] {:else if stat.top}
+      {@const peak = stat.top[0]?.count 
+   [text] {#each stat.top as entry (entry.value)}
+   [text] {:else if stat.distinct !== undefined}
+   [text] {formatNumber(stat.distinct)}{stat.distinctCapped ? '+' : ''
+   [text] {:else if stat.displayType === 'number' && stat.min !== unde
+   [text] all {num(stat.min)}
+   [text] {:else}
+   [text] {/if}
+    {#if stat.nulls > 0 && filled > 0}
+   [text] {share(stat.nulls, stat.count)} null
+   [text] {/if}
+   [text] {/snippet}
+   [text] onfitall?.()}
+      title="Double-click to auto-fit all colu
+   [text] {#each columns as col, i}
+   [text] {#if onsort}
+   [text] onsort?.(col.name)}
+            >
+   [text] {col.name}
+   [text] {compactTypeLabel(col.type)}
+   [text] {/if}
+              {/if}
+   [text] {#if onresize}
+   [title] {entry.value}: {formatNumber(entry.count)}
+   [title] Double-click to auto-fit all columns
+   [title] Drag to resize, double-click to auto-fit
+   [label] Values of {stat.name}: {describe(stat)}
+   [aria] Distribution of {stat.name}: {describe(stat)}
+   [aria] Share of true in {stat.name}: {describe(stat)}
+   [aria] Values of {stat.name}: {describe(stat)}
+
+📄 src/lib/components/table/VirtualTable.svelte
+   [text] ([])
+  let baseWidths = $state
+   [text] ([])
+  let manualTouched = $state
+   [text] ([])
+  let selection = $state.raw
+   [text] sum + w, 0)
+    if (available
+   [text] 0; i++) {
+      if (targetSet.has(i) && grown[i]
+   [text] (dragging = false)} />
+   [text] {#each effectiveWidths as width}
+   [text] {/each}
+   [text] 0 ? stats : undefined}
+      {statsScope}
+    />
+    {#if ro
+   [text] selectRow(absIdx)}
+            >{absIdx + 1}
+   [text] {#each meta as col, ci}
+   [text] {/if}
+   [text] {#if rowCount === 0 && meta.length > 0}
+   [text] No rows returned
+   [text] c.name === filterPopover!.column)}
+   [text] (filterPopover = null)}
+    />
+  {/if}
+   [label] Query result
+   [aria] Query result
+
+📄 src/lib/components/workspace/HomeTab.svelte
+   [text] s.currentProfile))
+
+  let openingDemo = $state
+   [text] DuckDB in your browser. Your data never leaves this tab.
+   [text] v{version}
+   [text] Quick start
+   [text] {#each quickStart as action}
+   [text] {action.title}
+   [text] {action.description}
+   [text] {/each}
+   [text] Try a dataset
+   [text] {#each demoDatasets as dataset (dataset.id)}
+   [text] openDemo(dataset)}>
+   [text] {dataset.name}
+   [text] {dataset.description}
+   [text] {dataset.rows} · {dataset.source}
+   [text] {#each resources as item}
+   [text] {item.title}
+   [text] {item.description}
+   [text] More from the author
+   [text] {#each products as item}
+   [title] Released {releaseDate}
+
+📄 src/lib/components/workspace/SqlTab.svelte
+   [text] {#if tab && tab.type === 'sql'}
+   [text] {#if executing}
+   [text] {:else}
+   [text] {/if}
+   [text] {#if !explaining}
+   [text] {/if}
+          Explain
+   [text] {#if !ui.hideBrain}
+   [text] Duck Brain
+   [text] (splitPercent = 45)}
+    >
+   [text] {#await import('../map/GeoMapView.svelte')}
+   [text] {:then { default: GeoMapView }}
+   [text] {:catch}
+   [text] The map could not be loaded.
+   [text] {/await}
+            {:else}
+   [text] {#if !fixing}
+   [text] (resultView = 'charts')} />
+   [text] Pin result
+   [text] (compareOpen = true)} disabled={pinCount === 0}>
+   [text] Compare{pinCount > 0 ? ` (${pinCount})` : ''}
+   [text] (addToDashboardOpen = true)}>
+   [text] Add to dashboard
+   [text] {/snippet}
+   [text] (addToDashboardOpen = false)}
+  />
+   [text] (shareTab = null)} />
+   [text] (saveOpen = false)} />
+   [text] (explainOpen = false)} />
+   [text] (compareOpen = false)} />
+
+  {#if resizing}
+   [title] Format SQL (Alt+F)
+   [title] Save query
+   [title] Share query and chart
+   [title] Ask Duck Brain
+   [title] Keep a copy of this result to compare against later
+   [label] Resize editor and results
+   [aria] Resize editor and results
+
+📄 src/lib/components/workspace/TableTab.svelte
+   [text] ('data')
+  let data = $state.raw
+   [text] (null)
+  let description = $state.raw
+   [text] (null)
+  let stats = $state.raw
+   [text] (null)
+  let distributions = $state
+   [text] >({})
+  /** null: the connection could not tell. */
+  let dd
+   [text] {#snippet failure(message: string)}
+   [text] Could not read the table
+   [text] {message}
+   [text] {/snippet}
+
+{#snippet waiting(label: string)}
+   [text] {label}
+   [text] {/snippet}
+
+{#if tab && ref}
+   [text] {database}.{schema}.
+   [text] {table}
+   [text] {#if info}
+   [text] {/if}
+   [text] {#if missing}
+   [text] {:else}
+   [text] {#if data.truncated}
+   [text] {#each stats as column (column.column_name)}
+   [text] {column.column_name}
+   [text] {column.column_type}
+   [text] {/each}
+   [text] {:else if stats}
+   [title] Open a query on this table
+   [title] Read the table again
+   [title] Table not found
+   [title] No statistics available
+   [title] No definition available
+   [desc] This connection does not expose the statement that created t
+   [label] {column.column_name} statistics
+   [aria] {column.column_name} statistics

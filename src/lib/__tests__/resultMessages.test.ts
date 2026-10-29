@@ -14,11 +14,19 @@ describe("formatQueryTime", () => {
 });
 
 describe("zeroRowsMessage", () => {
+  const mockT = (key: string, vars?: Record<string, unknown>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const took = (vars?.values as any)?.took ?? "";
+    if (key === "result.zeroRows") return `Query ran fine, 0 rows returned${took}.`;
+    if (key === "common.took") return "took";
+    return key;
+  };
+
   it("includes the engine time when known", () => {
-    expect(zeroRowsMessage(12)).toBe("Query ran fine, 0 rows returned (took 12 ms).");
+    expect(zeroRowsMessage(mockT, 12)).toBe("Query ran fine, 0 rows returned（took 12 ms）.");
   });
 
   it("omits the time for results restored from persistence", () => {
-    expect(zeroRowsMessage()).toBe("Query ran fine, 0 rows returned.");
+    expect(zeroRowsMessage(mockT)).toBe("Query ran fine, 0 rows returned.");
   });
 });

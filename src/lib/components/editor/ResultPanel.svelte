@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { FileX2, CircleCheck, Scissors, Table2, Sigma, ListTree, TriangleAlert } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Spinner from '../common/Spinner.svelte'
@@ -48,10 +49,10 @@
   const stats = $derived(grid && view === 'stats' ? computeColumnStats(grid.meta, grid.data) : [])
 
   const views = $derived<ResultView[]>([
-    { id: 'table', label: 'Table', icon: Table2 },
+    { id: 'table', label: $t('common.table'), icon: Table2 },
     ...extraViews,
-    { id: 'stats', label: 'Stats', icon: Sigma },
-    { id: 'schema', label: 'Schema', icon: ListTree },
+    { id: 'stats', label: $t('common.stats'), icon: Sigma },
+    { id: 'schema', label: $t('common.schema'), icon: ListTree },
   ])
   const activeView = $derived(views.some((v) => v.id === view) ? view : 'table')
   const isExtra = $derived(extraViews.some((v) => v.id === activeView))
@@ -68,12 +69,12 @@
     <div class="flex items-center gap-2 px-3 py-2 text-xs text-fg-3">
       <Spinner size="sm" />
       <span aria-live="polite">
-        {progress && progress.rows > 0 ? `${progress.rows.toLocaleString()} rows so far` : 'Running query...'}
+        {progress && progress.rows > 0 ? `${progress.rows.toLocaleString()}${$t('result.rowsSoFar')}` : $t('result.running')}
       </span>
       {#if progress && progress.elapsedMs > 1000}
         <span class="tabular-nums">· {(progress.elapsedMs / 1000).toFixed(1)}s</span>
       {/if}
-      <Button size="xs" variant="outline" class="ml-auto" onclick={oncancel}>Stop</Button>
+      <Button size="xs" variant="outline" class="ml-auto" onclick={oncancel}>{$t('common.stop')}</Button>
     </div>
     {#if progress?.columns?.length}
       <div class="flex gap-4 overflow-hidden border-y border-edge-subtle px-3 py-2">
@@ -84,13 +85,13 @@
     {/if}
   </div>
 {:else if !result}
-  <EmptyState icon={FileX2} title="No results yet" description="Run a query to see its rows here." class="h-full" />
+  <EmptyState icon={FileX2} title={$t('result.noResults')} description={$t('result.noResultsDesc')} class="h-full" />
 {:else if result.error}
   <div class="h-full overflow-auto p-3">
     <div class="rounded-md border border-danger/40 bg-danger-soft p-3" role="alert">
       <div class="flex items-center gap-2 text-[13px] font-medium text-danger">
         <TriangleAlert size={14} />
-        Query error
+        {$t('result.queryError')}
       </div>
       <pre class="mt-2 whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-fg-2">{result.error}</pre>
     </div>
@@ -100,17 +101,13 @@
   </div>
 {:else if result.data.length === 0}
   <!-- A successful query with no rows is not an error: say so plainly. -->
-  <EmptyState icon={CircleCheck} title={zeroRowsMessage(result.durationMs)} class="h-full" />
+  <EmptyState icon={CircleCheck} title={zeroRowsMessage($t, result.durationMs)} class="h-full" />
 {:else if grid}
   <div class="flex h-full flex-col">
     {#if result.truncated}
       <div class="mx-3 mt-2 flex items-start gap-2 rounded-md border border-warning/40 bg-warning-soft px-3 py-2 text-xs text-fg-2">
         <Scissors size={13} class="mt-0.5 shrink-0 text-warning" />
-        <span>
-          Showing the first {result.rowCount.toLocaleString()} rows. The query returns more: add a
-          <code class="font-mono">LIMIT</code>, or raise the row limit in Settings. Parquet export
-          still writes the complete result.
-        </span>
+        <span>{$t('result.truncated', { values: { count: result.rowCount.toLocaleString() } })}</span>
       </div>
     {/if}
 
@@ -134,7 +131,7 @@
 
     <!-- Sits at the bottom rather than as a full-width band above the
          results. The results are the part worth giving space to. -->
-    <div class="flex h-8 shrink-0 items-center gap-0.5 overflow-x-auto border-t border-edge-subtle px-2 [scrollbar-width:none]" role="tablist" aria-label="Result views">
+    <div class="flex h-8 shrink-0 items-center gap-0.5 overflow-x-auto border-t border-edge-subtle px-2 [scrollbar-width:none]" role="tablist" aria-label={$t('result.resultViews')}>
       {#each views as v (v.id)}
         <button
           class="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 text-xs transition-colors {activeView === v.id ? 'bg-active text-fg' : 'text-fg-3 hover:bg-hover hover:text-fg'}"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Search, X, Hash, FilterX, Database, ChartNoAxesColumn } from 'lucide-svelte'
   import VirtualTable from '../table/VirtualTable.svelte'
   import Button from '../common/Button.svelte'
@@ -178,15 +179,15 @@
   <div class="flex h-8 shrink-0 items-center gap-2 overflow-x-auto whitespace-nowrap border-t border-edge-subtle bg-sidebar px-2 text-xs text-fg-3 [scrollbar-width:none] [&>*]:shrink-0">
     <span class="tabular-nums">
       {#if inEngine}
-        <span class="text-fg">{formatNumber(shown.length)}</span>{engine?.truncated ? '+' : ''} {shown.length === 1 ? 'row' : 'rows'}
+        <span class="text-fg">{formatNumber(shown.length)}</span>{engine?.truncated ? '+' : ''} {$t(shown.length === 1 ? 'result.row' : 'result.rows')}
       {:else if narrowed}
-        <span class="text-fg">{formatNumber(shown.length)}</span> of {formatNumber(data.length)} rows
+        <span class="text-fg">{formatNumber(shown.length)}</span> {$t('result.ofRows', { values: { total: formatNumber(data.length) } })}
       {:else}
-        <span class="text-fg">{formatNumber(data.length)}</span> {data.length === 1 ? 'row' : 'rows'}
+        <span class="text-fg">{formatNumber(data.length)}</span> {$t(data.length === 1 ? 'result.row' : 'result.rows')}
       {/if}
     </span>
     <span class="text-fg-4">·</span>
-    <span>{meta.length} {meta.length === 1 ? 'column' : 'columns'}</span>
+    <span>{meta.length} {$t(meta.length === 1 ? 'result.column' : 'result.columns')}</span>
     {#if durationMs !== undefined}
       <span class="text-fg-4">·</span>
       <span class="tabular-nums">{formatQueryTime(durationMs)}</span>
@@ -194,23 +195,23 @@
 
     {#if inEngine}
       <span class="text-fg-4">·</span>
-      <span class="inline-flex items-center gap-1 text-accent" title="This result was cut at the row limit, so sorting and filtering ran in DuckDB over the whole answer.">
+      <span class="inline-flex items-center gap-1 text-accent" title={$t('result.cutAtLimit')}>
         <Database size={12} />
-        over the full result
+        {$t('result.overFullResult')}
       </span>
     {/if}
 
     {#if selectedCells > 0}
       <span class="text-fg-4">·</span>
       <span class="tabular-nums text-accent">
-        {formatNumber(selectedCells)} {selectedCells === 1 ? 'cell' : 'cells'} selected
+        {formatNumber(selectedCells)} {$t(selectedCells === 1 ? 'result.cellSelected' : 'result.cellsSelected')}
       </span>
     {/if}
 
     {#if narrowed}
-      <Button size="xs" variant="ghost" onclick={clearAll} title="Clear search and filters">
+      <Button size="xs" variant="ghost" onclick={clearAll} title={$t('common.clearSearch')}>
         <FilterX size={13} />
-        Clear
+        {$t('common.clear')}
       </Button>
     {/if}
 
@@ -221,12 +222,12 @@
           <input
             class="ds-input-sm h-6 w-44 pl-6 pr-6"
             type="text"
-            placeholder="Search rows"
-            aria-label="Search rows"
+            placeholder={$t('common.searchRows')}
+            aria-label={$t('common.searchRows')}
             bind:value={search}
           />
           {#if search}
-            <button class="absolute right-1 top-1/2 inline-flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-sm text-fg-4 hover:text-fg" onclick={() => (search = '')} aria-label="Clear search">
+            <button class="absolute right-1 top-1/2 inline-flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-sm text-fg-4 hover:text-fg" onclick={() => (search = '')} aria-label={$t('common.clearSearch')}>
               <X size={11} />
             </button>
           {/if}
@@ -237,7 +238,7 @@
           aria-pressed={getFormatNumbers()}
           class={getFormatNumbers() ? 'text-accent' : ''}
           onclick={toggleFormatNumbers}
-          title="Thousands separators in numbers"
+          title={$t('grid.thousandsSep')}
         >
           <Hash size={13} />
           1,000
@@ -248,10 +249,10 @@
           aria-pressed={getHeaderStats()}
           class={getHeaderStats() ? 'text-accent' : ''}
           onclick={toggleHeaderStats}
-          title="A summary under each column name: distribution, distinct values, nulls"
+          title={$t('grid.columnSummary')}
         >
           <ChartNoAxesColumn size={13} />
-          Column stats
+          {$t('grid.columnStats')}
         </Button>
         <ExportMenu rows={engine?.rows ?? rows} visibleColumns={meta.map((c) => c.name)} filteredRows={() => gridToRows(meta, shown)} />
       </div>

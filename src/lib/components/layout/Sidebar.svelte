@@ -7,6 +7,7 @@
   import { openCommandPalette } from '../../stores/command-palette.svelte'
   import { getRoute, goTo, goWorkspace } from '../../stores/router.svelte'
   import { groupForRoute, NAV_GROUPS, visibleRoutes, type NavGroup } from '@/lib/routes'
+  import { t } from 'svelte-i18n'
   import { Sun, Moon, Search, SquareTerminal, PanelLeft, CircleArrowUp } from 'lucide-svelte'
   import { applyUpdate, isUpdateApplying, isUpdateAvailable } from '../../stores/update.svelte'
   import { isMobile, openDrawer } from '../../stores/layout.svelte'
@@ -43,11 +44,11 @@
   aria-label="Primary"
 >
   {#if mobile}
-    <Button icon variant="ghost" size="sm" onclick={openDrawer} title="Open panel" aria-label="Open panel">
+    <Button icon variant="ghost" size="sm" onclick={openDrawer} title={$t('nav.openPanel')} aria-label={$t('nav.openPanel')}>
       <PanelLeft size={15} />
     </Button>
   {/if}
-  <Button icon variant="ghost" size="sm" onclick={openCommandPalette} title="Search or run a command (⌘K)" aria-label="Command menu">
+  <Button icon variant="ghost" size="sm" onclick={openCommandPalette} title={$t('nav.commandMenu')} aria-label={$t('nav.commandMenu')}>
     <Search size={15} />
   </Button>
 
@@ -56,8 +57,8 @@
   <button
     class="{railButton} {activeGroup.id === 'query' ? 'bg-active text-accent' : idle}"
     onclick={goWorkspace}
-    title="Query workspace (⌥N for a new query)"
-    aria-label="Query"
+    title={$t('nav.queryWorkspace')}
+    aria-label={$t('nav.queryWorkspace')}
     aria-current={activeGroup.id === 'query' ? 'page' : undefined}
   >
     {#if activeGroup.id === 'query'}{@render marker()}{/if}
@@ -92,8 +93,8 @@
     <button
       class="{railButton} {active ? 'bg-active text-fg' : idle}"
       onclick={() => openGroup(settingsGroup)}
-      title="Settings"
-      aria-label="Settings"
+      title={$t('settings.title')}
+      aria-label={$t('settings.title')}
       aria-current={active ? 'page' : undefined}
     >
       {#if active}{@render marker()}{/if}
@@ -109,8 +110,8 @@
       class="{railButton} {mobile ? '' : 'mb-1'} bg-accent-soft text-accent hover:bg-hover disabled:opacity-60"
       onclick={() => void applyUpdate()}
       disabled={isUpdateApplying()}
-      title="A new version of Duck-UI is ready. Click to reload into it"
-      aria-label="Update to the latest version"
+      title={$t('nav.updateReady')}
+      aria-label={$t('nav.updateReady')}
     >
       <CircleArrowUp size={16} />
     </button>
@@ -119,13 +120,13 @@
   {#if !mobile}
     <span
       class="my-1 h-1.5 w-1.5 rounded-full {online ? 'bg-success' : 'bg-danger'}"
-      title="{connection?.name ?? 'DuckDB'}: {online ? 'connected' : 'disconnected'}"
+      title={$t('nav.connectionStatus', { values: { name: connection?.name ?? 'DuckDB', status: online ? $t('connection.connected') : $t('connection.disconnected') } })}
       role="img"
-      aria-label={online ? 'Connected' : 'Disconnected'}
+      aria-label={online ? $t('connection.connected') : $t('connection.disconnected')}
     ></span>
   {/if}
 
-  <Button icon variant="ghost" size="sm" onclick={toggleTheme} title="Toggle theme" aria-label="Toggle theme">
+  <Button icon variant="ghost" size="sm" onclick={toggleTheme} title={$t('nav.toggleTheme')} aria-label={$t('nav.toggleTheme')}>
     {#if getTheme() === 'dark'}<Sun size={15} />{:else}<Moon size={15} />{/if}
   </Button>
 
@@ -134,7 +135,7 @@
       class="{mobile ? 'hidden' : 'mt-1 inline-flex'} h-7 w-7 items-center justify-center rounded-md hover:bg-hover"
       onclick={() => goTo('settings', 'profile')}
       title={profile.name}
-      aria-label="Profile: {profile.name}"
+      aria-label={$t('nav.profile', { values: { name: profile.name } })}
     >
       <ProfileAvatar avatarEmoji={profile.avatarEmoji} size="sm" />
     </button>
