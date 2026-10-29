@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { t } from 'svelte-i18n'
   import Toast from './lib/components/common/Toast.svelte'
   import Spinner from './lib/components/common/Spinner.svelte'
   import Button from './lib/components/common/Button.svelte'
@@ -76,14 +77,14 @@
 {:else if stage === 'engine' && engineError && !engineLoading}
   <div class="flex h-full flex-col items-center justify-center gap-3 px-6 text-center" role="alert">
     <ProfileAvatar avatarEmoji="logo" size="lg" />
-    <h1 class="text-[15px] text-fg">DuckDB failed to start</h1>
+    <h1 class="text-[15px] text-fg">{$t('error.duckdbStartFailed')}</h1>
     <p class="max-w-[60ch] text-[13px] text-fg-3">{engineError}</p>
-    <Button onclick={() => window.location.reload()}>Try again</Button>
+    <Button onclick={() => window.location.reload()}>{$t('common.tryAgain')}</Button>
   </div>
 {:else}
   <div class="flex h-full flex-col items-center justify-center gap-3">
     <ProfileAvatar avatarEmoji="logo" size="lg" />
     <Spinner size="lg" />
-    <p class="text-xs text-fg-3">{stage === 'profile' ? 'Loading profile...' : 'Initializing DuckDB...'}</p>
+    <p class="text-xs text-fg-3">{stage === 'profile' ? $t('common.loadingProfile') : $t('common.initializing')}</p>
   </div>
 {/if}

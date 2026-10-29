@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { ArrowLeftRight, Scissors, Trash2 } from 'lucide-svelte'
   import Modal from '../common/Modal.svelte'
   import Button from '../common/Button.svelte'
@@ -139,34 +140,34 @@
 <Modal
   {open}
   size="xl"
-  title="Compare results"
-  description="Pin results from any SQL tab, then compare two of them, or a pin against the current result. Pins last for this session and keep up to {PIN_ROW_LIMIT.toLocaleString()} rows."
+  title={$t('compare.title')}
+  description={$t('compare.description', { values: { limit: PIN_ROW_LIMIT.toLocaleString() } })}
   {onclose}
 >
   <div class="flex h-[65vh] flex-col gap-3">
     {#if pins.length === 0 || (pins.length < 2 && !hasCurrent)}
       <p class="text-[13px] text-fg-3">
         {pins.length === 0
-          ? 'Nothing pinned yet. Use "Pin result" under a query result first.'
-          : 'Pin one more result, or run a query, to have two sides to compare.'}
+          ? $t('compare.noPinsYet')
+          : $t('compare.needMorePins')}
       </p>
     {:else}
       <div class="flex flex-wrap items-end gap-2">
         <label class="min-w-0 flex-1 text-xs text-fg-3">
-          <span class="mb-1 block">Before</span>
-          <Select size="sm" options={sideOptions} bind:value={leftId} placeholder="Pick a result" />
+          <span class="mb-1 block">{$t('compare.before')}</span>
+          <Select size="sm" options={sideOptions} bind:value={leftId} placeholder={$t('compare.pickResult')} />
         </label>
-        <Button icon size="sm" variant="ghost" title="Swap sides" aria-label="Swap sides" onclick={swap}>
+        <Button icon size="sm" variant="ghost" title={$t('compare.swapSides')} aria-label={$t('compare.swapSides')} onclick={swap}>
           <ArrowLeftRight size={14} />
         </Button>
         <label class="min-w-0 flex-1 text-xs text-fg-3">
-          <span class="mb-1 block">After</span>
-          <Select size="sm" options={sideOptions} bind:value={rightId} placeholder="Pick a result" />
+          <span class="mb-1 block">{$t('compare.after')}</span>
+          <Select size="sm" options={sideOptions} bind:value={rightId} placeholder={$t('compare.pickResult')} />
         </label>
       </div>
 
       {#if commonColumns.length > 0}
-        <div class="text-xs text-fg-3" role="group" aria-label="Key columns">
+        <div class="text-xs text-fg-3" role="group" aria-label={$t('compare.keyColumns')}>
           <span class="mb-1 block">Key columns. None selected compares whole rows.</span>
           <div class="flex max-h-16 flex-wrap gap-1 overflow-auto">
             {#each commonColumns as column (column)}
@@ -199,7 +200,7 @@
             <Badge tone="warning">~{diff.rows.changed.length.toLocaleString()} changed</Badge>
           {/if}
           <Badge>{diff.rows.unchangedCount.toLocaleString()} unchanged</Badge>
-          {#if isIdentical(diff)}<Badge tone="brand">Identical</Badge>{/if}
+          {#if isIdentical(diff)}<Badge tone="brand">{$t('compare.identical')}</Badge>{/if}
         </div>
 
         {#if diff.partial}
@@ -224,7 +225,7 @@
         <div class="min-h-0 flex-1">
           {#if activeView === 'changed'}
             {#if diff.rows.changed.length === 0}
-              <p class="p-4 text-xs text-fg-3">No changed rows.</p>
+              <p class="p-4 text-xs text-fg-3">{$t('compare.noChangedRows')}</p>
             {:else}
               <div class="flex h-full flex-col">
                 {#if diff.rows.changed.length > changedShown.length}
@@ -291,7 +292,7 @@
                     <div class="text-warning">~ {c.name}: {c.from || '?'} → {c.to || '?'}</div>
                   {/each}
                   {#if schema.reordered}
-                    <div class="text-fg-3">Column order also differs.</div>
+                    <div class="text-fg-3">{$t('compare.columnOrderDiffers')}</div>
                   {/if}
                 </div>
               {/if}
@@ -303,7 +304,7 @@
 
     {#if pins.length > 0}
       <details class="shrink-0 text-xs">
-        <summary class="cursor-pointer text-fg-3">Pinned results ({pins.length})</summary>
+        <summary class="cursor-pointer text-fg-3">{$t('compare.pinnedResults', { values: { count: pins.length } })}</summary>
         <ul class="mt-1 max-h-32 space-y-1 overflow-auto">
           {#each [...pins].reverse() as pin (pin.id)}
             <li class="flex items-center gap-2">

@@ -48,6 +48,7 @@
     "maplibre-gl": "^6.11.2",
     "marked": "18.0.3",
     "sql-formatter": "^15.8.2",
+    "svelte-i18n": "4.0.1",
     "svelte-sonner": "1.1.1",
     "uplot": "^1.6.32",
     "y-protocols": "^1.0.7",

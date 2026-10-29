@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Upload, X } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import ErrorAlertList from './ErrorAlertList.svelte'
@@ -35,34 +36,31 @@
       multiple
       hidden
       {accept}
-      aria-label="Select files to import"
+      aria-label={$t('upload.selectFiles')}
       onchange={local.handleFileInputChange}
     />
     <Upload size={28} strokeWidth={1.5} class="mb-3 {local.isDragActive ? 'text-accent' : 'text-fg-4'}" />
     {#if local.isDragActive}
-      <p class="text-[13px] font-medium text-accent">Drop the files here ...</p>
+      <p class="text-[13px] font-medium text-accent">{$t('upload.dropHere')}</p>
     {:else}
-      <p class="text-[13px] font-medium text-fg">Drag and drop files here, or</p>
-      <Button class="mt-2" variant="outline" size="sm" onclick={() => fileInput?.click()}>Select files</Button>
-      <p class="mt-3 text-xs text-fg-3">Supported formats: CSV, JSON, Parquet, Arrow and DuckDB</p>
-      <p class="mt-0.5 text-xs text-fg-4">Maximum file size: {formatFileSize(MAX_FILE_SIZE)}</p>
+      <p class="text-[13px] font-medium text-fg">{$t('upload.dragOr')}</p>
+      <Button class="mt-2" variant="outline" size="sm" onclick={() => fileInput?.click()}>{$t('common.selectFiles')}</Button>
+      <p class="mt-3 text-xs text-fg-3">{$t('upload.supportedFormats')}</p>
+      <p class="mt-0.5 text-xs text-fg-4">{$t('upload.maxFileSize')} {formatFileSize(MAX_FILE_SIZE)}</p>
     {/if}
   </div>
 
   {#if local.hasFilesToImport}
     <div class="flex flex-col gap-3">
       <div class="flex items-center justify-between gap-3">
-        <h3 class="text-[13px] font-semibold text-fg">Files to import</h3>
+        <h3 class="text-[13px] font-semibold text-fg">{$t('upload.filesToImport')}</h3>
         <div class="flex items-center gap-2">
-          <span class="text-xs text-fg-3">Mode:</span>
+          <span class="text-xs text-fg-3">{$t('common.mode')}:</span>
           <ImportModeSwitch value={importMode} onchange={onmodechange} tableLabel="Import (Table)" viewLabel="Link (View)" />
         </div>
       </div>
       {#if importMode === 'view'}
-        <p class="text-xs text-fg-3">
-          Views reference the original file without copying data. Queries re-read the file each time, using less memory
-          but may be slower.
-        </p>
+        <p class="text-xs text-fg-3">{$t('upload.viewModeHint')}</p>
       {/if}
       {#each local.files as file (file.name)}
         <FileDetails
@@ -87,16 +85,16 @@
     <div class="flex gap-2">
       <Button class="flex-1" onclick={local.handleFileUpload} loading={local.isUploading}>
         {#if local.isUploading}
-          Importing files...
+          {$t('upload.importing')}
         {:else}
           <Upload size={14} />
-          Import {local.files.length} {local.files.length === 1 ? 'file' : 'files'}
+          {$t('upload.importN', { values: { count: local.files.length } })}
         {/if}
       </Button>
       {#if local.isUploading}
         <Button variant="danger" onclick={local.handleCancelUpload}>
           <X size={14} />
-          Cancel
+          {$t('common.cancel')}
         </Button>
       {/if}
     </div>

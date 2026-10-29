@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { Profile } from '@/store/types'
   import Modal from '../common/Modal.svelte'
   import Button from '../common/Button.svelte'
@@ -31,7 +32,7 @@
       await onsubmit(password)
       password = ''
     } catch {
-      error = 'Incorrect password'
+      error = $t('error.incorrectPassword')
     } finally {
       loading = false
     }
@@ -44,25 +45,25 @@
   }
 </script>
 
-<Modal {open} title="Unlock Profile" description="Enter your password to unlock this profile" size="sm" onclose={close}>
+<Modal {open} title={$t('profile.unlockTitle')} description={$t('profile.unlockDesc')} size="sm" onclose={close}>
   <form id={FORM_ID} class="flex flex-col gap-4" onsubmit={submit}>
     <div class="flex flex-col items-center gap-2">
       <ProfileAvatar avatarEmoji={profile.avatarEmoji} size="xl" />
       <span class="text-[13px] font-medium text-fg">{profile.name}</span>
     </div>
-    <FormField controlWidth="full" label="Password" for="settings-unlock-password" {error}>
+    <FormField controlWidth="full" label={$t('common.password')} for="settings-unlock-password" {error}>
       <Input
         id="settings-unlock-password"
         type="password"
         bind:value={password}
-        placeholder="Enter password"
+        placeholder={$t('profile.passwordPlaceholder')}
         invalid={!!error}
         autocomplete="current-password"
       />
     </FormField>
   </form>
   {#snippet footer()}
-    <Button size="sm" variant="ghost" onclick={close} disabled={loading}>Cancel</Button>
-    <Button size="sm" type="submit" form={FORM_ID} disabled={!password.trim()} {loading}>Unlock</Button>
+    <Button size="sm" variant="ghost" onclick={close} disabled={loading}>{$t('common.cancel')}</Button>
+    <Button size="sm" type="submit" form={FORM_ID} disabled={!password.trim()} {loading}>{$t('profile.unlock')}</Button>
   {/snippet}
 </Modal>
