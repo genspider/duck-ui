@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Copy, CopyCheck, History, Trash2, CircleAlert, Clock, CircleCheck, CircleX, SquareTerminal, Search, Timer, Rows3 } from 'lucide-svelte'
   import PageHeader from '../common/PageHeader.svelte'
   import PageBody from '../common/PageBody.svelte'
@@ -100,11 +101,11 @@
     try {
       await navigator.clipboard.writeText(query)
     } catch {
-      toastError('Could not copy to clipboard')
+      toastError($t('error.copyFailed'))
       return
     }
     copiedId = id
-    success('Query copied to clipboard', 1500)
+    success($t('history.copySuccess'), 1500)
     setTimeout(() => {
       if (copiedId === id) copiedId = null
     }, 1000)
@@ -123,7 +124,7 @@
   }
 </script>
 
-<PageHeader title="History" subtitle="Every query this profile has run">
+<PageHeader title={$t('history.title')} subtitle={$t('history.subtitle')}>
   {#snippet meta()}
     {#if total > 0}<Badge>{formatNumber(total)}</Badge>{/if}
   {/snippet}
@@ -133,8 +134,8 @@
       <input
         class="ds-input-sm pl-7"
         type="search"
-        placeholder="Search queries and errors"
-        aria-label="Search history"
+        placeholder={$t('history.search')}
+        aria-label={$t('history.search')}
         bind:value={searchInput}
       />
     </div>
@@ -199,10 +200,10 @@
             {/if}
           </div>
 
-          <Button icon variant="ghost" size="sm" onclick={() => openInTab(item.sql_text)} aria-label="Open in a new tab" title="Open in a new tab">
+          <Button icon variant="ghost" size="sm" onclick={() => openInTab(item.sql_text)} aria-label={$t('history.openInTab')} title={$t('history.openInTab')}>
             <SquareTerminal size={14} />
           </Button>
-          <Button icon variant="ghost" size="sm" onclick={() => copyQuery(item.id, item.sql_text)} aria-label="Copy query" title="Copy query">
+          <Button icon variant="ghost" size="sm" onclick={() => copyQuery(item.id, item.sql_text)} aria-label={$t('history.copyQuery')} title={$t('history.copyQuery')}>
             {#if copiedId === item.id}
               <CopyCheck size={14} />
             {:else}
@@ -216,7 +217,7 @@
     {#if entries.length < total}
       <div class="mt-4 flex items-center justify-center gap-3">
         <span class="text-xs text-fg-3 tabular-nums">{formatNumber(entries.length)} of {formatNumber(total)}</span>
-        <Button variant="outline" size="sm" onclick={loadMore} loading={loadingMore}>Load more</Button>
+        <Button variant="outline" size="sm" onclick={loadMore} loading={loadingMore}>{$t('history.loadMore')}</Button>
       </div>
     {/if}
   {/if}
@@ -224,7 +225,7 @@
 
 <ConfirmDialog
   open={confirmOpen}
-  title="Clear query history?"
+  title={$t('history.clearTitle')}
   description="This permanently deletes the whole history of this profile, not only what is shown."
   confirmLabel="Clear history"
   destructive

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Bookmark, EllipsisVertical, ExternalLink, Pencil, Trash2 } from 'lucide-svelte'
   import PageHeader from '../common/PageHeader.svelte'
   import PageBody from '../common/PageBody.svelte'
@@ -112,7 +113,7 @@
   const preview = (sql: string) => (sql.length > 100 ? `${sql.slice(0, 100)}...` : sql)
 </script>
 
-<PageHeader title="Saved queries" subtitle="Queries you kept for later">
+<PageHeader title={$t('saved.title')} subtitle={$t('saved.subtitle')}>
   {#snippet meta()}
     {#if queries.length > 0}<Badge>{queries.length}</Badge>{/if}
   {/snippet}
@@ -124,7 +125,7 @@
   {:else if queries.length === 0}
     <EmptyState
       icon={Bookmark}
-      title="No saved queries yet"
+      title={$t('saved.empty')}
       description="Save a query from the editor toolbar and it shows up here."
     />
   {:else}
@@ -137,7 +138,7 @@
                 bind:this={renameInput}
                 bind:value={editName}
                 class="ds-input-sm font-medium"
-                aria-label="Rename {query.name}"
+                aria-label="{$t('saved.rename')} {query.name}"
                 onblur={() => finishRename(query.id)}
                 onkeydown={(e) => onRenameKeydown(e, query.id)}
               />
@@ -155,7 +156,7 @@
           <button
             type="button"
             class="mr-1.5 mt-2 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-3 transition-colors hover:bg-active hover:text-fg"
-            aria-label="{query.name} options"
+            aria-label="{query.name} {$t('saved.options')}"
             aria-haspopup="menu"
             onclick={(e) => openMenu(e, query)}
           >

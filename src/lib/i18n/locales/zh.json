@@ -312,5 +312,22 @@
   "params.alwaysQuoted": "始终作为引号文本替换",
   "params.turnOff": "关闭参数替换",
   "params.turnOffDesc": "按原样运行 SQL，不替换 $name 占位符",
-  "params.off": "关闭"
+  "params.off": "关闭",
+  "history.title": "历史",
+  "history.subtitle": "此配置运行过的所有查询",
+  "history.search": "搜索查询和错误",
+  "history.openInTab": "在新标签页打开",
+  "history.copyQuery": "复制查询",
+  "history.loadMore": "加载更多",
+  "history.clearTitle": "清空查询历史？",
+  "history.clearDesc": "此操作无法撤销。",
+  "history.cleared": "历史已清空",
+  "history.copySuccess": "已复制",
+  "saved.title": "保存的查询",
+  "saved.subtitle": "保存供后续使用的查询",
+  "saved.empty": "暂无保存的查询",
+  "saved.rename": "重命名",
+  "saved.options": "选项",
+  "saved.deleted": "查询已删除",
+  "saved.deleteFail": "删除查询失败"
 }
