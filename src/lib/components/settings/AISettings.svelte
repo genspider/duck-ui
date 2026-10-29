@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import {
     AlertCircle, Check, ChevronDown, Cloud, Cpu, Download, Eye, EyeOff, FlaskConical,
     HardDrive, Key, RefreshCw, Server, Trash2,
@@ -200,8 +201,8 @@
 
 <div class="flex flex-col gap-4">
   <Panel
-    title="Duck Brain provider"
-    description="Where &quot;question in, SQL out&quot; actually runs. A local server keeps everything on your machine with real model quality."
+    title={$t('ai.providerTitle')}
+    description={$t('ai.providerDesc')}
   >
     <div class="flex flex-col gap-4">
       <div class="flex flex-wrap gap-2" role="group" aria-label="AI provider">
@@ -222,10 +223,7 @@
         <div class="flex flex-col gap-4">
           <div class={noteClass}>
             <Server size={14} class="mt-0.5 shrink-0 text-fg-3" />
-            <p>
-              Any OpenAI-compatible endpoint works: Ollama and LM Studio locally, or vLLM, DeepSeek and friends
-              remotely. Nothing but the endpoint you set ever sees your prompts.
-            </p>
+            <p>{$t('ai.endpointNote')}</p>
           </div>
 
           <div>
@@ -258,17 +256,17 @@
 
           <div>
             <div class="flex items-center justify-between">
-              <label class={labelClass} for="ai-model-id">Model</label>
+              <label class={labelClass} for="ai-model-id">{$t('ai.model')}</label>
               <Button size="xs" variant="ghost" disabled={!baseUrl} loading={listing} onclick={findModels}>
                 {#if !listing}<RefreshCw size={12} />{/if}
-                Find models
+                {$t('ai.findModels')}
               </Button>
             </div>
             {#if foundModels && foundModels.length > 0}
               <Select
                 id="ai-model-id"
                 bind:value={modelId}
-                placeholder="Pick a model"
+                placeholder={$t('ai.pickModel')}
                 options={foundModels.map((model) => ({ value: model, label: model }))}
               />
             {:else}
@@ -285,14 +283,14 @@
           <div>
             <label class={labelClass} for="ai-compat-key">
               <Key size={13} class="text-fg-3" />
-              API key <span class="font-normal text-fg-3">(optional)</span>
+              {$t('ai.apiKey')} <span class="font-normal text-fg-3">({$t('ai.apiKeyOptional')})</span>
             </label>
             <div class="relative">
               <Input
                 id="ai-compat-key"
                 type={showKey.compatible ? 'text' : 'password'}
                 bind:value={compatibleKey}
-                placeholder="Only if the server requires one"
+                placeholder={$t('ai.apiKeyOptional')}
                 autocomplete="off"
                 class="pr-8"
               />
@@ -301,24 +299,19 @@
           </div>
 
           <Button class="w-full" disabled={!baseUrl || !modelId} loading={testing} onclick={saveCompatible}>
-            {testing ? 'Testing connection...' : 'Test & save'}
+            {testing ? $t('ai.testing') : $t('ai.testAndSave')}
           </Button>
 
           {#if compatible?.baseUrl && compatible?.modelId}
             <div>
               <Badge tone="success">
                 <Check size={11} />
-                Using {compatible.modelId}
+                {$t('ai.using')} {compatible.modelId}
               </Badge>
             </div>
           {/if}
 
-          <p class="text-xs leading-relaxed text-fg-3">
-            Ollama blocks unknown browser origins by default. If the connection fails from a deployed Duck-UI, start
-            it with
-            <code class="rounded-sm bg-surface-2 px-1 font-mono text-fg-2">OLLAMA_ORIGINS=https://duckui.com</code>
-            (or your own origin). localhost works out of the box.
-          </p>
+          <p class="text-xs leading-relaxed text-fg-3">{$t('ai.ollamaHint')}</p>
         </div>
       {/if}
 
