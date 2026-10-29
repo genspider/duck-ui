@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { FileWarning, FileCheck, X, File as FileIcon, Calendar, HardDrive, RefreshCw } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
@@ -66,11 +67,11 @@
         </div>
         <div class="flex shrink-0 items-center">
           {#if status.status === 'error'}
-            <Button icon variant="ghost" size="xs" onclick={onretry} aria-label="Retry {file.name}" title="Retry">
+            <Button icon variant="ghost" size="xs" onclick={onretry} aria-label="{$t('file.retry')} {file.name}" title={$t('file.retry')}>
               <RefreshCw size={13} />
             </Button>
           {/if}
-          <Button icon variant="ghost" size="xs" onclick={onremove} aria-label="Remove {file.name}" title="Remove file">
+          <Button icon variant="ghost" size="xs" onclick={onremove} aria-label="{$t('file.remove')} {file.name}" title={$t('file.remove')}>
             <X size={13} />
           </Button>
         </div>
@@ -78,7 +79,7 @@
 
       <FormField
         class="mt-3"
-        label="Table name"
+        label={$t('file.tableName')}
         for="table-{idSuffix}"
         required
         error={nameError ?? undefined}
@@ -90,7 +91,7 @@
           mono
           required
           value={tableName}
-          placeholder="Enter table name"
+          placeholder={$t('file.enterTableName')}
           invalid={!!nameError}
           disabled={busy}
           oninput={(e) => ontablenamechange(e.currentTarget.value)}

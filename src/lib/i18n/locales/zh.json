@@ -278,5 +278,9 @@
   "ext.installed": "已安装",
   "ext.unavailable": "不可用",
   "ext.notWasm": "WASM 中不可用",
-  "ext.noBuild": "扩展仓库没有此扩展在当前平台的构建版本"
+  "ext.noBuild": "扩展仓库没有此扩展在当前平台的构建版本",
+  "file.retry": "重试",
+  "file.remove": "移除文件",
+  "file.tableName": "表名",
+  "file.enterTableName": "输入表名"
 }
