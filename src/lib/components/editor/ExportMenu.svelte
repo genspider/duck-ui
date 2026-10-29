@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tr } from '../../../lib/i18n/translate'
   import { Download, FileText, Braces, Sheet as SheetIcon, Database, FolderDown } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
@@ -54,9 +55,9 @@
   }
 </script>
 
-<Button size="xs" variant="ghost" onclick={toggle} aria-expanded={menu !== null} disabled={rows.length === 0} title="Export the rows shown in the grid">
+<Button size="xs" variant="ghost" onclick={toggle} aria-expanded={menu !== null} disabled={rows.length === 0} title={tr('export.title')}>
   <Download size={13} />
-  Export
+  {tr('export.button')}
 </Button>
 
 <ContextMenu open={menu !== null} x={menu?.x ?? 0} y={menu?.y ?? 0} {items} onclose={() => (menu = null)} />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Variable } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import { duck, duckActions } from '../../stores/duck.svelte'
@@ -52,7 +53,7 @@
       </Button>
     </div>
   {:else}
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-edge-subtle px-3 py-1" role="group" aria-label="Query parameters">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-edge-subtle px-3 py-1" role="group" aria-label={$t('params.queryParams')}>
       <Variable size={13} class="shrink-0 text-fg-3" />
       {#each names as name (name)}
         {@const value = params.values[name] ?? ''}
@@ -63,8 +64,8 @@
           <input
             class="ds-input-sm h-6 w-32 {value === '' ? 'border-warning' : ''}"
             {value}
-            placeholder="value"
-            aria-label="Value for ${name}"
+            placeholder={$t('params.value')}
+            aria-label={$t('params.valueFor', { values: { name } })}
             oninput={(e) => setValue(name, e.currentTarget.value)}
           />
           <button
@@ -73,9 +74,9 @@
             class="rounded border border-edge px-1 font-mono text-[10px] leading-4 text-fg-3 enabled:hover:bg-hover disabled:opacity-60"
             title={numeric
               ? asText
-                ? 'Substituted as quoted text. Click to use as a number'
-                : 'Substituted as a number. Click to quote as text'
-              : 'Substituted as quoted text'}
+                ? $t('params.asQuoted')
+                : $t('params.asNumber')
+              : $t('params.alwaysQuoted')}
             onclick={() => toggleText(name)}
           >
             {asText ? 'abc' : '123'}
@@ -86,10 +87,10 @@
         size="xs"
         variant="ghost"
         class="ml-auto"
-        title="Run the SQL exactly as written, without substituting $name placeholders"
+        title={$t('params.turnOffDesc')}
         onclick={() => update((current) => ({ ...current, disabled: true }))}
       >
-        Turn off
+        {$t('params.off')}
       </Button>
     </div>
   {/if}

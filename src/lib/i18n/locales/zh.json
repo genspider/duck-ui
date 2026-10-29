@@ -301,5 +301,16 @@
   "csv.timestampFormat": "时间戳格式",
   "csv.timestampPlaceholder": "ISO 8601",
   "upload.tableMode": "导入 (表)",
-  "upload.viewMode": "链接 (视图)"
+  "upload.viewMode": "链接 (视图)",
+  "export.title": "导出表格中显示的行",
+  "export.button": "导出",
+  "params.queryParams": "查询参数",
+  "params.value": "值",
+  "params.valueFor": "{name} 的值",
+  "params.asQuoted": "作为引号文本替换。点击作为数字",
+  "params.asNumber": "作为数字替换。点击作为引号文本",
+  "params.alwaysQuoted": "始终作为引号文本替换",
+  "params.turnOff": "关闭参数替换",
+  "params.turnOffDesc": "按原样运行 SQL，不替换 $name 占位符",
+  "params.off": "关闭"
 }

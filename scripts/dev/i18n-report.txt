@@ -1,4 +1,4 @@
-发现 1967 处硬编码英文，其中 1967 处尚未翻译
+发现 1904 处硬编码英文，其中 1903 处尚未翻译
 ============================================================
 
 📄 src/App.svelte
@@ -1284,38 +1284,30 @@
    [text] *]:shrink-0">
    [text] {#if inEngine}
    [text] {formatNumber(shown.length)}
-   [text] of {formatNumber(data.length)} rows
-      {:else}
    [text] {formatNumber(data.length)}
-   [text] {data.length === 1 ? 'row' : 'rows'}
-      {/if}
-   [text] {meta.length} {meta.length === 1 ? 'column' : 'columns'}
+   [text] {$t(data.length === 1 ? 'result.row' : 'result.rows')}
+     
+   [text] {meta.length} {$t(meta.length === 1 ? 'result.column' : 'res
    [text] {#if durationMs !== undefined}
    [text] {formatQueryTime(durationMs)}
    [text] {/if}
 
     {#if inEngine}
-   [text] over the full result
+   [text] {$t('result.overFullResult')}
    [text] {/if}
 
     {#if selectedCells > 0}
    [text] {/if}
 
     {#if narrowed}
+   [text] {$t('common.clear')}
    [text] {/if}
 
     {#if !compact}
    [text] {#if search}
-   [text] (search = '')} aria-label="Clear search">
-   [text] Column stats
+   [text] (search = '')} aria-label={$t('common.clearSearch')}>
+   [text] {$t('grid.columnStats')}
    [text] c.name)} filteredRows={() => gridToRows(meta, shown)} />
-   [placeholder] Search rows
-   [title] Clear search and filters
-   [title] Thousands separators in numbers
-   [label] Search rows
-   [label] Clear search
-   [aria] Search rows
-   [aria] Clear search
 
 📄 src/lib/components/editor/ResultPanel.svelte
    [text] /** Buttons on the right of the view switcher. */
@@ -1325,13 +1317,14 @@
    [text] {#if progress && progress.elapsedMs > 1000}
    [text] · {(progress.elapsedMs / 1000).toFixed(1)}s
    [text] {/if}
+   [text] {$t('common.stop')}
    [text] {#if progress?.columns?.length}
    [text] {#each progress.columns.slice(0, 15) as name (name)}
    [text] {name}
    [text] {/each}
    [text] {:else if !result}
    [text] {:else if result.error}
-   [text] Query error
+   [text] {$t('result.queryError')}
    [text] {result.error}
    [text] {#if errorActions}
    [text] {@render errorActions(result)}
@@ -1347,10 +1340,6 @@
    [text] {/each}
       {#if actions}
    [text] {@render actions(result)}
-   [title] No results yet
-   [desc] Run a query to see its rows here.
-   [label] Result views
-   [aria] Result views
 
 📄 src/lib/components/editor/SchemaPanel.svelte
    [text] Column Name
@@ -1493,22 +1482,6 @@
     >
    [text] {/if}
   {/if}
-   [placeholder] Search tables and columns
-   [title] Import data
-   [title] Refresh schema
-   [title] Hide explorer (⌘B)
-   [title] Could not load schema
-   [title] No data yet
-   [label] Import data
-   [label] Refresh schema
-   [label] Hide explorer
-   [label] Search tables and columns
-   [label] Resize explorer
-   [aria] Import data
-   [aria] Refresh schema
-   [aria] Hide explorer
-   [aria] Search tables and columns
-   [aria] Resize explorer
 
 📄 src/lib/components/explorer/SchemaTree.svelte
    [text] s.databases))
@@ -1674,16 +1647,6 @@
    [text] onchange('timestampFormat', e.currentTarget.value)}
         
    [text] {/if}
-   [placeholder] Delimiter character
-   [placeholder] Empty values treated as NULL
-   [placeholder] ISO 8601
-   [label] Quote character
-   [label] Escape character
-   [label] Skip rows
-   [label] Sample size
-   [label] NULL string
-   [label] Date format
-   [label] Timestamp format
 
 📄 src/lib/components/importer/ErrorAlertList.svelte
    [text] {#if warning}
@@ -1715,16 +1678,13 @@
 
       {#if status.status === 'error' && status.error}
    [text] {status.error}
-   [placeholder] Enter table name
    [title] File size
    [title] Last modified
-   [title] Remove file
-   [label] Retry {file.name}
-   [label] Remove {file.name}
-   [label] Table name
+   [label] {$t('file.retry')} {file.name}
+   [label] {$t('file.remove')} {file.name}
    [label] Upload progress for {file.name}
-   [aria] Retry {file.name}
-   [aria] Remove {file.name}
+   [aria] {$t('file.retry')} {file.name}
+   [aria] {$t('file.remove')} {file.name}
    [aria] Upload progress for {file.name}
 
 📄 src/lib/components/importer/FileImporter.svelte
@@ -1874,24 +1834,21 @@
         {/if}
    [text] navigate ·
    [text] run ·
-   [placeholder] Search tables, tabs and actions
-   [label] Command menu
-   [label] Search tables, tabs and actions
-   [aria] Command menu
-   [aria] Search tables, tabs and actions
 
 📄 src/lib/components/layout/ContextPanel.svelte
    [text] {#snippet pageNav()}
-   [text] {group.label}
-   [text] {meta.label}
+   [text] {$t('nav.' + group.id)}
+   [text] {$t('page.' + item.replace(/-([a-z])/g, (_, c) => c.toUpperC
    [text] 0}
             {@const current = getSection()}
    [text] {#each sections as s (s.id)}
-   [text] {s.label}
+   [text] {$t('section.' + s.id)}
    [text] {/each}
    [text] {/if}
         {/each}
    [text] {#if group.id === 'settings'}
+   [text] {$t('nav.docs')}
+   [text] {$t('nav.github')}
    [text] v{__DUCK_UI_VERSION__}
    [text] {/if}
    [text] {/snippet}
@@ -1953,19 +1910,6 @@
   {#if isUpdateAvailable()}
    [text] {#if getTheme() === 'dark'}
    [text] {#if profile && settingsGroup}
-   [title] Open panel
-   [title] Search or run a command (⌘K)
-   [title] Query workspace (⌥N for a new query)
-   [title] A new version of Duck-UI is ready. Click to reload into it
-   [title] Toggle theme
-   [label] Open panel
-   [label] Command menu
-   [label] Toggle theme
-   [label] Profile: {profile.name}
-   [aria] Open panel
-   [aria] Command menu
-   [aria] Toggle theme
-   [aria] Profile: {profile.name}
 
 📄 src/lib/components/layout/TabBar.svelte
    [text] s.executingTabs))
@@ -2264,21 +2208,23 @@
    [text] {provider.label}
    [text] {/each}
    [text] {#if aiProvider === 'openai-compatible'}
+   [text] {$t('ai.endpointNote')}
    [text] {#each LOCAL_PRESETS as preset (preset.label)}
    [text] {preset.label}
    [text] (foundModels = null)}
             />
+   [text] {$t('ai.model')}
    [text] {#if !listing}
    [text] {/if}
-                Find models
+                {$t('ai.findModels')}
    [text] {#if foundModels && foundModels.length > 0}
-   [text] (optional)
+   [text] {$t('ai.apiKey')}
+   [text] ({$t('ai.apiKeyOptional')})
    [text] {@render keyToggle('compatible')}
-   [text] {testing ? 'Testing connection...' : 'Test & save'}
+   [text] {testing ? $t('ai.testing') : $t('ai.testAndSave')}
    [text] {#if compatible?.baseUrl && compatible?.modelId}
-   [text] Using {compatible.modelId}
-   [text] OLLAMA_ORIGINS=https://duckui.com
-   [text] (or your own origin). localhost works out of the box.
+   [text] {$t('ai.using')} {compatible.modelId}
+   [text] {$t('ai.ollamaHint')}
    [text] {CLOUD_LABEL[provider]} API key
    [text] {@render keyToggle(provider)}
    [text] saveCloudKey(provider)}>
@@ -2311,10 +2257,7 @@
    [text] {#if !clearing}
    [text] {/if}
             Clear cache
-   [placeholder] Pick a model
    [placeholder] llama3.2, qwen2.5-coder, ...
-   [placeholder] Only if the server requires one
-   [title] Duck Brain provider
    [label] Model download progress
    [aria] Model download progress
 
@@ -2344,6 +2287,7 @@
    [text] Extensions available to
    [text] {connectionName ?? 'the active connection'}
    [text] {#if readOnly}
+   [text] {$t('ext.readOnly')}
    [text] {/if}
 
   {#if loadError}
@@ -2351,12 +2295,14 @@
    [text] {/if}
 
   {#if extensions === null && !loadError}
-   [text] Loading extensions...
+   [text] {$t('ext.loading')}
    [text] {:else if extensions}
-   [text] Filter extensions
+   [text] {$t('ext.filter')}
    [text] {ext.name}
    [text] {#if ext.loaded}
+   [text] {$t('ext.loaded')}
    [text] {:else if ext.installed}
+   [text] {$t('ext.installed')}
    [text] {/if}
               {#if unavailable[ext.name]}
    [text] {/if}
@@ -2376,9 +2322,6 @@
    [text] {/each}
       {#if visible.length === 0}
    [text] No extensions match "{filter}".
-   [placeholder] Filter extensions...
-   [label] Refresh extension list
-   [aria] Refresh extension list
 
 📄 src/lib/components/settings/GeneralSettings.svelte
    [text] {#each options as option (option.value)}
@@ -2386,7 +2329,6 @@
         />
    [text] {option.label}
    [text] {/each}
-   [desc] System follows the appearance set in your operating system.
 
 📄 src/lib/components/settings/PasswordDialog.svelte
    [text] {profile.name}
@@ -2401,13 +2343,12 @@
   let memoryLimitMb = $state
    [text] (memoryLimitMb = Number(e.currentTarget.value))}
       />
+   [text] {$t('common.save')}
    [text] (maxResultRowsDraft = Number(e.currentTarget.value))}
       
    [text] saveRangeReads(e.currentTarget.checked)}
       />
-   [label] DuckDB memory limit (MB)
-   [label] Maximum rows per result
-   [label] Read remote files in ranges
+   [text] {$t('perf.enabled')}
 
 📄 src/lib/components/settings/ProfileSettings.svelte
    [text] (null)
@@ -2438,9 +2379,6 @@
    [text] (showCreate = false)}>
    [text] (showCreate = false)} />
    [text] {#if switchTarget}
-   [title] Your profile
-   [desc] Name and avatar shown across the app.
-   [desc] Each profile keeps its own connections, queries and settings
 
 📄 src/lib/components/settings/ProjectImportDialog.svelte
    [text] s.currentProfileId))
@@ -2703,8 +2641,11 @@
 📄 src/lib/components/workspace/SqlTab.svelte
    [text] {#if tab && tab.type === 'sql'}
    [text] {#if executing}
+   [text] {$t('editor.stop')}
    [text] {:else}
+   [text] {$t('editor.run')}
    [text] {/if}
+   [text] {$t('editor.format')}
    [text] {#if !explaining}
    [text] {/if}
           Explain
@@ -2720,11 +2661,11 @@
             {:else}
    [text] {#if !fixing}
    [text] (resultView = 'charts')} />
-   [text] Pin result
+   [text] {$t('editor.pin')}
    [text] (compareOpen = true)} disabled={pinCount === 0}>
-   [text] Compare{pinCount > 0 ? ` (${pinCount})` : ''}
+   [text] 0 ? ` (${pinCount})` : ''}
    [text] (addToDashboardOpen = true)}>
-   [text] Add to dashboard
+   [text] {$t('editor.addToDashboard')}
    [text] {/snippet}
    [text] (addToDashboardOpen = false)}
   />
@@ -2734,13 +2675,7 @@
    [text] (compareOpen = false)} />
 
   {#if resizing}
-   [title] Format SQL (Alt+F)
-   [title] Save query
-   [title] Share query and chart
    [title] Ask Duck Brain
-   [title] Keep a copy of this result to compare against later
-   [label] Resize editor and results
-   [aria] Resize editor and results
 
 📄 src/lib/components/workspace/TableTab.svelte
    [text] ('data')
@@ -2776,10 +2711,10 @@
    [text] {column.column_type}
    [text] {/each}
    [text] {:else if stats}
+   [text] {$t('common.copy')}
    [title] Open a query on this table
    [title] Read the table again
    [title] Table not found
-   [title] No statistics available
    [title] No definition available
    [desc] This connection does not expose the statement that created t
    [label] {column.column_name} statistics
