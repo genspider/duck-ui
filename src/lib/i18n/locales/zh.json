@@ -282,5 +282,22 @@
   "file.retry": "重试",
   "file.remove": "移除文件",
   "file.tableName": "表名",
-  "file.enterTableName": "输入表名"
+  "file.enterTableName": "输入表名",
+  "csv.delimiter": "分隔符",
+  "csv.delimiterHint": "常见值：,（逗号）、;（分号）、tab、pipe (|)",
+  "csv.delimiterPlaceholder": "分隔符字符",
+  "csv.quoteChar": "引号字符",
+  "csv.quotePlaceholder": "\"（默认）",
+  "csv.escapeChar": "转义字符",
+  "csv.escapePlaceholder": "\"（默认）",
+  "csv.skipRows": "跳过行数",
+  "csv.skipPlaceholder": "0",
+  "csv.sampleSize": "样本大小",
+  "csv.samplePlaceholder": "自动",
+  "csv.nullString": "NULL 字符串",
+  "csv.nullPlaceholder": "空值视为 NULL",
+  "csv.dateFormat": "日期格式",
+  "csv.datePlaceholder": "ISO 8601",
+  "csv.timestampFormat": "时间戳格式",
+  "csv.timestampPlaceholder": "ISO 8601"
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tr } from '../../../lib/i18n/translate'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
   import FormField from '../common/FormField.svelte'
@@ -53,12 +54,12 @@
         {/each}
       </div>
 
-      <FormField label="Delimiter" for="delimiter-{idSuffix}" hint="Common values: , (comma), ; (semicolon), tab, pipe (|)">
+      <FormField label={tr('csv.delimiter')} for="delimiter-{idSuffix}" hint={tr('csv.delimiterHint')}>
         <Input
           id="delimiter-{idSuffix}"
           size="sm"
           value={csvOptions.delimiter}
-          placeholder="Delimiter character"
+          placeholder={tr('csv.delimiterPlaceholder')}
           {disabled}
           oninput={(e) => onchange('delimiter', e.currentTarget.value)}
         />
@@ -68,7 +69,7 @@
         <h5 class="text-xs font-medium text-fg-3">Advanced options</h5>
 
         <div class="grid grid-cols-2 gap-3">
-          <FormField controlWidth="full" label="Quote character" for="quote-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.quoteChar')} for="quote-{idSuffix}">
             <Input
               id="quote-{idSuffix}"
               size="sm"
@@ -79,7 +80,7 @@
             />
           </FormField>
 
-          <FormField controlWidth="full" label="Escape character" for="escape-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.escapeChar')} for="escape-{idSuffix}">
             <Input
               id="escape-{idSuffix}"
               size="sm"
@@ -90,7 +91,7 @@
             />
           </FormField>
 
-          <FormField controlWidth="full" label="Skip rows" for="skip-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.skipRows')} for="skip-{idSuffix}">
             <Input
               id="skip-{idSuffix}"
               size="sm"
@@ -103,7 +104,7 @@
             />
           </FormField>
 
-          <FormField controlWidth="full" label="Sample size" for="sample-size-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.sampleSize')} for="sample-size-{idSuffix}">
             <Input
               id="sample-size-{idSuffix}"
               size="sm"
@@ -119,7 +120,7 @@
 
         <FormField
           controlWidth="full"
-          label="NULL string"
+          label={tr('csv.nullString')}
           for="null-str-{idSuffix}"
           hint="Values matching this string will be treated as NULL"
         >
@@ -127,14 +128,14 @@
             id="null-str-{idSuffix}"
             size="sm"
             value={csvOptions.nullStr ?? ''}
-            placeholder="Empty values treated as NULL"
+            placeholder={tr('csv.nullPlaceholder')}
             {disabled}
             oninput={(e) => onchange('nullStr', e.currentTarget.value)}
           />
         </FormField>
 
         <div class="grid grid-cols-2 gap-3">
-          <FormField controlWidth="full" label="Date format" for="date-format-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.dateFormat')} for="date-format-{idSuffix}">
             <Input
               id="date-format-{idSuffix}"
               size="sm"
@@ -145,7 +146,7 @@
             />
           </FormField>
 
-          <FormField controlWidth="full" label="Timestamp format" for="timestamp-format-{idSuffix}">
+          <FormField controlWidth="full" label={tr('csv.timestampFormat')} for="timestamp-format-{idSuffix}">
             <Input
               id="timestamp-format-{idSuffix}"
               size="sm"
