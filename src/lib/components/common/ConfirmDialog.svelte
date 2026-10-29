@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tr } from '../../i18n/translate'
   import Modal from './Modal.svelte'
   import Button from './Button.svelte'
 
@@ -18,8 +19,8 @@
     open,
     title,
     description = '',
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    confirmLabel = tr('common.confirm'),
+    cancelLabel = tr('common.cancel'),
     loading = false,
     destructive = false,
     onconfirm,
