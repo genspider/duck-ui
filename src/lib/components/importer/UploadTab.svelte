@@ -56,7 +56,7 @@
         <h3 class="text-[13px] font-semibold text-fg">{$t('upload.filesToImport')}</h3>
         <div class="flex items-center gap-2">
           <span class="text-xs text-fg-3">{$t('common.mode')}:</span>
-          <ImportModeSwitch value={importMode} onchange={onmodechange} tableLabel="Import (Table)" viewLabel="Link (View)" />
+          <ImportModeSwitch value={importMode} onchange={onmodechange} tableLabel={$t('upload.tableMode')} viewLabel={$t('upload.viewMode')} />
         </div>
       </div>
       {#if importMode === 'view'}

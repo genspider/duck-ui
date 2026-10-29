@@ -299,5 +299,7 @@
   "csv.dateFormat": "日期格式",
   "csv.datePlaceholder": "ISO 8601",
   "csv.timestampFormat": "时间戳格式",
-  "csv.timestampPlaceholder": "ISO 8601"
+  "csv.timestampPlaceholder": "ISO 8601",
+  "upload.tableMode": "导入 (表)",
+  "upload.viewMode": "链接 (视图)"
 }
