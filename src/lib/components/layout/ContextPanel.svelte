@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { BookOpen, ExternalLink, Star } from 'lucide-svelte'
   import ExplorerPanel from '../explorer/ExplorerPanel.svelte'
   import { getRoute, getSection, goTo, isOnWorkspace } from '../../stores/router.svelte'
@@ -30,10 +31,10 @@
 
 {#snippet pageNav()}
     <div class="flex h-12 shrink-0 items-center pl-4 pr-2">
-      <span class="text-[13px] font-semibold tracking-[-0.01em] text-fg">{group.label}</span>
+      <span class="text-[13px] font-semibold tracking-[-0.01em] text-fg">{$t('nav.' + group.id)}</span>
     </div>
 
-    <nav class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-2" aria-label={group.label}>
+    <nav class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-2" aria-label={$t('nav.' + group.id)}>
       <div class="space-y-px">
         {#each routes as item (item)}
           {@const active = route === item}
@@ -45,7 +46,7 @@
             aria-current={active ? 'page' : undefined}
           >
             <meta.icon size={15} strokeWidth={1.75} class="shrink-0 {active ? 'text-accent' : 'text-fg-3'}" />
-            <span class="truncate">{meta.label}</span>
+            <span class="truncate">{$t('page.' + item.replace(/-([a-z])/g, (_, c) => c.toUpperCase()))}</span>
           </button>
           {#if active && sections.length > 0}
             {@const current = getSection()}
@@ -56,7 +57,7 @@
                   onclick={() => open(item, s.id)}
                   aria-current={current === s.id ? 'true' : undefined}
                 >
-                  <span class="truncate">{s.label}</span>
+                  <span class="truncate">{$t('section.' + s.id)}</span>
                 </button>
               {/each}
             </div>
@@ -71,7 +72,7 @@
             href="https://docs.duckui.com/" target="_blank" rel="noopener noreferrer"
           >
             <BookOpen size={15} strokeWidth={1.75} class="shrink-0 text-fg-3" />
-            <span class="truncate">Docs</span>
+            <span class="truncate">{$t('nav.docs')}</span>
             <ExternalLink size={12} class="ml-auto text-fg-4" />
           </a>
           <a
@@ -79,7 +80,7 @@
             href="https://github.com/caioricciuti/duck-ui" target="_blank" rel="noopener noreferrer"
           >
             <Star size={15} strokeWidth={1.75} class="shrink-0 text-fg-3" />
-            <span class="truncate">GitHub</span>
+            <span class="truncate">{$t('nav.github')}</span>
             <ExternalLink size={12} class="ml-auto text-fg-4" />
           </a>
           <p class="px-2 pt-1 font-mono text-[11px] text-fg-4">v{__DUCK_UI_VERSION__}</p>
@@ -96,7 +97,7 @@
       class="fixed inset-y-0 left-0 z-[61] flex w-[min(86vw,340px)] flex-col overflow-hidden border-r border-edge bg-sidebar"
       role="dialog"
       aria-modal="true"
-      aria-label={isOnWorkspace() ? 'Schema explorer' : `${group.label} navigation`}
+      aria-label={isOnWorkspace() ? $t('explorer.title') : $t('nav.' + group.id) + ' ' + $t('nav.navigation')}
       tabindex="-1"
       use:trapFocus
       transition:fly={{ x: -320, duration: 160 }}

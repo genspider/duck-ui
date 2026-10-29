@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Table2, RefreshCw, SquareTerminal, Rows3, ListTree, Sigma, Code2, Copy, Scissors, SearchX, TriangleAlert } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Tabs, { type TabItem } from '../common/Tabs.svelte'
@@ -290,18 +291,18 @@
               </div>
             </div>
           {:else if stats}
-            <EmptyState icon={Sigma} title="No statistics available" size="compact" class="h-full" />
+            <EmptyState icon={Sigma} title={$t('table.noStats')} size="compact" class="h-full" />
           {:else}
-            {@render waiting('Reading column statistics...')}
+            {@render waiting($t('table.readingStats'))}
           {/if}
         {:else if busy.ddl || !loaded.ddl}
-          {@render waiting('Reading the definition...')}
+          {@render waiting($t('table.readingDefinition'))}
         {:else if ddl}
           <div class="flex h-full flex-col">
             <div class="flex h-9 shrink-0 items-center justify-end border-b border-edge-subtle px-2">
               <Button size="xs" variant="ghost" onclick={copyDdl}>
                 <Copy size={13} />
-                Copy
+                {$t('common.copy')}
               </Button>
             </div>
             <div class="min-h-0 flex-1">

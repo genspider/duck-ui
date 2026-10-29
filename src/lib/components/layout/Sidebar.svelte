@@ -76,8 +76,8 @@
       <button
         class="{railButton} {mobile ? '' : 'mt-1'} {active ? 'bg-active text-fg' : idle}"
         onclick={() => openGroup(group)}
-        title={group.label}
-        aria-label={group.label}
+        title={$t('nav.' + group.id)}
+        aria-label={$t('nav.' + group.id)}
         aria-current={active ? 'page' : undefined}
       >
         {#if active}{@render marker()}{/if}
