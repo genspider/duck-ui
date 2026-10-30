@@ -329,5 +329,13 @@
   "saved.rename": "重命名",
   "saved.options": "选项",
   "saved.deleted": "查询已删除",
-  "saved.deleteFail": "删除查询失败"
+  "saved.deleteFail": "删除查询失败",
+  "rules.title": "规则管理",
+  "rules.subtitle": "发布和管理数据比对规则",
+  "rules.newRule": "新建规则",
+  "rules.emptyTitle": "暂无规则",
+  "rules.emptyDesc": "创建第一条比对规则，供团队复用。",
+  "rules.fingerprint": "结构指纹",
+  "rules.publisher": "发布者",
+  "rules.updated": "更新于"
 }
