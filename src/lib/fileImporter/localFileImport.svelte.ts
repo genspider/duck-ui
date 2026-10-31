@@ -1,4 +1,5 @@
 import { useDuckStore } from "@/store";
+import { tr } from "@/lib/i18n/translate";
 import * as toast from "@/lib/stores/toast.svelte";
 import {
   DEFAULT_CSV_OPTIONS,
@@ -33,14 +34,14 @@ export function createLocalFileImport(ctx: ImporterContext) {
     const extension = extensionOf(file.name) as FileExtension;
 
     if (!extension || !SUPPORTED_FILE_EXTENSIONS.includes(extension)) {
-      errors.push(toUploadError(`Unsupported file type: .${extension}`, file.name));
-      toast.error(`Unsupported file type: .${extension}`);
+      errors.push(toUploadError(tr("fileImporter.unsupportedType", { ext: extension }), file.name));
+      toast.error(tr("fileImporter.unsupportedType", { ext: extension }));
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      const message = `File exceeds maximum size of ${formatFileSize(MAX_FILE_SIZE)}`;
-      errors.push(toUploadError(message, file.name));
-      toast.warning(message);
+      const fileSizeMsg = tr("fileImporter.fileTooLarge", { size: formatFileSize(MAX_FILE_SIZE) });
+      errors.push(toUploadError(fileSizeMsg, file.name));
+      toast.warning(fileSizeMsg);
     }
 
     return errors;
@@ -120,7 +121,7 @@ export function createLocalFileImport(ctx: ImporterContext) {
     if (nameError) {
       ctx.setErrors([...ctx.getErrors(), toUploadError(nameError, file.name)]);
       updateImportState(file.name, { status: "error", error: nameError });
-      toast.error(`Invalid table name for ${file.name}`);
+      toast.error(tr("fileImporter.invalidTableName", { name: file.name }));
       return;
     }
 
@@ -141,7 +142,7 @@ export function createLocalFileImport(ctx: ImporterContext) {
         .getState()
         .importFile(file.name, arrayBuffer, cleanTableName, fileType, undefined, importOptions);
       updateImportState(file.name, { status: "success" });
-      toast.success(`Successfully imported ${file.name}`);
+      toast.success(tr("fileImporter.success", { name: file.name }));
     } catch (e) {
       const errorMessage = errorMessageOf(e);
       updateImportState(file.name, { status: "error", error: errorMessage });
@@ -152,7 +153,7 @@ export function createLocalFileImport(ctx: ImporterContext) {
           errorMessage === "File processing aborted" ? undefined : file.name
         ),
       ]);
-      toast.error(`Error importing ${file.name}`);
+      toast.error(tr("fileImporter.importError", { name: file.name }));
     }
   };
 
@@ -179,11 +180,11 @@ export function createLocalFileImport(ctx: ImporterContext) {
       if (allFilesSuccess) {
         ctx.close();
         reset();
-        toast.success("All files imported successfully");
+        toast.success(tr("fileImporter.allImported"));
       }
     } catch (e) {
       console.error("Error uploading: ", e);
-      toast.error("Error uploading files");
+      toast.error(tr("fileImporter.uploadError"));
     } finally {
       isUploading = false;
       abortController = null;
@@ -193,7 +194,7 @@ export function createLocalFileImport(ctx: ImporterContext) {
   const handleCancelUpload = () => {
     abortController?.abort();
     isUploading = false;
-    toast.warning("Upload cancelled");
+    toast.warning(tr("fileImporter.uploadCancelled"));
   };
 
   const removeFile = (fileName: string) => {
@@ -202,12 +203,12 @@ export function createLocalFileImport(ctx: ImporterContext) {
     delete importStates[fileName];
     delete csvOptions[fileName];
     ctx.setErrors(ctx.getErrors().filter((error) => error.file !== fileName));
-    toast.info(`Removed ${fileName}`);
+    toast.info(tr("fileImporter.removed", { name: fileName }));
   };
 
   const retryFileUpload = (fileName: string) => {
     updateImportState(fileName, { status: "pending", error: undefined });
-    toast.info(`Retrying upload for ${fileName}`);
+    toast.info(tr("fileImporter.retrying", { name: fileName }));
   };
 
   return {

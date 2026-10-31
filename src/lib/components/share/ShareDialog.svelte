@@ -1,5 +1,6 @@
 <script lang="ts">
   import { BadgeCheck, ChartColumn, Check, CodeXml, Info, Link2, Play, SlidersHorizontal } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
   import Sheet from '../common/Sheet.svelte'
   import Tabs from '../common/Tabs.svelte'
   import Input from '../common/Input.svelte'
@@ -29,22 +30,23 @@
   type CopyTarget = 'link' | 'iframe' | 'deep' | 'badge'
 
   const NUMERIC_TYPE = /int|float|double|decimal|hugeint|numeric|real/i
-  const SECTIONS = [
-    { id: 'link', label: 'Link', icon: Link2 },
-    { id: 'embed', label: 'Embed', icon: CodeXml },
-    { id: 'badge', label: 'Badge', icon: BadgeCheck },
-  ]
-  const PARAM_TYPES: { value: ParamType; label: string }[] = [
-    { value: 'select', label: 'Dropdown' },
-    { value: 'search', label: 'Search' },
-    { value: 'range', label: 'Range' },
-  ]
-  const BADGE_FORMATS: { value: SourceFormat; label: string }[] = [
-    { value: 'parquet', label: 'Parquet' },
-    { value: 'csv', label: 'CSV' },
-    { value: 'json', label: 'JSON' },
-    { value: 'duckdb', label: 'DuckDB' },
-  ]
+  // $derived so the labels follow a locale change; the ids are stable.
+  const SECTIONS = $derived([
+    { id: 'link', label: $t('share.tab.link'), icon: Link2 },
+    { id: 'embed', label: $t('share.tab.embed'), icon: CodeXml },
+    { id: 'badge', label: $t('share.tab.badge'), icon: BadgeCheck },
+  ])
+  const PARAM_TYPES: { value: ParamType; label: string }[] = $derived([
+    { value: 'select', label: $t('share.filter.dropdown') },
+    { value: 'search', label: $t('share.filter.search') },
+    { value: 'range', label: $t('share.filter.range') },
+  ])
+  const BADGE_FORMATS: { value: SourceFormat; label: string }[] = $derived([
+    { value: 'parquet', label: $t('share.format.parquet') },
+    { value: 'csv', label: $t('share.format.csv') },
+    { value: 'json', label: $t('share.format.json') },
+    { value: 'duckdb', label: $t('share.format.duckdb') },
+  ])
 
   const uid = $props.id()
 
@@ -144,7 +146,7 @@
       toast.success(which === 'link' ? 'Link copied to clipboard' : 'Embed snippet copied')
       setTimeout(() => (copied = null), 2000)
     } catch {
-      toast.error("Couldn't copy. Select the text and copy manually")
+      toast.error($t('share.copyFailed'))
     }
   }
 </script>
@@ -159,14 +161,14 @@
 <Sheet
   {open}
   {onclose}
-  title="Share this analysis"
-  description="Anyone who opens this gets the query and chart, reconstructed in their browser. No server, no signup."
+  title={$t('share.title')}
+  description={$t('share.desc')}
 >
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap gap-2 text-xs">
-      {@render chip(Check, 'SQL query')}
-      {#if hasChart}{@render chip(ChartColumn, 'Chart config')}{/if}
-      {@render chip(Play, 'Auto-runs on open')}
+      {@render chip(Check, $t('share.chip.sql'))}
+      {#if hasChart}{@render chip(ChartColumn, $t('share.chip.chart'))}{/if}
+      {@render chip(Play, $t('share.chip.autoRun'))}
       {#if params.length > 0}
         {@render chip(SlidersHorizontal, `${params.length} filter${params.length > 1 ? 's' : ''}`)}
       {/if}
@@ -175,31 +177,30 @@
     <Tabs items={SECTIONS} value={section} onchange={(id) => (section = id)} size="sm" />
 
     {#if section === 'link'}
-      <div class="flex flex-col gap-2" role="tabpanel" aria-label="Link">
+      <div class="flex flex-col gap-2" role="tabpanel" aria-label={$t('share.tab.link')}>
         <CopyField
           label="share link"
-          value={building ? 'Building link...' : (links?.appUrl ?? '')}
+          value={building ? $t('share.building') : (links?.appUrl ?? '')}
           busy={building || !links}
           copied={copied === 'link'}
           oncopy={() => links && copy(links.appUrl, 'link')}
         />
-        <p class="text-xs text-fg-3">Share in chat or social. It opens the full Duck-UI editor.</p>
+        <p class="text-xs text-fg-3">{$t('share.descLink')}</p>
       </div>
     {:else if section === 'embed'}
-      <div class="flex flex-col gap-3" role="tabpanel" aria-label="Embed">
+      <div class="flex flex-col gap-3" role="tabpanel" aria-label={$t('share.tab.embed')}>
         <div class="flex flex-col gap-1.5">
-          <p class="text-xs font-medium text-fg-2">iframe, works anywhere</p>
+          <p class="text-xs font-medium text-fg-2">{$t('share.embedSectionTitle')}</p>
           <CopyField
             label="iframe snippet"
             rows={3}
-            value={building ? 'Building snippet...' : (links?.iframeSnippet ?? '')}
+            value={building ? $t('share.building') : (links?.iframeSnippet ?? '')}
             busy={building || !links}
             copied={copied === 'iframe'}
             oncopy={() => links && copy(links.iframeSnippet, 'iframe')}
           />
           <p class="text-xs text-fg-3">
-            Paste into any HTML page, Notion, or Ghost: a live, read-only DuckDB chart that runs entirely in the
-            viewer's browser.
+            {$t('share.embedHint')}
           </p>
         </div>
 
@@ -208,10 +209,10 @@
           <div class="flex flex-col gap-2 border-t border-edge-subtle pt-3">
             <div class="flex items-center gap-2">
               <SlidersHorizontal size={14} class="text-fg-3" />
-              <p class="text-xs font-medium text-fg-2">Interactive filters (optional)</p>
+              <p class="text-xs font-medium text-fg-2">{$t('share.filterSectionTitle')}</p>
             </div>
             <p class="text-xs text-fg-3">
-              Let viewers filter the embed live. Pick result columns to expose as controls.
+              {$t('share.filterHint')}
             </p>
             <div class="max-h-40 divide-y divide-edge-subtle overflow-auto rounded-md border border-edge-subtle">
               {#each columns as col (col.name)}
@@ -244,32 +245,29 @@
         {/if}
       </div>
     {:else}
-      <div class="flex flex-col gap-3" role="tabpanel" aria-label="Badge">
+      <div class="flex flex-col gap-3" role="tabpanel" aria-label={$t('share.tab.badge')}>
         <p class="text-xs text-fg-3">
-          An <strong class="font-medium text-fg-2">Open in Duck-UI</strong> link loads remote data and this query in
-          one click. Paste the badge into a dataset README or blog post. Openers see a confirmation before anything
-          runs.
+          {$t('share.badgeDesc')}
         </p>
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-medium text-fg-2" for="{uid}-urls">Data URL(s), comma separated</label>
+          <label class="text-xs font-medium text-fg-2" for="{uid}-urls">{$t('share.dataUrlLabel')}</label>
           <Input
             id="{uid}-urls"
             size="sm"
             mono
             value={badgeInput}
-            placeholder="https://example.com/data.parquet"
+            placeholder={$t('share.urlPlaceholder')}
             oninput={(e) => (badgeDataUrl = e.currentTarget.value)}
           />
           {#if detectedSources.length === 0 && !badgeDataUrl}
             <p class="text-xs text-fg-3">
-              This query doesn't read from a URL yet. Point it at hosted data (with CORS enabled) so the link
-              reproduces for anyone.
+              {$t('share.urlHint')}
             </p>
           {/if}
           {#if needsFormat}
             <div class="flex items-center gap-2 text-xs">
               <label class="text-fg-3" for="{uid}-format">
-                A URL has no file extension. Pick its format so the link works:
+                {$t('share.formatHint')}
               </label>
               <Select id="{uid}-format" size="sm" class="w-28 shrink-0" bind:value={badgeFormat} options={BADGE_FORMATS} />
             </div>
@@ -277,7 +275,7 @@
         </div>
         {#if deepLink && badgeMarkdown}
           <div class="flex flex-col gap-1.5">
-            <p class="text-xs font-medium text-fg-2">Deep link</p>
+            <p class="text-xs font-medium text-fg-2">{$t('share.deepLabel')}</p>
             <CopyField
               label="deep link"
               value={deepLink}
@@ -286,7 +284,7 @@
             />
           </div>
           <div class="flex flex-col gap-1.5">
-            <p class="text-xs font-medium text-fg-2">Markdown badge</p>
+            <p class="text-xs font-medium text-fg-2">{$t('share.markdownLabel')}</p>
             <CopyField
               label="markdown badge"
               value={badgeMarkdown}
@@ -294,7 +292,7 @@
               oncopy={() => copy(badgeMarkdown, 'badge')}
             />
             <p class="text-xs text-fg-3">
-              Renders as
+              {$t('share.rendersAs')}
               <img src="{import.meta.env.BASE_URL}badge.svg" alt="Open in Duck-UI" class="inline h-4 align-text-bottom" />
             </p>
           </div>
@@ -307,17 +305,14 @@
       <div class="flex items-start gap-2 rounded-md border border-edge-subtle bg-surface-2 p-3 text-xs text-fg-2">
         <Info size={14} class="mt-0.5 shrink-0 text-info" />
         <p>
-          The link carries the query, not the data. This one reads from a URL, so it reproduces fully for anyone who
-          opens it.
+          {$t('share.dataHint')}
         </p>
       </div>
     {:else}
       <div class="flex items-start gap-2 rounded-md bg-danger-soft p-3 text-xs text-danger" role="alert">
         <Info size={14} class="mt-0.5 shrink-0" />
         <p>
-          Heads up: this query reads a <strong class="font-medium">locally-imported table</strong>, so it won't
-          reproduce for viewers. To make a shareable or embeddable analysis, read from a URL instead, for example
-          <code class="mx-0.5 font-mono">read_parquet('https://...')</code>.
+          {@html $t('share.localTableWarning')}
         </p>
       </div>
     {/if}

@@ -1,4 +1,5 @@
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { useDuckStore } from "@/store";
 import {
   fileSystemService,
@@ -103,7 +104,9 @@ export async function importFolderFile(
   const resultLabel = importMode === "view" ? "view" : "table";
 
   try {
-    toast.loading(`${modeLabel} ${file.name}...`, { id: TOAST_ID });
+    toast.loading(tr("fileImporter.folderImporting", { mode: modeLabel, name: file.name }), {
+      id: TOAST_ID,
+    });
 
     const fileData = await fileSystemService.readFile(folderId, file.path);
     const buffer = await fileData.arrayBuffer();
@@ -114,11 +117,19 @@ export async function importFolderFile(
     await importFile(file.name, buffer, tableName, fileType, undefined, { importMode, csv });
     await fetchDatabasesAndTablesInfo();
 
-    toast.success(`Created ${resultLabel} "${tableName}" from "${file.name}"`, { id: TOAST_ID });
+    toast.success(
+      tr("fileImporter.folderCreated", { label: resultLabel, name: tableName, file: file.name }),
+      { id: TOAST_ID }
+    );
   } catch (error) {
     console.error("Failed to import file:", error);
-    toast.error(`Failed to import: ${error instanceof Error ? error.message : "Unknown error"}`, {
-      id: TOAST_ID,
-    });
+    toast.error(
+      tr("fileImporter.folderImportFailed", {
+        message: error instanceof Error ? error.message : tr("common.unknownError"),
+      }),
+      {
+        id: TOAST_ID,
+      }
+    );
   }
 }

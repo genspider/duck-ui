@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import PageHeader from '../common/PageHeader.svelte'
   import PageBody from '../common/PageBody.svelte'
   import Badge from '../common/Badge.svelte'
@@ -11,7 +12,7 @@
   const sessionId = $derived(duck((s) => s.currentSession?.id))
 </script>
 
-<PageHeader title="Extensions" subtitle="DuckDB extensions for the active connection">
+<PageHeader title={$t('ext.extensions')} subtitle={$t('ext.subtitle')}>
   {#snippet meta()}
     {#if connection}<Badge tone="brand">{connection.name}</Badge>{/if}
   {/snippet}

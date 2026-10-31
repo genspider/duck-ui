@@ -20,8 +20,9 @@ export type NavGroupId = "query" | "library" | "data" | "share" | "settings";
 type Icon = typeof Settings;
 
 export interface PageMeta {
-  label: string;
-  description: string;
+  /** i18n key，渲染时用 $t()/tr() 翻译 */
+  labelKey: string;
+  descriptionKey: string;
   icon: Icon;
   /** Kiosk flag that removes the page when set. */
   hiddenBy?: keyof UiConfig;
@@ -29,52 +30,54 @@ export interface PageMeta {
 
 export interface PageSection {
   id: string;
-  label: string;
+  /** i18n key，渲染时用 $t()/tr() 翻译 */
+  labelKey: string;
 }
 
 export interface NavGroup {
   id: NavGroupId;
-  label: string;
+  /** i18n key，渲染时用 $t()/tr() 翻译 */
+  labelKey: string;
   icon: Icon;
   routes: PageRoute[];
 }
 
 export const PAGE_ROUTES: Record<PageRoute, PageMeta> = {
   dashboards: {
-    label: "Dashboards",
-    description: "Reports written as markdown, with live SQL",
+    labelKey: "page.dashboards",
+    descriptionKey: "page.dashboards.description",
     icon: LayoutDashboard,
   },
   "saved-queries": {
-    label: "Saved queries",
-    description: "Queries you kept for later",
+    labelKey: "page.savedQueries",
+    descriptionKey: "page.savedQueries.description",
     icon: Bookmark,
   },
   history: {
-    label: "History",
-    description: "What ran in this session and before",
+    labelKey: "page.history",
+    descriptionKey: "page.history.description",
     icon: History,
   },
   connections: {
-    label: "Connections",
-    description: "DuckDB servers and browser databases this profile can query",
+    labelKey: "page.connections",
+    descriptionKey: "page.connections.description",
     icon: Cable,
     hiddenBy: "hideConnections",
   },
   extensions: {
-    label: "Extensions",
-    description: "DuckDB extensions for the active connection",
+    labelKey: "page.extensions",
+    descriptionKey: "page.extensions.description",
     icon: Puzzle,
     hiddenBy: "hideSettings",
   },
   live: {
-    label: "Live session",
-    description: "Work with someone from two browsers, with no server in between",
+    labelKey: "page.live",
+    descriptionKey: "page.live.description",
     icon: Radio,
   },
   settings: {
-    label: "Settings",
-    description: "Profile, AI provider and engine preferences for this browser",
+    labelKey: "page.settings",
+    descriptionKey: "page.settings.description",
     icon: Settings,
     hiddenBy: "hideSettings",
   },
@@ -82,25 +85,25 @@ export const PAGE_ROUTES: Record<PageRoute, PageMeta> = {
 
 export const PAGE_SECTIONS: Partial<Record<PageRoute, PageSection[]>> = {
   settings: [
-    { id: "profile", label: "Profile" },
-    { id: "general", label: "General" },
-    { id: "ai", label: "AI" },
-    { id: "performance", label: "Performance" },
-    { id: "project", label: "Project" },
+    { id: "profile", labelKey: "section.profile" },
+    { id: "general", labelKey: "section.general" },
+    { id: "ai", labelKey: "section.ai" },
+    { id: "performance", labelKey: "section.performance" },
+    { id: "project", labelKey: "section.project" },
   ],
 };
 
 export const NAV_GROUPS: NavGroup[] = [
-  { id: "query", label: "Query", icon: SquareTerminal, routes: [] },
+  { id: "query", labelKey: "nav.query", icon: SquareTerminal, routes: [] },
   {
     id: "library",
-    label: "Library",
+    labelKey: "nav.library",
     icon: Library,
     routes: ["dashboards", "saved-queries", "history"],
   },
-  { id: "data", label: "Data", icon: Database, routes: ["connections", "extensions"] },
-  { id: "share", label: "Share live", icon: Radio, routes: ["live"] },
-  { id: "settings", label: "Settings", icon: Settings, routes: ["settings"] },
+  { id: "data", labelKey: "nav.data", icon: Database, routes: ["connections", "extensions"] },
+  { id: "share", labelKey: "nav.share", icon: Radio, routes: ["live"] },
+  { id: "settings", labelKey: "nav.settings", icon: Settings, routes: ["settings"] },
 ];
 
 export const isPageRoute = (value: string | null): value is PageRoute =>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { Snippet } from 'svelte'
   import { fly, fade } from 'svelte/transition'
   import { X } from 'lucide-svelte'
@@ -53,7 +54,7 @@
             <p class="mt-0.5 text-[13px] text-fg-3">{description}</p>
           {/if}
         </div>
-        <Button icon variant="ghost" size="sm" class="-mr-1.5 -mt-1" onclick={onclose} aria-label="Close">
+        <Button icon variant="ghost" size="sm" class="-mr-1.5 -mt-1" onclick={onclose} aria-label={$t('common.close')}>
           <X size={15} />
         </Button>
       </div>

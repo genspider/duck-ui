@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { getSession } from "@/services/engine";
 import { DatasetRunner } from "@/services/dashboard/queryRunner";
 import { parseDashboardSource, starterSource, toQueryName } from "@/services/dashboard/markdown";
@@ -123,7 +124,7 @@ export const createDashboardSlice: StateCreator<DuckStoreState, [], [], Dashboar
   createDashboard: async (name: string) => {
     const profileId = get().currentProfileId;
     if (!profileId) {
-      toast.error("Create a profile before making a dashboard");
+      toast.error(tr("dashboard.createProfileFirst"));
       return null;
     }
     const connectionId = get().currentConnection?.id ?? "WASM";
@@ -182,7 +183,7 @@ export const createDashboardSlice: StateCreator<DuckStoreState, [], [], Dashboar
         toast.error(
           error instanceof Error && /another Duck-UI tab/.test(error.message)
             ? error.message
-            : "Couldn't save the dashboard"
+            : tr("dashboard.saveFailed")
         );
       }
     };
@@ -278,7 +279,7 @@ export const createDashboardSlice: StateCreator<DuckStoreState, [], [], Dashboar
     });
 
     get().openDashboardTab(dashboard.id, dashboard.name);
-    toast.success(`Added to "${dashboard.name}"`);
+    toast.success(tr("session.addedToDashboard", { name: dashboard.name }));
   },
 
   /** Focuses the tab for a dashboard, opening one if it is not already open. */

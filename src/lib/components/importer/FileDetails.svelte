@@ -54,11 +54,11 @@
         <div class="min-w-0">
           <h3 class="truncate text-[13px] font-medium text-fg" title={file.name}>{file.name}</h3>
           <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-fg-3">
-            <span class="inline-flex items-center gap-1" title="File size">
+            <span class="inline-flex items-center gap-1" title={$t('importer.fileSize')}>
               <HardDrive size={12} />
               {formatFileSize(file.size)}
             </span>
-            <span class="inline-flex items-center gap-1" title="Last modified">
+            <span class="inline-flex items-center gap-1" title={$t('importer.lastModified')}>
               <Calendar size={12} />
               {lastModified}
             </span>
@@ -83,7 +83,7 @@
         for="table-{idSuffix}"
         required
         error={nameError ?? undefined}
-        hint="This name will be used to reference the table in SQL queries"
+        hint={$t('importer.tableNameHint')}
       >
         <Input
           id="table-{idSuffix}"
@@ -111,7 +111,7 @@
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={status.progress}
-            aria-label="Upload progress for {file.name}"
+            aria-label={$t('importer.uploadProgress', { values: { name: file.name } })}
           >
             <div class="h-full bg-accent transition-[width]" style="width: {status.progress}%"></div>
           </div>
@@ -121,7 +121,7 @@
       {#if status.status === 'success'}
         <p class="mt-3 flex items-center gap-1.5 rounded-md bg-success-soft px-2 py-1.5 text-xs text-success">
           <FileCheck size={13} />
-          Successfully imported
+          {$t('importer.successImport')}
         </p>
       {/if}
 

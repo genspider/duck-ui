@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Cable, ChevronDown } from 'lucide-svelte'
   import type { ConnectionProvider } from '@/store/types'
   import { getUiConfig } from '@/lib/appConfig'
@@ -141,7 +142,7 @@
     class="inline-flex h-7 min-w-0 items-center gap-2 rounded-md border border-edge px-2 text-xs text-fg-2 transition-colors hover:border-edge-strong hover:bg-hover hover:text-fg disabled:cursor-not-allowed disabled:opacity-70"
     aria-haspopup="menu"
     aria-expanded={open}
-    aria-label={`Switch connection, current: ${activeConnection?.name ?? 'none'}`}
+    aria-label={$t('connection.switchAria', { values: { name: activeConnection?.name ?? $t('common.none') } })}
     disabled={loading}
     onclick={() => (open ? closeMenu() : openMenu())}
   >
@@ -169,11 +170,11 @@
     class="surface-card fixed z-[96] rounded-md py-1"
     style="left:{left}px;top:{top}px;width:{MENU_WIDTH}px"
     role="menu"
-    aria-label="Switch connection"
+    aria-label={$t('connection.switchMenu')}
     tabindex="-1"
     onkeydown={onMenuKeydown}
   >
-    <p class="px-3 py-1 text-[11px] text-fg-3">Switch Connection</p>
+    <p class="px-3 py-1 text-[11px] text-fg-3">{$t('connection.switch')}</p>
 
     {#each ownConnections as connection (connection.id)}
       {@const isActive = activeConnection?.id === connection.id}
@@ -197,7 +198,7 @@
          indistinguishable from a local one. -->
     {#if sessionConnections.length > 0}
       <div class="my-1 h-px bg-edge-subtle"></div>
-      <p class="px-3 py-1 text-[11px] text-fg-3">Session</p>
+      <p class="px-3 py-1 text-[11px] text-fg-3">{$t('connection.session')}</p>
       {#each sessionConnections as connection (connection.id)}
         {@const isActive = activeConnection?.id === connection.id}
         <button
@@ -213,7 +214,7 @@
           <span class="min-w-0 flex-1">
             <span class="block truncate font-medium">{connection.name}</span>
             <span class="block truncate text-[10px] text-fg-3">
-              {hostName ? `Hosted by ${hostName}` : 'Hosted by a participant'} · Read-only
+              {hostName ? $t('connection.hostedBy', { values: { name: hostName } }) : $t('connection.hostedParticipant')} · {$t('connection.readOnly')}
             </span>
           </span>
         </button>
@@ -224,7 +225,7 @@
       <div class="my-1 h-px bg-edge-subtle"></div>
       <button type="button" role="menuitem" class={itemClass} onclick={manageConnections}>
         <Cable size={14} class="shrink-0" />
-        <span>Manage Connections</span>
+        <span>{$t('connection.manage')}</span>
       </button>
     {/if}
   </div>

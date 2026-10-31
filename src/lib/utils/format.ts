@@ -1,3 +1,5 @@
+import { tr } from "@/lib/i18n/translate";
+
 /** Format a number with locale-aware separators */
 export function formatNumber(n: number): string {
   return n.toLocaleString();
@@ -86,9 +88,9 @@ export function formatRelativeTime(value: unknown): string {
   if (!date) return "";
   if (Number.isNaN(date.getTime())) return String(value);
   const diff = Math.max(0, Date.now() - date.getTime());
-  if (diff < 60_000) return "just now";
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
-  if (diff < 604_800_000) return `${Math.floor(diff / 86_400_000)}d ago`;
+  if (diff < 60_000) return tr("format.justNow");
+  if (diff < 3_600_000) return tr("format.minutesAgo", { n: Math.floor(diff / 60_000) });
+  if (diff < 86_400_000) return tr("format.hoursAgo", { n: Math.floor(diff / 3_600_000) });
+  if (diff < 604_800_000) return tr("format.daysAgo", { n: Math.floor(diff / 86_400_000) });
   return date.toLocaleDateString();
 }

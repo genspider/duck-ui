@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { ColumnMeta } from '../../types/query'
   import type { ColumnStats } from '../../utils/stats'
   import { getDisplayType, isRightAligned } from '../../utils/column-types'
@@ -39,15 +40,15 @@
   function describe(stat: ColumnStats): string {
     const parts: string[] = []
     if (stat.displayType === 'number' && stat.min !== undefined) {
-      parts.push(`min ${num(stat.min)}`, `max ${num(stat.max)}`, `avg ${num(stat.avg)}`)
+      parts.push(`${$t('table.min')} ${num(stat.min)}`, `${$t('table.max')} ${num(stat.max)}`, `${$t('table.avg')} ${num(stat.avg)}`)
     } else if (stat.displayType === 'date' && stat.earliest) {
-      parts.push(`${stat.earliest} to ${stat.latest}`)
+      parts.push(`${stat.earliest} ${$t('table.to')} ${stat.latest}`)
     } else if (stat.displayType === 'bool') {
-      parts.push(`true ${formatNumber(stat.trueCount ?? 0)}`, `false ${formatNumber(stat.falseCount ?? 0)}`)
+      parts.push(`${$t('table.true')} ${formatNumber(stat.trueCount ?? 0)}`, `${$t('table.false')} ${formatNumber(stat.falseCount ?? 0)}`)
     } else if (stat.distinct !== undefined) {
-      parts.push(`${formatNumber(stat.distinct)}${stat.distinctCapped ? '+' : ''} distinct`)
+      parts.push(`${formatNumber(stat.distinct)}${stat.distinctCapped ? '+' : ''} ${$t('table.distinct')}`)
     }
-    parts.push(`${formatNumber(stat.nulls)} null`)
+    parts.push(`${formatNumber(stat.nulls)} ${$t('table.null')}`)
     if (statsScope) parts.push(statsScope)
     return parts.join(' · ')
   }
@@ -112,21 +113,21 @@
   {@const filled = stat.count - stat.nulls}
   <div class="mt-1.5 flex h-4 items-end gap-1.5 text-left text-[10px] font-normal leading-none text-fg-4" title={describe(stat)}>
     {#if filled === 0}
-      <span class="truncate">{stat.count > 0 ? 'all null' : ''}</span>
+      <span class="truncate">{stat.count > 0 ? $t('table.allNull') : ''}</span>
     {:else if stat.bins}
       {@const peak = Math.max(...stat.bins)}
-      <div class="flex h-full min-w-0 flex-1 items-end gap-px" role="img" aria-label="Distribution of {stat.name}: {describe(stat)}">
+      <div class="flex h-full min-w-0 flex-1 items-end gap-px" role="img" aria-label="{$t('table.distOf', { values: { name: stat.name } })}">
         {#each stat.bins as count, b (b)}
           <div class="flex-1 rounded-t-[1px] bg-accent/60" style="height:{count > 0 ? Math.max(12, (count / peak) * 100) : 0}%"></div>
         {/each}
       </div>
     {:else if stat.displayType === 'bool'}
-      <div class="mb-1 flex h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-edge-strong" role="img" aria-label="Share of true in {stat.name}: {describe(stat)}">
+      <div class="mb-1 flex h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-edge-strong" role="img" aria-label="{$t('table.shareTrue', { values: { name: stat.name } })}">
         <div class="h-full bg-accent/60" style="width:{((stat.trueCount ?? 0) / filled) * 100}%"></div>
       </div>
     {:else if stat.top}
       {@const peak = stat.top[0]?.count || 1}
-      <div class="flex h-full min-w-0 flex-1 items-end gap-px" role="img" aria-label="Values of {stat.name}: {describe(stat)}">
+      <div class="flex h-full min-w-0 flex-1 items-end gap-px" role="img" aria-label="{$t('table.valuesOf', { values: { name: stat.name } })}">
         {#each stat.top as entry (entry.value)}
           <div
             class="max-w-3 flex-1 rounded-t-[1px] bg-accent/60"
@@ -136,14 +137,14 @@
         {/each}
       </div>
     {:else if stat.distinct !== undefined}
-      <span class="min-w-0 flex-1 truncate">{formatNumber(stat.distinct)}{stat.distinctCapped ? '+' : ''} distinct</span>
+      <span class="min-w-0 flex-1 truncate">{formatNumber(stat.distinct)}{stat.distinctCapped ? '+' : ''} {$t('table.distinct')}</span>
     {:else if stat.displayType === 'number' && stat.min !== undefined}
-      <span class="min-w-0 flex-1 truncate">all {num(stat.min)}</span>
+      <span class="min-w-0 flex-1 truncate">{$t('table.allValue', { values: { value: num(stat.min) } })}</span>
     {:else}
       <span class="min-w-0 flex-1"></span>
     {/if}
     {#if stat.nulls > 0 && filled > 0}
-      <span class="shrink-0 tabular-nums">{share(stat.nulls, stat.count)} null</span>
+      <span class="shrink-0 tabular-nums">{share(stat.nulls, stat.count)} {$t('table.null')}</span>
     {/if}
   </div>
 {/snippet}
@@ -155,7 +156,7 @@
       class="sticky left-0 z-20 px-2.5 py-2 text-xs font-semibold text-fg-2 border-r border-edge-subtle text-center select-none bg-surface-2"
       style="width:60px;max-width:60px;min-width:60px"
       ondblclick={() => onfitall?.()}
-      title="Double-click to auto-fit all columns"
+      title={$t('table.autoFitAll')}
     >#</th>
     {#each columns as col, i}
       <th
@@ -206,8 +207,8 @@
                   : 'text-fg-4 opacity-0 group-hover:opacity-100 hover:text-fg'}"
               onclick={(e) => handleFilterClick(e, col.name)}
               onmousedown={(e) => e.stopPropagation()}
-              title={active ? `Edit filter on ${col.name}` : `Filter ${col.name}`}
-              aria-label={`Filter ${col.name} column`}
+              title={active ? $t('table.editFilter', { values: { name: col.name } }) : $t('table.filter', { values: { name: col.name } })}
+              aria-label={$t('table.filterAria', { values: { name: col.name } })}
             >
               <Filter size={11} fill={active ? 'currentColor' : 'none'} />
             </button>
@@ -226,8 +227,8 @@
             onmousedown={(e) => handleMouseDown(e, i)}
             ondblclick={(e) => handleFitColumn(e, i)}
             onclick={(e) => e.stopPropagation()}
-            title="Drag to resize, double-click to auto-fit"
-            aria-label={`Resize ${col.name} column`}
+            title={$t('table.resizeHint')}
+            aria-label={$t('table.resizeAria', { values: { name: col.name } })}
           ></button>
         {/if}
       </th>

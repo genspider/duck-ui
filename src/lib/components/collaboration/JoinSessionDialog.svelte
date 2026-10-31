@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Check, Copy, Lock } from 'lucide-svelte'
   import Sheet from '../common/Sheet.svelte'
   import Button from '../common/Button.svelte'
@@ -48,7 +49,7 @@
         const decoded = await decodeInvite<ManualInvite>(encoded)
         if (cancelled) return
         if (!decoded || !('offer' in decoded)) {
-          toast.error("That invite link isn't readable")
+          toast.error($t('liveSession.join.invalidInvite'))
           clearInviteHash()
           return
         }
@@ -71,9 +72,9 @@
       await navigator.clipboard.writeText(value)
       copied = true
       setTimeout(() => (copied = false), 1500)
-      toast.success('Copied. Send this back to the host')
+      toast.success($t('liveSession.join.copiedToast'))
     } catch {
-      toast.error('Could not copy. Select the text and copy it manually')
+      toast.error($t('liveSession.join.copiedError'))
     }
   }
 
@@ -96,16 +97,15 @@
 </script>
 
 {#if invite}
-  <Sheet open={!dismissed} onclose={close} title="Join “{invite.sessionName}”" description="Hosted by {host}">
+  <Sheet open={!dismissed} onclose={close} title={$t('liveSession.join.title', { values: { name: invite.sessionName } })} description={$t('liveSession.join.description', { values: { name: host } })}>
     {#if !hasCode}
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2 rounded-md border border-edge-subtle p-3 text-[13px] text-fg">
-          <p>This session can share workspace state with your browser.</p>
+          <p>{$t('liveSession.join.privacy')}</p>
           <div class="flex items-start gap-2 text-xs text-fg-3">
             <Lock size={14} class="mt-0.5 shrink-0 text-success" />
             <span>
-              Your own data stays private. Nothing runs and no file is read until you join, and any shared data
-              appears only if {host} grants it.
+              {$t('liveSession.join.privacyHint', { values: { host } })}
             </span>
           </div>
         </div>
@@ -116,10 +116,10 @@
       </div>
     {:else}
       <div class="flex flex-col gap-4">
-        <FormField label="Send this code back to {host}" for="{uid}-answer" controlWidth="full">
+        <FormField label={$t('liveSession.join.sendCode', { values: { host } })} for="{uid}-answer" controlWidth="full">
           <div class="flex gap-2">
             <Input id="{uid}-answer" readonly mono class="text-xs" value={session.answerCode ?? ''} />
-            <Button icon variant="outline" onclick={() => copy(session.answerCode ?? '')} aria-label="Copy connection code">
+            <Button icon variant="outline" onclick={() => copy(session.answerCode ?? '')} aria-label={$t('liveSession.copyCodeAria')}>
               {#if copied}<Check size={14} />{:else}<Copy size={14} />{/if}
             </Button>
           </div>
@@ -128,23 +128,23 @@
         {#if isConnected}
           <p class="flex items-center gap-1.5 text-xs text-success">
             <Check size={14} />
-            Connected to {host}
+            {$t('liveSession.join.connected', { values: { host } })}
           </p>
         {:else}
           <p class="flex items-center gap-1.5 text-xs text-fg-3">
             <Spinner size="sm" class="h-3.5 w-3.5" />
-            Waiting for {host} to paste it...
+            {$t('liveSession.join.waiting', { values: { host } })}
           </p>
         {/if}
 
         {#if session.sharedCapabilities.length > 0}
           <div class="rounded-md border border-success/40 bg-success-soft p-3 text-[13px] text-fg">
-            <p class="font-medium">Shared data available</p>
+            <p class="font-medium">{$t('liveSession.join.sharedData')}</p>
             <ul class="mt-1 flex flex-col gap-0.5 text-xs">
               {#each session.sharedCapabilities as capability (capability.id)}
                 <li>
-                  {capability.name} · read-only{capability.policy.maxResultRows
-                    ? ` · up to ${capability.policy.maxResultRows.toLocaleString()} rows`
+                  {capability.name} · {$t('liveSession.readOnly')}{capability.policy.maxResultRows
+                    ? ` · ${$t('liveSession.fork.upTo', { values: { limit: capability.policy.maxResultRows.toLocaleString() } })}`
                     : ''}
                 </li>
               {/each}
@@ -160,10 +160,10 @@
 
     {#snippet footer()}
       {#if !hasCode}
-        <Button variant="ghost" onclick={decline}>Not now</Button>
-        <Button onclick={() => inviteCode && duckActions().joinLiveSession(inviteCode)} loading={isConnecting}>Join</Button>
+        <Button variant="ghost" onclick={decline}>{$t('liveSession.join.notNow')}</Button>
+        <Button onclick={() => inviteCode && duckActions().joinLiveSession(inviteCode)} loading={isConnecting}>{$t('liveSession.join.join')}</Button>
       {:else}
-        <Button variant="outline" onclick={hide}>{isConnected ? 'Open workspace' : 'Hide'}</Button>
+        <Button variant="outline" onclick={hide}>{isConnected ? $t('liveSession.join.openWorkspace') : $t('liveSession.join.hide')}</Button>
       {/if}
     {/snippet}
   </Sheet>

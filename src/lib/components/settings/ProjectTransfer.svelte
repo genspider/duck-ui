@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Download, Upload } from 'lucide-svelte'
   import { downloadProjectExport } from '@/services/projectTransfer'
   import Button from '../common/Button.svelte'
@@ -31,22 +32,22 @@
 </script>
 
 <section>
-  <SectionHeader title="Project files" />
+  <SectionHeader title={$t('projectTransfer.title')} />
   <p class="mb-3 max-w-[64ch] text-xs leading-relaxed text-fg-3">
-    Export saved queries, notebooks and dashboards as a zip of plain
-    <code class="rounded-sm bg-surface-2 px-1 font-mono text-fg-2">.sql</code> and
-    <code class="rounded-sm bg-surface-2 px-1 font-mono text-fg-2">.md</code> files you can commit to git. Connections,
-    credentials and AI settings are never included. Importing merges by id, then by name, and shows what will change
-    first.
+    {$t('projectTransfer.desc1')}
+    <code class="rounded-sm bg-surface-2 px-1 font-mono text-fg-2">.sql</code>
+    {$t('projectTransfer.desc2')}
+    <code class="rounded-sm bg-surface-2 px-1 font-mono text-fg-2">.md</code>
+    {$t('projectTransfer.desc3')}
   </p>
   <div class="flex flex-wrap gap-2">
     <Button size="sm" variant="outline" disabled={!currentProfileId} loading={exporting} onclick={exportProject}>
       <Download size={14} />
-      Export project
+      {$t('projectTransfer.export')}
     </Button>
     <Button size="sm" variant="outline" disabled={!currentProfileId} onclick={() => inputEl?.click()}>
       <Upload size={14} />
-      Import project
+      {$t('projectTransfer.import')}
     </Button>
   </div>
   <input
@@ -54,7 +55,7 @@
     type="file"
     accept=".zip,application/zip"
     class="hidden"
-    aria-label="Project zip file"
+    aria-label={$t('projectTransfer.projectFileAria')}
     tabindex="-1"
     onchange={pickFile}
   />

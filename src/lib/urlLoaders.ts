@@ -1,5 +1,6 @@
 import { useDuckStore } from "@/store";
 import * as toast from "@/lib/stores/toast.svelte";
+import { tr } from "@/lib/i18n/translate";
 import { getUiConfig } from "@/lib/appConfig";
 import { parseDeepLink, type DeepLinkRequest } from "@/lib/deepLink";
 import { decodeShare, readShareParam, clearShareHash, serializeShareCells } from "@/lib/share";
@@ -68,14 +69,14 @@ export function loadQueryFromURL(): void {
       clearShareHash();
 
       if (!payload) {
-        toast.error("This shared link is invalid or corrupted.");
+        toast.error(tr("share.invalidOrCorrupted"));
         return;
       }
 
       if (payload.type === "notebook") {
         const content = payload.cells ? serializeShareCells(payload.cells) : "";
         createTab("notebook", content, payload.title);
-        toast.success("Shared notebook loaded");
+        toast.success(tr("share.notebookLoaded"));
         return;
       }
 
@@ -84,15 +85,13 @@ export function loadQueryFromURL(): void {
       if (payload.chartConfig && tabId) {
         updateTabChartConfig(tabId, payload.chartConfig);
       }
-      toast.success("Shared analysis loaded");
+      toast.success(tr("share.analysisLoaded"));
 
       if (payload.autoRun && sql.trim() && tabId) {
         // Small delay to ensure the tab is mounted before executing.
         setTimeout(() => {
           executeQuery(sql, tabId).catch(() => {
-            toast.error(
-              "Couldn't run the shared query automatically. It may need data that isn't loaded yet."
-            );
+            toast.error(tr("share.autoRunFailed"));
           });
         }, 100);
       }
@@ -104,12 +103,12 @@ export function loadQueryFromURL(): void {
   try {
     const decodedQuery = atob(queryParam as string);
     if (!decodedQuery.trim()) {
-      toast.error("Empty query in URL");
+      toast.error(tr("share.emptyQuery"));
       return;
     }
 
     const tabId = createTab("sql", decodedQuery);
-    toast.success("Query loaded from URL");
+    toast.success(tr("share.queryLoaded"));
 
     if (searchParams.get("execute") === "true" && tabId) {
       setTimeout(() => {
@@ -120,7 +119,7 @@ export function loadQueryFromURL(): void {
     clearSearchParams();
   } catch (error) {
     console.error("Failed to decode query from URL:", error);
-    toast.error("Failed to decode query from URL. Invalid base64 encoding.");
+    toast.error(tr("share.decodeFailed"));
   }
 }
 

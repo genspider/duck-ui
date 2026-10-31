@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Check, Copy, ExternalLink, Eye, GitFork, Cpu, Unplug, UserMinus, X } from 'lucide-svelte'
   import PageHeader from '../common/PageHeader.svelte'
   import PageBody from '../common/PageBody.svelte'
@@ -36,7 +37,7 @@
   const guesting = $derived(
     session.role === 'guest' && phase !== 'dropped' && (phase !== 'idle' || Boolean(session.answerCode)),
   )
-  const sessionTitle = $derived(session.sessionName || 'Live session')
+  const sessionTitle = $derived(session.sessionName || $t('liveSession.title'))
 
   let forking = $state<SharedCapability | null>(null)
   let copied = $state(false)
@@ -44,18 +45,18 @@
   const FACTS = [
     {
       icon: Eye,
-      title: 'They see your workspace',
-      text: 'Tabs, editors and dashboards, with a cursor for each person. Your data only if you share it.',
+      title: $t('liveSession.fact.workspace.title'),
+      text: $t('liveSession.fact.workspace.text'),
     },
     {
       icon: Cpu,
-      title: 'Queries run in your browser',
-      text: 'What a guest runs on shared tables executes here, read-only, and the result streams straight to them.',
+      title: $t('liveSession.fact.local.title'),
+      text: $t('liveSession.fact.local.text'),
     },
     {
       icon: Unplug,
-      title: 'No server in between',
-      text: 'The two browsers connect directly. The invite and the reply travel by hand, over a channel you already trust.',
+      title: $t('liveSession.fact.direct.title'),
+      text: $t('liveSession.fact.direct.text'),
     },
   ]
 
@@ -68,27 +69,27 @@
       await navigator.clipboard.writeText(session.answerCode ?? '')
       copied = true
       setTimeout(() => (copied = false), 1500)
-      toast.success('Copied. Send this back to the host')
+      toast.success($t('liveSession.copiedToast'))
     } catch {
-      toast.error('Could not copy. Select the text and copy it manually')
+      toast.error($t('liveSession.copiedError'))
     }
   }
 </script>
 
 {#snippet sessionDetails()}
-  <Panel title={sessionTitle} description={isHost ? "You're hosting" : `Hosted by ${session.hostName}`}>
+  <Panel title={sessionTitle} description={isHost ? $t('liveSession.youAreHosting') : $t('liveSession.hostedBy', { values: { name: session.hostName } })}>
     <div class="flex flex-col gap-4">
-      <section class="flex flex-col gap-1" aria-label="Participants">
-        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">Participants</p>
+      <section class="flex flex-col gap-1" aria-label={$t('liveSession.participants')}>
+        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">{$t('liveSession.participants')}</p>
         {#if session.participants.length === 0}
-          <p class="text-xs text-fg-3">{isHost ? 'Waiting for someone to join...' : 'Connecting to the session...'}</p>
+          <p class="text-xs text-fg-3">{isHost ? $t('liveSession.waitingForGuest') : $t('liveSession.connecting')}</p>
         {:else}
           {#each session.participants as person (person.peerId)}
             <div class="flex h-7 items-center gap-2 text-[13px] text-fg">
               <span class="h-2 w-2 shrink-0 rounded-full" style="background-color: {safePeerColor(person.color)}"></span>
               <span class="min-w-0 flex-1 truncate">{person.displayName}</span>
               {#if person.isHost}
-                <span class="text-xs text-fg-3">host</span>
+                <span class="text-xs text-fg-3">{$t('liveSession.host')}</span>
               {/if}
               {#if isHost && !person.isHost}
                 <Button
@@ -96,8 +97,8 @@
                   size="xs"
                   variant="ghost"
                   onclick={() => duckActions().removeParticipant(person.peerId)}
-                  title="Remove from the session"
-                  aria-label="Remove {person.displayName} from the session"
+                  title={$t('liveSession.removeUser')}
+                  aria-label="{$t('liveSession.removeUser')} {person.displayName}"
                 >
                   <UserMinus size={13} />
                 </Button>
@@ -107,33 +108,33 @@
         {/if}
       </section>
 
-      <section class="flex flex-col gap-1" aria-label="Shared data">
-        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">Shared data</p>
+      <section class="flex flex-col gap-1" aria-label={$t('liveSession.sharedData')}>
+        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">{$t('liveSession.sharedData')}</p>
         {#if session.sharedCapabilities.length === 0}
           <p class="text-xs text-fg-3">
-            {isHost ? 'Nothing. Guests see the workspace and cannot query your data.' : 'The host has not shared any data.'}
+            {isHost ? $t('liveSession.nothingShared') : $t('liveSession.nothingSharedGuest')}
           </p>
         {/if}
         {#each session.sharedCapabilities as capability (capability.id)}
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
               <p class="truncate text-[13px] text-fg">{capability.name}</p>
-              <p class="text-xs text-fg-3">Read-only</p>
+              <p class="text-xs text-fg-3">{$t('liveSession.readOnly')}</p>
             </div>
             {#if session.role === 'guest'}
-              <Button size="xs" variant="outline" onclick={() => (forking = capability)} aria-label="Fork {capability.name}">
+              <Button size="xs" variant="outline" onclick={() => (forking = capability)} aria-label="{$t('liveSession.fork')} {capability.name}">
                 <GitFork size={13} />
-                Fork
+                {$t('liveSession.fork')}
               </Button>
             {:else if isHost}
               <Button
                 size="xs"
                 variant="ghost"
                 onclick={() => duckActions().revokeCapability(capability.id)}
-                aria-label="Withdraw access to {capability.name}"
+                aria-label="{$t('liveSession.withdraw')} {capability.name}"
               >
                 <X size={13} />
-                Withdraw
+                {$t('liveSession.withdraw')}
               </Button>
             {/if}
           </div>
@@ -143,19 +144,19 @@
   </Panel>
 {/snippet}
 
-<PageHeader title={PAGE_ROUTES.live.label} subtitle={PAGE_ROUTES.live.description}>
+<PageHeader title={$t(PAGE_ROUTES.live.labelKey)} subtitle={$t(PAGE_ROUTES.live.descriptionKey)}>
   {#snippet meta()}
     {#if phase === 'connected'}
-      <Badge tone="success" dot>Live</Badge>
+      <Badge tone="success" dot>{$t('liveSession.badge.live')}</Badge>
     {:else if phase === 'waiting'}
-      <Badge tone="warning" dot>Waiting</Badge>
+      <Badge tone="warning" dot>{$t('liveSession.badge.waiting')}</Badge>
     {:else if phase === 'dropped'}
-      <Badge tone="danger" dot>Dropped</Badge>
+      <Badge tone="danger" dot>{$t('liveSession.badge.dropped')}</Badge>
     {/if}
   {/snippet}
   {#snippet actions()}
     {#if hosting || guesting}
-      <Button size="sm" variant="danger" onclick={end}>{isHost ? 'End session' : 'Leave'}</Button>
+      <Button size="sm" variant="danger" onclick={end}>{isHost ? $t('liveSession.endSession') : $t('liveSession.leave')}</Button>
     {/if}
   {/snippet}
 </PageHeader>
@@ -163,19 +164,16 @@
 <PageBody>
   <div class="max-w-5xl">
     {#if !session.isWebRtcSupported}
-      <Panel title="Live sharing isn't available">
+      <Panel title={$t('liveSession.notAvailable.title')}>
         <p class="text-[13px] text-fg-2">
-          This browser doesn't support the peer connections a live session needs. Everything else in Duck-UI works
-          normally, and you can still share a snapshot link.
+          {$t('liveSession.notAvailable.desc')}
         </p>
-        <p class="mt-2 text-xs text-fg-3">Try a current version of Chrome, Edge, Firefox or Safari.</p>
+        <p class="mt-2 text-xs text-fg-3">{$t('liveSession.notAvailable.hint')}</p>
       </Panel>
     {:else if phase === 'dropped'}
-      <Panel title="The live session dropped">
+      <Panel title={$t('liveSession.dropped.title')}>
         <p class="max-w-[64ch] text-[13px] text-fg-2">
-          Your workspace, results and any forked tables are untouched. They live in this browser. To reconnect,
-          {session.role === 'guest' ? 'ask the host for a fresh invite' : 'send a fresh invite'}; rejoining brings the
-          shared workspace back where it was.
+          {$t('liveSession.dropped.desc', { values: { action: session.role === 'guest' ? $t('liveSession.dropped.rejoin') : $t('liveSession.dropped.startNew') } })}
         </p>
         {#if session.error}
           <p class="mt-2 text-xs text-danger" role="alert">{session.error}</p>
@@ -183,12 +181,12 @@
         <!-- Ending clears what is left of the old session, and the page goes
              back to its two cards: host a new one, or paste a new code. -->
         <Button size="sm" class="mt-4" onclick={end}>
-          {session.role === 'guest' ? 'Rejoin with a new code' : 'Start a new session'}
+          {session.role === 'guest' ? $t('liveSession.dropped.rejoin') : $t('liveSession.dropped.startNew')}
         </Button>
       </Panel>
     {:else if hosting}
       <div class="grid items-start gap-4 lg:grid-cols-2">
-        <Panel title="Invite" description="Each invite works once, for one person.">
+        <Panel title={$t('liveSession.invite')} description={$t('liveSession.inviteDesc')}>
           <HostSession />
         </Panel>
         {@render sessionDetails()}
@@ -197,11 +195,11 @@
       <div class="grid items-start gap-4 lg:grid-cols-2">
         {@render sessionDetails()}
         {#if phase !== 'connected' && session.answerCode}
-          <Panel title="Finish joining" description="The host pastes this code to connect the two browsers.">
-            <FormField label="Send this code back to {session.hostName}" for="{uid}-answer" controlWidth="full">
+          <Panel title={$t('liveSession.finishJoining')} description={$t('liveSession.finishJoiningDesc')}>
+            <FormField label={$t('liveSession.sendCode', { values: { name: session.hostName } })} for="{uid}-answer" controlWidth="full">
               <div class="flex gap-2">
                 <Input id="{uid}-answer" readonly mono class="text-xs" value={session.answerCode ?? ''} />
-                <Button icon variant="outline" onclick={copyAnswer} aria-label="Copy connection code">
+                <Button icon variant="outline" onclick={copyAnswer} aria-label={$t('liveSession.copyCodeAria')}>
                   {#if copied}<Check size={14} />{:else}<Copy size={14} />{/if}
                 </Button>
               </div>
@@ -223,10 +221,10 @@
       </ul>
 
       <div class="grid items-start gap-4 lg:grid-cols-2">
-        <Panel title="Host a session" description="Invite someone into this workspace. You choose what data they can query.">
+        <Panel title={$t('liveSession.hostSection')} description={$t('liveSession.hostSectionDesc')}>
           <HostSession />
         </Panel>
-        <Panel title="Join a session" description="Paste the link or the code someone sent you. Nothing runs until you confirm.">
+        <Panel title={$t('liveSession.joinSection')} description={$t('liveSession.joinSectionDesc')}>
           <JoinByCode />
         </Panel>
       </div>
@@ -237,7 +235,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        How live sessions work
+        {$t('liveSession.howItWorks')}
         <ExternalLink size={12} />
       </a>
     {/if}

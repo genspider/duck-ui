@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { AlertCircle, RotateCcw, Table2 } from 'lucide-svelte'
   import Badge from '../common/Badge.svelte'
   import Button from '../common/Button.svelte'
@@ -32,20 +33,20 @@
 {#if queryResult.status === 'running'}
   <div class="flex items-center gap-2 rounded-md border border-edge-subtle bg-surface p-2.5" role="status">
     <Spinner size="sm" class="text-accent" />
-    <span class="text-[13px] text-fg-3">Executing query...</span>
+    <span class="text-[13px] text-fg-3">{$t('brain.executingQuery')}</span>
   </div>
 {:else if queryResult.status === 'error'}
   <div class="rounded-md border border-danger/40 bg-danger-soft p-2.5" role="alert">
     <div class="flex items-start gap-2">
       <AlertCircle size={15} class="mt-0.5 shrink-0 text-danger" />
       <div class="min-w-0 flex-1">
-        <p class="text-[13px] font-medium text-danger">Query failed</p>
-        <p class="mt-1 break-words text-xs text-fg-2">{queryResult.error || 'Unknown error occurred'}</p>
+        <p class="text-[13px] font-medium text-danger">{$t('brain.queryFailed')}</p>
+        <p class="mt-1 break-words text-xs text-fg-2">{queryResult.error || $t('brain.unknownError')}</p>
       </div>
       {#if onretry}
         <Button variant="ghost" size="sm" onclick={onretry}>
           <RotateCcw size={13} />
-          Retry
+          {$t('common.retry')}
         </Button>
       {/if}
     </div>
@@ -54,13 +55,13 @@
   <div class="overflow-hidden rounded-md border border-edge-subtle bg-surface">
     <div class="flex items-center gap-2 border-b border-edge-subtle bg-surface-2 px-2.5 py-1.5">
       <Table2 size={14} class="text-fg-3" />
-      <span class="text-xs font-medium text-fg">Results</span>
+      <span class="text-xs font-medium text-fg">{$t('brain.results')}</span>
       <Badge tone="neutral">
-        {result.rowCount.toLocaleString()} row{result.rowCount !== 1 ? 's' : ''}
+        {result.rowCount.toLocaleString()} {$t('common.rows')}
       </Badge>
       {#if result.truncated}
-        <Badge tone="warning" title="The engine stopped at the row limit. This is only the first part of the result.">
-          truncated
+        <Badge tone="warning" title={$t('brain.truncatedTitle')}>
+          {$t('brain.truncated')}
         </Badge>
       {/if}
     </div>

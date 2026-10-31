@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatNumber, formatNumberWithSuffix } from '@/lib/chartUtils'
+  import { tr } from '@/lib/i18n/translate'
   import { niceTicks, type BoxStats } from '@/lib/boxPlot'
   import { getTheme } from '../../stores/theme.svelte'
   import { chartTheme, themeColor, withAlpha } from './palette'
@@ -51,7 +52,7 @@
 
 <div class="relative h-full w-full" bind:clientWidth={width} bind:clientHeight={height}>
   {#if boxes.length === 0}
-    <div class="flex h-full items-center justify-center text-[13px] text-fg-3">No numeric values</div>
+    <div class="flex h-full items-center justify-center text-[13px] text-fg-3">{tr('chart.boxplot.noNumericValues')}</div>
   {:else if width > 0 && height > 0}
     <svg
       {width}
@@ -59,7 +60,7 @@
       font-family={colors.fontFamily}
       font-size="11"
       role="img"
-      aria-label="Box plot of {valueLabel}, {boxes.length} {boxes.length === 1 ? 'box' : 'boxes'}"
+      aria-label={tr('chart.boxplot.ariaLabel', { valueLabel, count: boxes.length })}
     >
       {#each ticks as tick (tick)}
         <line x1={MARGIN.left} x2={width - MARGIN.right} y1={yOf(tick)} y2={yOf(tick)} stroke={colors.grid} />
@@ -108,11 +109,11 @@
       >
         <div class="col-span-2 mb-0.5 max-w-[220px] truncate font-medium text-fg">{box.label}</div>
         {#each [['n', box.n], ['max', box.max], ['q3', box.q3], ['median', box.median], ['q1', box.q1], ['min', box.min]] as [name, value] (name)}
-          <span class="text-fg-3">{name}</span>
+          <span class="text-fg-3">{tr('chart.boxplot.stat.' + name)}</span>
           <span class="text-right tabular-nums text-fg">{formatNumber(Number(value))}</span>
         {/each}
         {#if box.outliers.length}
-          <span class="text-fg-3">outliers</span>
+          <span class="text-fg-3">{tr('chart.boxplot.stat.outliers')}</span>
           <span class="text-right tabular-nums text-fg">{box.outliers.length}</span>
         {/if}
       </div>

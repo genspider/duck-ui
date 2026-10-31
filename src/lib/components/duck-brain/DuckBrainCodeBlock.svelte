@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Check, Copy, FileInput, FilePlus2, Play } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Spinner from '../common/Spinner.svelte'
@@ -59,16 +60,16 @@
       </Button>
 
       {#if oninsert}
-        <Button variant="ghost" size="sm" title="Replace the query in the current SQL tab" onclick={() => oninsert(sql)}>
+        <Button variant="ghost" size="sm" title={$t('brain.replaceInCurrent')} onclick={() => oninsert(sql)}>
           <FileInput size={13} />
-          Insert
+          {$t('brain.insert')}
         </Button>
       {/if}
 
       {#if onopenintab}
-        <Button variant="ghost" size="sm" title="Open this query in a new SQL tab" onclick={() => onopenintab(sql)}>
+        <Button variant="ghost" size="sm" title={$t('brain.openInNewTab')} onclick={() => onopenintab(sql)}>
           <FilePlus2 size={13} />
-          New tab
+          {$t('brain.newTab')}
         </Button>
       {/if}
 

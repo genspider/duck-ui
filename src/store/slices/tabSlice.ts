@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { generateUUID } from "@/lib/utils";
 import { isGatedTabHidden } from "@/lib/appConfig";
 import { isPageTabType, openPageFor } from "@/lib/pageNavigation";
@@ -213,11 +214,9 @@ export const createTabSlice: StateCreator<DuckStoreState, [], [], TabSlice> = (s
   closeAllTabs: () => {
     try {
       set((state) => settlePanes(state.tabs.filter(isHomeTab), null));
-      toast.success("All tabs closed successfully!");
-    } catch (error: unknown) {
-      toast.error(
-        `Failed to close tabs: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      toast.success(tr("session.allTabsClosed"));
+    } catch {
+      toast.error(tr("common.unknownError"));
     }
   },
 

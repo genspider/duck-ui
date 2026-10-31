@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { AlertCircle, Brain, Cloud, Download, RefreshCw, Trash2, X } from 'lucide-svelte'
   import Badge from '../common/Badge.svelte'
   import Button from '../common/Button.svelte'
@@ -14,6 +15,7 @@
   import { AVAILABLE_MODELS, DEFAULT_MODEL } from '@/lib/duckBrain'
   import { OPENAI_MODELS, ANTHROPIC_MODELS } from '@/lib/duckBrain/providers/types'
   import { formatSchemaForContext } from '@/lib/duckBrain/schemaFormatter'
+  import { tr } from '@/lib/i18n/translate'
   import { TEXT_TO_SQL_SYSTEM_PROMPT, DUCKDB_FEW_SHOT_EXAMPLES } from '@/lib/duckBrain/prompts/text-to-sql'
   import { estimateTokens } from '@/lib/duckBrain/tokenEstimate'
 
@@ -65,7 +67,7 @@
       }
     }
     // In-browser model, or nothing configured yet.
-    return { name: localModelName || 'Not configured', isCloud: false }
+    return { name: localModelName || tr('brain.notConfiguredShort'), isCloud: false }
   })
 
   // Providers that can be picked in the chat: only the ones that are set up.
@@ -73,7 +75,7 @@
     const providers: { value: AIProviderType; label: string }[] = []
 
     if (modelStatus === 'ready' || modelStatus === 'downloading' || modelStatus === 'loading') {
-      providers.push({ value: 'webllm', label: localModelName || 'Local Model' })
+      providers.push({ value: 'webllm', label: localModelName || tr('brain.localModel') })
     }
     if (providerConfigs.openai?.apiKey) {
       const model = OPENAI_MODELS.find((m) => m.id === providerConfigs.openai?.modelId)
@@ -149,7 +151,7 @@
   async function handleExecuteSQL(messageId: string, sql: string) {
     try {
       const result = await duckActions().executeQueryInChat(messageId, sql)
-      if (result) toast.success(`Query returned ${result.rowCount} rows`)
+      if (result) toast.success(tr('brain.queryReturnedRows', { count: result.rowCount }))
     } catch {
       // The store already recorded the error, ResultsArtifact shows it.
     }
@@ -157,11 +159,11 @@
 
   function handleInsertSQL(sql: string) {
     duckActions().updateTabQuery(tabId, sql)
-    toast.success('SQL inserted into editor')
+    toast.success(tr('brain.sqlInserted'))
   }
 
   function handleOpenInTab(sql: string) {
-    duckActions().createTab('sql', sql, 'Duck Brain query')
+    duckActions().createTab('sql', sql, tr('brain.queryTitle'))
     // The sheet covers the workspace, close it so the new tab is visible.
     close()
   }
@@ -170,12 +172,10 @@
     void duckActions().initializeDuckBrain(DEFAULT_MODEL.id)
   }
 
-  function openAISettings() {
-    const { tabs, setActiveTab, createTab } = duckActions()
-    const existing = tabs.find((tab) => tab.type === 'settings')
-    if (existing) setActiveTab(existing.id)
-    else createTab('settings', '', 'Settings')
-    // The sheet covers the workspace, close it so Settings is visible.
+  async function openAISettings() {
+    // Settings is a standalone page, not a workspace tab.
+    const { goTo } = await import('../../stores/router.svelte')
+    goTo('settings', 'ai')
     close()
   }
 </script>
@@ -192,15 +192,15 @@
   <div class="flex shrink-0 items-center justify-between border-b border-edge-subtle px-3 py-2">
     <div class="flex items-center gap-2">
       <Brain size={16} class="text-accent" />
-      <h2 id={titleId} class="text-[13px] font-semibold">Duck Brain</h2>
+      <h2 id={titleId} class="text-[13px] font-semibold">{$t('editor.duckBrain')}</h2>
     </div>
     <div class="flex items-center gap-1">
       {#if view === 'chat' && messages.length > 0}
-        <Button icon variant="ghost" size="sm" aria-label="Clear chat" title="Clear chat" onclick={() => duckActions().clearBrainMessages()}>
+        <Button icon variant="ghost" size="sm" aria-label={$t('brain.clearChat')} title={$t('brain.clearChat')} onclick={() => duckActions().clearBrainMessages()}>
           <Trash2 size={14} />
         </Button>
       {/if}
-      <Button icon variant="ghost" size="sm" aria-label="Close Duck Brain" onclick={close}>
+      <Button icon variant="ghost" size="sm" aria-label={$t('brain.close')} onclick={close}>
         <X size={15} />
       </Button>
     </div>
@@ -212,9 +212,9 @@
         <div class="flex items-start gap-2">
           <AlertCircle size={15} class="mt-0.5 shrink-0 text-danger" />
           <div>
-            <p class="font-medium text-danger">WebGPU Not Supported</p>
+            <p class="font-medium text-danger">{$t('brain.webgpuUnsupported')}</p>
             <p class="mt-1 text-xs text-fg-2">
-              Duck Brain requires WebGPU for local AI processing. Please use Chrome 113+ or Edge 113+.
+              {$t('brain.webgpuRequired')}
             </p>
           </div>
         </div>
@@ -224,33 +224,32 @@
   {:else if view === 'init-local'}
     {#snippet body()}
       <Brain size={40} class="mx-auto mb-4 text-accent" />
-      <h3 class="mb-2 text-sm font-semibold">Initialize Duck Brain</h3>
+      <h3 class="mb-2 text-sm font-semibold">{$t('brain.initialize')}</h3>
       <p class="mb-4 text-fg-3">
-        Download an AI model to enable natural language to SQL conversion. This runs 100% locally in your browser.
+        {$t('brain.initializeDesc')}
       </p>
       <div class="mb-4 space-y-1.5 text-xs text-fg-3">
-        <p><strong class="text-fg-2">Model:</strong> {DEFAULT_MODEL.displayName}</p>
-        <p><strong class="text-fg-2">Size:</strong> {DEFAULT_MODEL.size}</p>
-        <p>First load downloads the model. Future loads use cache.</p>
+        <p><strong class="text-fg-2">{$t('ai.model')}:</strong> {DEFAULT_MODEL.displayName}</p>
+        <p><strong class="text-fg-2">{$t('brain.size')}:</strong> {DEFAULT_MODEL.size}</p>
+        <p>{$t('brain.firstLoadHint')}</p>
       </div>
       <Button onclick={handleInitialize}>
         <Download size={14} />
-        Load AI Model
+        {$t('brain.loadModel')}
       </Button>
     {/snippet}
     {@render centered(body)}
   {:else if view === 'not-configured'}
     {#snippet body()}
       <Brain size={40} class="mx-auto mb-4 text-accent" />
-      <h3 class="mb-2 text-sm font-semibold">No AI configured yet</h3>
+      <h3 class="mb-2 text-sm font-semibold">{$t('brain.notConfigured')}</h3>
       <p class="mb-4 text-fg-3">
-        Duck Brain turns questions into SQL. Point it at a local Ollama (private, one click if it's running), or add an
-        OpenAI or Anthropic key.
+        {$t('brain.notConfiguredDesc')}
       </p>
       {#if !getUiConfig().hideSettings}
         <Button onclick={openAISettings}>
           <Cloud size={14} />
-          Open AI settings
+          {$t('brain.openAISettings')}
         </Button>
       {/if}
     {/snippet}
@@ -259,12 +258,12 @@
     {#snippet body()}
       <Spinner size="md" class="mx-auto mb-4 text-accent" />
       <h3 class="mb-3 text-sm font-semibold">
-        {modelStatus === 'downloading' ? 'Downloading Model...' : 'Loading Model...'}
+        {modelStatus === 'downloading' ? $t('brain.downloading') : $t('brain.loading')}
       </h3>
       <div
         class="mb-2 h-1.5 overflow-hidden rounded-full bg-surface-2"
         role="progressbar"
-        aria-label="Model download"
+        aria-label={$t('brain.downloadProgress')}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(downloadProgress)}
@@ -280,21 +279,21 @@
   {:else if view === 'error'}
     {#snippet body()}
       <AlertCircle size={40} class="mx-auto mb-4 text-danger" />
-      <h3 class="mb-2 text-sm font-semibold">Failed to Load Model</h3>
-      <p class="mb-4 break-words text-fg-3">{error || 'An unknown error occurred'}</p>
+      <h3 class="mb-2 text-sm font-semibold">{$t('brain.loadFailed')}</h3>
+      <p class="mb-4 break-words text-fg-3">{error || $t('brain.unknownError')}</p>
       <Button variant="outline" onclick={handleInitialize}>
         <RefreshCw size={14} />
-        Try Again
+        {$t('brain.tryAgain')}
       </Button>
     {/snippet}
     {@render centered(body)}
   {:else}
     <div class="flex shrink-0 flex-wrap items-center gap-2 border-b border-edge-subtle px-3 py-1.5">
-      <Badge tone="success" dot>Ready</Badge>
+      <Badge tone="success" dot>{$t('brain.modelReady')}</Badge>
 
       <!-- The provider can be switched here once more than one is set up. -->
       {#if availableProviders.length > 1}
-        <label class="sr-only" for="brain-provider">AI provider</label>
+        <label class="sr-only" for="brain-provider">{$t('brain.aiProvider')}</label>
         <Select
           id="brain-provider"
           size="sm"
@@ -314,7 +313,7 @@
 
       <!-- Model switcher for the active cloud provider (#23) -->
       {#if switchableModels && activeModelId}
-        <label class="sr-only" for="brain-model">Model</label>
+        <label class="sr-only" for="brain-model">{$t('brain.model')}</label>
         <Select
           id="brain-model"
           size="sm"
@@ -342,7 +341,7 @@
         generating={isGenerating}
         disabled={modelStatus !== 'ready' && !hasExternalProvider}
         {databases}
-        placeholder="Ask Duck Brain... (@ for tables)"
+        placeholder={$t('brain.askPlaceholder')}
         {baselineTokens}
       />
     </div>

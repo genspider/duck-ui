@@ -1,4 +1,5 @@
 import type { StateCreator } from "@/store/createStore";
+import { tr } from "@/lib/i18n/translate";
 import {
   collectExecution,
   materializeCollected,
@@ -97,7 +98,7 @@ export const createQuerySlice: StateCreator<DuckStoreState, [], [], QuerySlice> 
       }));
 
       const session = get().currentSession;
-      if (!session) throw new Error("No active connection");
+      if (!session) throw new Error(tr("error.noActiveConnection"));
 
       // Registered synchronously: Stop is reachable from the instant the
       // statement exists, including while it waits behind another one.
@@ -175,7 +176,7 @@ export const createQuerySlice: StateCreator<DuckStoreState, [], [], QuerySlice> 
       activeExecutions.delete(cancelKey);
       // The engine already ran the message through the error explainer and
       // labelled cancellations, so it is presentable as-is.
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : tr("common.unknownError");
       const errorResult: QueryResult = {
         columns: [],
         columnTypes: [],
@@ -240,7 +241,9 @@ export const createQuerySlice: StateCreator<DuckStoreState, [], [], QuerySlice> 
     } catch (error) {
       console.error("Failed to export to parquet:", error);
       throw new Error(
-        `Parquet export failed: ${error instanceof Error ? error.message : "Unknown error"}`
+        tr("error.parquetExportFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
       );
     }
   },

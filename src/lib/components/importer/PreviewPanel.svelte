@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { ArrowLeft, Check } from 'lucide-svelte'
   import type { QueryResult } from '@/store'
   import Button from '../common/Button.svelte'
@@ -30,17 +31,17 @@
 <div class="flex flex-col gap-4">
   <div class="flex items-start justify-between gap-3 rounded-md border border-edge bg-surface p-3">
     <div class="min-w-0">
-      <h3 class="truncate text-[13px] font-semibold text-fg" title={url.previewFileName}>Preview: {shortName}</h3>
+      <h3 class="truncate text-[13px] font-semibold text-fg" title={url.previewFileName}>{$t('importer.previewTitle', { values: { name: shortName } })}</h3>
       <p class="mt-0.5 text-xs text-fg-3">
-        Table name: <span class="font-mono text-fg-2">{url.previewTableName}</span>
+        {$t('importer.tableName')} <span class="font-mono text-fg-2">{url.previewTableName}</span>
       </p>
       <p class="mt-0.5 text-xs text-fg-4">
-        Showing first {PREVIEW_ROW_LIMIT} rows, {previewData.rowCount} loaded
+        {$t('importer.showingRows', { values: { limit: PREVIEW_ROW_LIMIT, count: previewData.rowCount } })}
       </p>
     </div>
     <Button variant="ghost" size="sm" onclick={url.handleBackFromPreview}>
       <ArrowLeft size={14} />
-      Back
+      {$t('importer.back')}
     </Button>
   </div>
 
@@ -51,13 +52,13 @@
   <SchemaEditor {url} />
 
   <div class="flex justify-end gap-2">
-    <Button variant="outline" onclick={url.handleBackFromPreview}>Cancel</Button>
+    <Button variant="outline" onclick={url.handleBackFromPreview}>{$t('importer.cancel')}</Button>
     <Button onclick={url.handleImportFromPreview} loading={url.isUrlImporting}>
       {#if url.isUrlImporting}
-        Importing...
+        {$t('importer.importing')}
       {:else}
         <Check size={14} />
-        Import table
+        {$t('importer.importTable')}
       {/if}
     </Button>
   </div>

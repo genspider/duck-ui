@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import {
   GuestLiveSession,
   HostLiveSession,
@@ -121,11 +122,11 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
   }) => {
     const source = get().currentSession;
     if (!source) {
-      toast.error("Connect to a database before sharing");
+      toast.error(tr("session.mustConnectFirst"));
       return;
     }
     if (!isWebRtcAvailable()) {
-      toast.error("This browser can't make peer connections");
+      toast.error(tr("session.noPeerSupport"));
       return;
     }
 
@@ -193,8 +194,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
         },
       }));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Couldn't start the session";
-      set((state) => ({ session: { ...state.session, status: "failed", error: message } }));
+      const message = error instanceof Error ? error.message : tr("common.unknownError");
       toast.error(message);
     }
   },
@@ -250,9 +250,9 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
           sharedCapabilities: hostSession?.grantedCapabilities ?? [],
         },
       }));
-      toast.success("Connected");
+      toast.success(tr("session.connected"));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Couldn't complete the connection";
+      const message = error instanceof Error ? error.message : tr("common.unknownError");
       set((state) => ({ session: { ...state.session, status: "failed", error: message } }));
       toast.error(message);
     }
@@ -260,7 +260,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
 
   joinLiveSession: async (inviteCode: string) => {
     if (!isWebRtcAvailable()) {
-      toast.error("This browser can't make peer connections");
+      toast.error(tr("session.noPeerSupport"));
       return;
     }
 
@@ -284,7 +284,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
           lastStatus === "connected" &&
           (session.status === "disconnected" || session.status === "failed")
         ) {
-          toast.error("The live session dropped. Your workspace stays as it is.");
+          toast.error(tr("session.dropped"));
         }
         lastStatus = session.status;
         set((state) => ({
@@ -335,8 +335,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
         },
       }));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Couldn't join the session";
-      set((state) => ({ session: { ...state.session, status: "failed", error: message } }));
+      const message = error instanceof Error ? error.message : tr("common.unknownError");
       toast.error(message);
     }
   },
@@ -373,7 +372,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
     // the app is still usable rather than left with no connection at all.
     if (wasOnRevokedSession) {
       void get().setCurrentConnection(WASM_CONNECTION_ID);
-      toast.info("That shared connection is no longer available");
+      toast.info(tr("session.inviteUnavailable"));
     }
   },
 
@@ -465,7 +464,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
   removeParticipant: async (peerId: string) => {
     if (!hostSession) return;
     await hostSession.dropGuest(peerId);
-    toast.success("Removed from the session");
+    toast.success(tr("session.removed"));
   },
 
   revokeCapability: async (capabilityId: string) => {
@@ -477,7 +476,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
         sharedCapabilities: hostSession?.grantedCapabilities ?? [],
       },
     }));
-    toast.success("Access withdrawn");
+    toast.success(tr("session.accessWithdrawn"));
   },
 
   /**
@@ -605,7 +604,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
   forkCapability: async (capabilityId, tables, onProgress, targetConnectionId) => {
     const source = getSession(capabilityId);
     if (!source) {
-      toast.error("That shared connection is no longer available");
+      toast.error(tr("session.inviteUnavailable"));
       return [];
     }
 
@@ -617,7 +616,7 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
         (connection) => connection.id === targetConnectionId
       );
       if (!provider) {
-        toast.error("That destination connection no longer exists");
+        toast.error(tr("session.connectionGone"));
         return [];
       }
       try {
@@ -625,15 +624,13 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
           toConnectionDefinition(provider),
           toCredentialMaterial(provider)
         );
-      } catch (error) {
-        toast.error(
-          `Couldn't open the destination: ${error instanceof Error ? error.message : "unknown error"}`
-        );
+      } catch {
+        toast.error(tr("common.unknownError"));
         return [];
       }
     }
     if (!target) {
-      toast.error("The local engine is not ready");
+      toast.error(tr("session.engineNotReady"));
       return [];
     }
 
@@ -644,11 +641,13 @@ export const createSessionSlice: StateCreator<DuckStoreState, [], [], SessionSli
     if (failed === 0) {
       toast.success(
         results.length === 1
-          ? "Forked. Your copy is independent of the host."
-          : `Forked ${results.length} tables. Your copies are independent of the host.`
+          ? tr("session.forkedSingle")
+          : tr("session.forkedMultiple", { count: results.length })
       );
     } else {
-      toast.error(`${failed} of ${results.length} tables failed to fork`);
+      toast.error(
+        tr("session.forkFailed", { failed: String(failed), total: String(results.length) })
+      );
     }
     await get()
       .fetchDatabasesAndTablesInfo()

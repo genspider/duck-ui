@@ -4,6 +4,10 @@ import {
   buildCreateAs,
   buildCsvReadOptions,
   buildReadExpression,
+  buildDropTable,
+  buildAttachDatabase,
+  buildImportTable,
+  buildImportVerification,
 } from "../importSql";
 import { DEFAULT_CSV_OPTIONS } from "../constants";
 import type { SchemaColumn } from "../types";
@@ -164,5 +168,56 @@ describe("buildCreateAs", () => {
     expect(buildCreateAs("VIEW", 't"x', "SELECT 1")).toBe(
       'CREATE OR REPLACE VIEW "t""x" AS SELECT 1'
     );
+  });
+});
+
+describe("buildDropTable", () => {
+  it("quotes the table name", () => {
+    expect(buildDropTable('a"b')).toBe('DROP TABLE IF EXISTS "a""b"');
+  });
+});
+
+describe("buildAttachDatabase", () => {
+  it("escapes the file name and quotes the alias", () => {
+    expect(buildAttachDatabase("a'b.duckdb", 'a"b')).toBe(
+      "ATTACH DATABASE 'a''b.duckdb' AS \"a\"\"b\""
+    );
+  });
+});
+
+describe("buildImportTable", () => {
+  it("builds the csv import with its collected options", () => {
+    expect(buildImportTable("TABLE", "data", "data.csv", "csv", "header=false")).toBe(
+      "CREATE OR REPLACE TABLE \"data\" AS SELECT * FROM read_csv('data.csv', header=false)"
+    );
+  });
+
+  it("falls back to the default csv options and lowercases the kind", () => {
+    expect(buildImportTable("TABLE", "data", "data.csv", "CSV")).toBe(
+      `CREATE OR REPLACE TABLE "data" AS SELECT * FROM read_csv('data.csv', ${buildCsvReadOptions()})`
+    );
+  });
+
+  it("reads json with the sniffer on and the rest through their reader", () => {
+    expect(buildImportTable("VIEW", "j", "j.json", "json")).toBe(
+      "CREATE OR REPLACE VIEW \"j\" AS SELECT * FROM read_json('j.json', auto_detect=true, ignore_errors=true)"
+    );
+    expect(buildImportTable("TABLE", "p", "p.parquet", "parquet")).toBe(
+      "CREATE OR REPLACE TABLE \"p\" AS SELECT * FROM read_parquet('p.parquet')"
+    );
+  });
+
+  it("escapes the file name", () => {
+    expect(buildImportTable("TABLE", "t", "a'b.parquet", "parquet")).toBe(
+      "CREATE OR REPLACE TABLE \"t\" AS SELECT * FROM read_parquet('a''b.parquet')"
+    );
+  });
+});
+
+describe("buildImportVerification", () => {
+  it("escapes the table and catalog", () => {
+    const sql = buildImportVerification("t'", 'mem"');
+    expect(sql).toContain("table_name = 't'''");
+    expect(sql).toContain("table_catalog = 'mem\"'");
   });
 });

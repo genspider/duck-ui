@@ -46,10 +46,10 @@
     <div class="flex items-center gap-2 border-b border-edge-subtle px-3 py-1 text-xs text-fg-3">
       <Variable size={13} class="shrink-0" />
       <span class="truncate">
-        Parameters off: {names.map((name) => `$${name}`).join(', ')} run as written
+        {$t('params.offDesc', { values: { names: names.map((name) => `$${name}`).join(', ') } })}
       </span>
       <Button size="xs" variant="ghost" class="ml-auto" onclick={() => update((current) => ({ ...current, disabled: false }))}>
-        Turn on
+        {$t('params.turnOn')}
       </Button>
     </div>
   {:else}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { DocumentBlock } from '@/services/dashboard/markdown'
   import type { InputsStore, InputValue } from '@/services/dashboard/inputs'
   import type { DatasetResult } from '@/services/dashboard/queryRunner'
@@ -17,7 +18,7 @@
 
 {#if blocks.length === 0}
   <div class="flex h-full items-center justify-center text-[13px] text-fg-3">
-    An empty page. Switch to Edit and start writing.
+    {$t('dashboard.emptyEditHint')}
   </div>
 {:else}
   <!-- A readable measure, like a report, not edge to edge like an app screen. -->

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { tr } from '../../../lib/i18n/translate'
   import { Download, FileText, Braces, Sheet as SheetIcon, Database, FolderDown } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
@@ -36,10 +37,10 @@
     for (const folder of folders) {
       list.push(
         { id: `sep-${folder.id}`, separator: true },
-        { id: `${folder.id}-csv`, label: `Save CSV to ${folder.name}`, icon: FolderDown, onSelect: () => void exporters.saveToFolderAsCSV(folder.id, folder.name) },
-        { id: `${folder.id}-json`, label: `Save JSON to ${folder.name}`, icon: FolderDown, onSelect: () => void exporters.saveToFolderAsJSON(folder.id, folder.name) },
-        { id: `${folder.id}-xlsx`, label: `Save XLSX to ${folder.name}`, icon: FolderDown, onSelect: () => void exporters.saveToFolderAsXLSX(folder.id, folder.name) },
-        { id: `${folder.id}-parquet`, label: `Save Parquet to ${folder.name}`, icon: FolderDown, disabled: !canUseDuckDb, onSelect: () => void exporters.saveToFolderAsParquet(folder.id, folder.name) },
+        { id: `${folder.id}-csv`, label: $t('export.saveToFolderCsv', { values: { name: folder.name } }), icon: FolderDown, onSelect: () => void exporters.saveToFolderAsCSV(folder.id, folder.name) },
+        { id: `${folder.id}-json`, label: $t('export.saveToFolderJson', { values: { name: folder.name } }), icon: FolderDown, onSelect: () => void exporters.saveToFolderAsJSON(folder.id, folder.name) },
+        { id: `${folder.id}-xlsx`, label: $t('export.saveToFolderXlsx', { values: { name: folder.name } }), icon: FolderDown, onSelect: () => void exporters.saveToFolderAsXLSX(folder.id, folder.name) },
+        { id: `${folder.id}-parquet`, label: $t('export.saveToFolderParquet', { values: { name: folder.name } }), icon: FolderDown, disabled: !canUseDuckDb, onSelect: () => void exporters.saveToFolderAsParquet(folder.id, folder.name) },
       )
     }
     return list

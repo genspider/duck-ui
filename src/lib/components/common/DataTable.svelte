@@ -1,4 +1,5 @@
 <script lang="ts" module>
+  import { t } from 'svelte-i18n'
   import type { Snippet } from 'svelte'
   /**
    * Spec-driven table for lists of records: sticky header, click-to-sort,
@@ -129,7 +130,7 @@
             </th>
           {/each}
           {#if actions}
-            <th class="sticky top-0 z-10 h-8 border-b border-edge bg-surface px-2 pr-3"><span class="sr-only">Actions</span></th>
+            <th class="sticky top-0 z-10 h-8 border-b border-edge bg-surface px-2 pr-3"><span class="sr-only">{$t('common.actions')}</span></th>
           {/if}
         </tr>
       </thead>

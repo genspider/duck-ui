@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Plus } from 'lucide-svelte'
   import { generateUUID } from '@/lib/utils'
   import Button from '../common/Button.svelte'
@@ -8,6 +9,7 @@
   import { duck, duckActions } from '../../stores/duck.svelte'
   import ConnectionForm from './ConnectionForm.svelte'
   import ConnectionsList from './ConnectionsList.svelte'
+  import OpfsStorageManager from './OpfsStorageManager.svelte'
   import QuackAttachments from './QuackAttachments.svelte'
   import { toConnectionProvider, valuesFromConnection, type ConnectionFormValues } from './connectionSchema'
 
@@ -51,17 +53,17 @@
   }
 </script>
 
-<PageHeader title="Connections" subtitle="DuckDB servers and browser databases this profile can query">
+<PageHeader title={$t('connection.title')} subtitle={$t('connection.overview')}>
   {#snippet actions()}
     <Button size="sm" disabled={connecting} onclick={() => (adding = true)}>
       <Plus size={14} />
-      Add connection
+      {$t('connection.add')}
     </Button>
   {/snippet}
 </PageHeader>
 
 <PageBody>
-  <Panel title="Available connections" description="Every connection configured for this profile" padding="none">
+  <Panel title={$t('connection.manageLabel')} description={$t('connection.overview')} padding="none">
     <div class="pt-3">
       <ConnectionsList
         {connections}
@@ -75,6 +77,8 @@
   </Panel>
 
   <QuackAttachments bind:attaching={attachingQuack} />
+
+  <OpfsStorageManager />
 </PageBody>
 
 <ConnectionForm

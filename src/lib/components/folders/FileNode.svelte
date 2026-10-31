@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { ChevronRight, ChevronDown, File as FileIcon, FileSpreadsheet, FileJson, Database, FolderOpen, Import, Table } from 'lucide-svelte'
   import Spinner from '../common/Spinner.svelte'
   import FileNode from './FileNode.svelte'
@@ -48,7 +49,7 @@
     e.preventDefault()
     const file = entry
     actions.menu(
-      [{ id: 'quick-import', label: 'Quick Import as Table', icon: Table, onSelect: () => actions.quickImport(folderId, file) }],
+      [{ id: 'quick-import', label: $t('folder.quickImportTable'), icon: Table, onSelect: () => actions.quickImport(folderId, file) }],
       e.clientX,
       e.clientY,
     )
@@ -111,8 +112,8 @@
       <button
         type="button"
         class="mr-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-accent opacity-0 transition-opacity hover:bg-accent-soft focus-visible:opacity-100 group-hover:opacity-100"
-        aria-label="Import {file.name}"
-        title="Import"
+        aria-label={$t('folder.importFile', { values: { name: file.name } })}
+        title={$t('folder.importAction')}
         onclick={(e) => actions.importOptions(folderId, file, e.currentTarget.getBoundingClientRect())}
       >
         <Import size={13} />

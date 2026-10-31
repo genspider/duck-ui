@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Check, Copy, Eye, Pencil, Radio } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
   import Sheet from '../common/Sheet.svelte'
@@ -28,8 +29,8 @@
   const PENDING = '…'
 
   const ROLES: { mode: DashboardShareMode; icon: typeof Eye; title: string; caption: string }[] = [
-    { mode: 'viewer', icon: Eye, title: 'Viewer', caption: 'Opens read-only. Good for anyone who should look, not touch.' },
-    { mode: 'editor', icon: Pencil, title: 'Editor', caption: 'Imports an editable copy into their Duck-UI. Their edits stay theirs.' },
+    { mode: 'viewer', icon: Eye, title: $t('dashboard.shareViewer'), caption: $t('dashboard.shareViewerCaption') },
+    { mode: 'editor', icon: Pencil, title: $t('dashboard.shareEditor'), caption: $t('dashboard.shareEditorCaption') },
   ]
 
   let links = $state<Record<DashboardShareMode, string> | null>(null)
@@ -76,8 +77,8 @@
   {open}
   {onclose}
   size="md"
-  title="Share “{dashboard.name}”"
-  description="Links carry the document: markdown and SQL, never results. Queries reproduce for the recipient when the data they read is publicly reachable."
+  title={$t('dashboard.shareTitle', { values: { name: dashboard.name } })}
+  description={$t('dashboard.shareDesc')}
 >
   <div class="flex flex-col gap-4">
     {#each ROLES as role (role.mode)}
@@ -95,7 +96,7 @@
             variant="outline"
             disabled={!links}
             onclick={() => copy(role.mode)}
-            aria-label="Copy {role.title} link"
+            aria-label={$t('dashboard.copyLink', { values: { role: role.title } })}
           >
             {#if copied === role.mode}<Check size={14} />{:else}<Copy size={14} />{/if}
           </Button>
@@ -108,14 +109,13 @@
       <div class="flex flex-col gap-1.5 rounded-md border border-edge p-3">
         <span class="flex items-center gap-1.5 text-xs font-medium text-fg">
           <Radio size={13} class="text-accent" />
-          Live
+          {$t('dashboard.shareLive')}
         </span>
         <p class="text-xs text-fg-3">
-          Edit the same document together in real time, with queries running on your data, in your
-          browser. Revocable, unlike a link.
+          {$t('dashboard.shareLiveDesc')}
         </p>
         <Button size="sm" variant="outline" class="mt-1 self-start" onclick={onsharelive}>
-          Start a live session
+          {$t('dashboard.startLive')}
         </Button>
       </div>
     {/if}

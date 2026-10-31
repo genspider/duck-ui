@@ -2,11 +2,15 @@
 import { get } from "svelte/store";
 import { t } from "svelte-i18n";
 
-export function tr(key: string, vars?: Record<string, string | number>): string {
+export function tr(key: string, vars?: Record<string, unknown>): string {
   // svelte-i18n 的 t store 在未初始化时可能不可用，这里做安全回退
   let result: string;
   try {
-    result = get(t)(key, vars);
+    // Accept both flat `{ name }` and pre-wrapped `{ values: { name } }`,
+    // so the exact shape callers use never breaks interpolation.
+    const alreadyWrapped = vars != null && "values" in vars;
+    const opts = vars == null ? undefined : alreadyWrapped ? vars : { values: vars };
+    result = get(t)(key, opts);
   } catch {
     result = key;
   }

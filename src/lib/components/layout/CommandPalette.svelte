@@ -28,8 +28,8 @@
   }
 
   const GROUP_LABEL: Record<Group, string> = {
-    actions: 'Quick actions', pages: 'Pages', tabs: 'Open tabs', saved: 'Saved queries',
-    dashboards: 'Dashboards', tables: 'Tables', history: 'Recent queries',
+    actions: $t('palette.group.actions'), pages: $t('palette.group.pages'), tabs: $t('palette.group.tabs'), saved: $t('palette.group.saved'),
+    dashboards: $t('palette.group.dashboards'), tables: $t('palette.group.tables'), history: $t('palette.group.history'),
   }
   const GROUP_ORDER: Group[] = ['actions', 'tabs', 'saved', 'dashboards', 'tables', 'pages', 'history']
   const MAX_PER_GROUP = 12
@@ -112,20 +112,21 @@
 
   const items = $derived.by((): CommandItem[] => {
     const list: CommandItem[] = [
-      { id: 'new-query', group: 'actions', label: 'New query', icon: Plus, shortcut: '⌥N', keywords: 'sql editor tab', run: inWorkspace(() => duckActions().createTab('sql')) },
-      { id: 'new-notebook', group: 'actions', label: 'New notebook', icon: NotebookPen, keywords: 'python markdown cells', run: inWorkspace(() => duckActions().createTab('notebook')) },
-      { id: 'home', group: 'actions', label: 'Home', icon: Home, keywords: 'start welcome', run: inWorkspace(openHome) },
-      { id: 'explorer', group: 'actions', label: 'Toggle explorer', icon: PanelLeft, shortcut: '⌘B', keywords: 'sidebar schema panel', run: inWorkspace(toggleExplorer) },
-      { id: 'refresh', group: 'actions', label: 'Refresh schema', icon: RefreshCw, keywords: 'reload tables databases', run: () => void duckActions().fetchDatabasesAndTablesInfo() },
-      { id: 'theme', group: 'actions', label: getTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme', icon: getTheme() === 'dark' ? Sun : Moon, keywords: 'dark light mode appearance', run: toggleTheme },
+      { id: 'new-query', group: 'actions', label: $t('palette.newQuery'), icon: Plus, shortcut: '⌥N', keywords: $t('palette.newQuery'), run: inWorkspace(() => duckActions().createTab('sql')) },
+      { id: 'new-notebook', group: 'actions', label: $t('palette.newNotebook'), icon: NotebookPen, keywords: 'python markdown cells', run: inWorkspace(() => duckActions().createTab('notebook')) },
+      { id: 'home', group: 'actions', label: $t('palette.home'), icon: Home, keywords: 'start welcome', run: inWorkspace(openHome) },
+      { id: 'explorer', group: 'actions', label: $t('palette.toggleExplorer'), icon: PanelLeft, shortcut: '⌘B', keywords: 'sidebar schema panel', run: inWorkspace(toggleExplorer) },
+      { id: 'refresh', group: 'actions', label: $t('palette.refreshSchema'), icon: RefreshCw, keywords: 'reload tables databases', run: () => void duckActions().fetchDatabasesAndTablesInfo() },
+      { id: 'theme', group: 'actions', label: getTheme() === 'dark' ? $t('palette.switchToLight') : $t('palette.switchToDark'), icon: getTheme() === 'dark' ? Sun : Moon, keywords: 'dark light mode appearance', run: toggleTheme },
     ]
 
     for (const group of NAV_GROUPS) {
       for (const route of visibleRoutes(group)) {
         const meta = PAGE_ROUTES[route]
-        list.push({ id: `page:${route}`, group: 'pages', label: meta.label, sub: group.label, keywords: meta.description, icon: meta.icon, run: () => goTo(route) })
+        const pageLabel = $t(meta.labelKey)
+        list.push({ id: `page:${route}`, group: 'pages', label: pageLabel, sub: $t('nav.' + group.id), keywords: $t(meta.descriptionKey), icon: meta.icon, run: () => goTo(route) })
         for (const section of PAGE_SECTIONS[route] ?? []) {
-          list.push({ id: `page:${route}:${section.id}`, group: 'pages', label: `${meta.label}: ${section.label}`, sub: group.label, icon: meta.icon, run: () => goTo(route, section.id) })
+          list.push({ id: `page:${route}:${section.id}`, group: 'pages', label: `${pageLabel}: ${$t(section.labelKey)}`, sub: $t('nav.' + group.id), icon: meta.icon, run: () => goTo(route, section.id) })
         }
       }
     }
@@ -285,7 +286,7 @@
 
       <div bind:this={listEl} class="min-h-0 flex-1 overflow-auto p-1.5">
         {#if flat.length === 0}
-          <div class="px-3 py-8 text-center text-[13px] text-fg-3">No match for "{query}"</div>
+          <div class="px-3 py-8 text-center text-[13px] text-fg-3">{$t('palette.noMatch', { values: { query } })}</div>
         {:else}
           {#each grouped as g (g.group)}
             <div class="flex items-center gap-2 px-2 pb-1 pt-2">
@@ -317,9 +318,7 @@
         {/if}
       </div>
 
-      <div class="border-t border-edge-subtle px-3 py-2 text-[11px] text-fg-3">
-        <span class="font-medium">↑↓</span> navigate · <span class="font-medium">↵</span> run · <span class="font-medium">esc</span> close
-      </div>
+      <div class="border-t border-edge-subtle px-3 py-2 text-[11px] text-fg-3">{$t('palette.footerHint')}</div>
     </div>
   </div>
 {/if}

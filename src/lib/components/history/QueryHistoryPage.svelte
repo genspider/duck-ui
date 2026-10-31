@@ -21,9 +21,9 @@
   const PAGE_SIZE = 50
   const SEARCH_DEBOUNCE_MS = 200
   const STATUS_TABS = [
-    { id: 'all', label: 'All' },
-    { id: 'succeeded', label: 'Succeeded' },
-    { id: 'failed', label: 'Failed' },
+    { id: 'all', label: $t('history.all') },
+    { id: 'succeeded', label: $t('history.succeeded') },
+    { id: 'failed', label: $t('history.failed') },
   ]
 
   const profileId = $derived(duck((s) => s.currentProfileId))
@@ -142,7 +142,7 @@
     <Tabs items={STATUS_TABS} value={status} onchange={(id) => (status = id as HistoryStatus)} variant="segmented" />
     <Button variant="outline" size="sm" onclick={() => (confirmOpen = true)} disabled={total === 0 && !filtered}>
       <Trash2 size={13} />
-      Clear
+      {$t('history.clear')}
     </Button>
   {/snippet}
 </PageHeader>
@@ -153,10 +153,10 @@
   {:else if entries.length === 0}
     <EmptyState
       icon={History}
-      title={filtered ? 'Nothing matches' : 'No history yet'}
+      title={filtered ? $t('history.nothingMatches') : $t('history.noHistory')}
       description={filtered
-        ? 'No query in the history matches this search.'
-        : 'Queries you run show up here, and stay across reloads.'}
+        ? $t('history.nothingMatchesDesc')
+        : $t('history.noHistoryDesc')}
     />
   {:else}
     <ul class="flex flex-col gap-2">
@@ -164,9 +164,9 @@
         <li class="flex items-start gap-2 rounded-md border border-edge bg-surface p-3">
           <span class="mt-1.5 shrink-0">
             {#if item.error}
-              <CircleX size={14} class="text-danger" aria-label="Failed" />
+              <CircleX size={14} class="text-danger" aria-label={$t('history.failed')} />
             {:else}
-              <CircleCheck size={14} class="text-success" aria-label="Succeeded" />
+              <CircleCheck size={14} class="text-success" aria-label={$t('history.succeeded')} />
             {/if}
           </span>
 
@@ -187,7 +187,7 @@
               {#if item.row_count !== null && !item.error}
                 <span class="inline-flex items-center gap-1 tabular-nums">
                   <Rows3 size={12} />
-                  {formatNumber(item.row_count)} {item.row_count === 1 ? 'row' : 'rows'}
+                  {formatNumber(item.row_count)} {$t('common.rows')}
                 </span>
               {/if}
             </p>
@@ -226,8 +226,8 @@
 <ConfirmDialog
   open={confirmOpen}
   title={$t('history.clearTitle')}
-  description="This permanently deletes the whole history of this profile, not only what is shown."
-  confirmLabel="Clear history"
+  description={$t('history.clearDesc')}
+  confirmLabel={$t('history.clearConfirm')}
   destructive
   onconfirm={clearHistory}
   oncancel={() => (confirmOpen = false)}

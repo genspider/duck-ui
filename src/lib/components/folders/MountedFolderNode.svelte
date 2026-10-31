@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { ChevronRight, ChevronDown, FolderOpen, RefreshCw, X, AlertCircle, Ellipsis } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
+  import { ChevronRight, ChevronDown, FolderOpen, FolderUp, RefreshCw, X, AlertCircle, Ellipsis } from 'lucide-svelte'
   import type { MountedFolderInfo } from '@/store/types'
   import Spinner from '../common/Spinner.svelte'
   import FileNode from './FileNode.svelte'
@@ -27,7 +28,7 @@
     } catch (error) {
       console.error('Failed to load files:', error)
       if (error instanceof Error && error.message === 'Permission denied') {
-        toastError('Permission required. Click to grant access.')
+        toastError($t('folder.permRequired'))
       }
     } finally {
       loading = false
@@ -46,8 +47,9 @@
   function openMenu(x: number, y: number) {
     actions.menu(
       [
-        { id: 'refresh', label: 'Refresh', icon: RefreshCw, onSelect: () => void loadFiles() },
-        { id: 'unmount', label: 'Unmount', icon: X, danger: true, onSelect: () => onunmount(folder.id) },
+        { id: 'refresh', label: $t('folder.refresh'), icon: RefreshCw, onSelect: () => void loadFiles() },
+        { id: 'quick-import-folder', label: $t('folder.quickImportFolder'), icon: FolderUp, disabled: !folder.hasPermission, onSelect: () => void actions.quickImportMountedFolder(folder.id) },
+        { id: 'unmount', label: $t('folder.unmount'), icon: X, danger: true, onSelect: () => onunmount(folder.id) },
       ],
       x,
       y,
@@ -84,15 +86,15 @@
       <FolderOpen size={14} class="shrink-0 text-accent" />
       <span class="min-w-0 flex-1 truncate font-medium">{folder.name}</span>
       {#if !folder.hasPermission}
-        <span class="inline-flex shrink-0 text-warning" title="Click to grant permission">
-          <AlertCircle size={13} aria-label="Permission required" />
+        <span class="inline-flex shrink-0 text-warning" title={$t('folder.permRequired')}>
+          <AlertCircle size={13} aria-label={$t('folder.permRequiredAria')} />
         </span>
       {/if}
     </button>
     <button
       type="button"
       class="mr-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-fg-3 opacity-0 transition-opacity hover:bg-hover hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
-      aria-label="{folder.name} actions"
+      aria-label={$t('folder.actions', { values: { name: folder.name } })}
       aria-haspopup="menu"
       onclick={onMoreClick}
     >
@@ -109,6 +111,6 @@
   {/if}
 
   {#if expanded && files.length === 0 && !loading}
-    <p class="py-1 pl-8 text-xs text-fg-4">No supported files found</p>
+    <p class="py-1 pl-8 text-xs text-fg-4">{$t('folder.noFiles')}</p>
   {/if}
 </li>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { onMount } from 'svelte'
   import Sidebar from './Sidebar.svelte'
   import TabBar, { TAB_DRAG_TYPE } from './TabBar.svelte'
@@ -221,7 +222,7 @@
         style="grid-row: 1 / span 2; grid-column: 2"
         role="separator"
         aria-orientation="vertical"
-        aria-label="Resize panes"
+        aria-label={$t('shell.resizePanes')}
         onmousedown={onResizeStart}
         ondblclick={resetPanes}
       >

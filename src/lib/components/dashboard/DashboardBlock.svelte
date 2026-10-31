@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { TriangleAlert, Download, ExternalLink } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Spinner from '../common/Spinner.svelte'
@@ -115,7 +116,7 @@
   {#if inputs && inputValues}
     <DashboardInput {block} {inputs} values={inputValues} {results} />
   {:else}
-    {@render placeholder('Inputs are not available in this view')}
+    {@render placeholder($t('dashboard.inputsNotAvailable'))}
   {/if}
 {:else if block.tag === 'Alert'}
   <div class="my-3 rounded-md border p-3 text-[13px] {ALERT_TONES[propText(block.props.status) ?? 'info'] ?? ALERT_TONES.info}">
@@ -124,7 +125,7 @@
 {:else if block.tag === 'Details'}
   <details class="my-3 rounded-md border border-edge p-3">
     <summary class="cursor-pointer text-[13px] font-medium text-fg">
-      {propText(block.props.title) ?? 'Details'}
+      {propText(block.props.title) ?? $t('dashboard.details')}
     </summary>
     <div class="mt-2">
       {@render children(block.children)}
@@ -153,17 +154,17 @@
 {:else if !bound || bound.state === 'missing'}
   {@render placeholder(
     block.props.data
-      ? `Unknown query "${propText(block.props.data)}". Declare it in a \`\`\`sql fence`
-      : `<${block.tag}> needs data={query_name}`,
+      ? $t('dashboard.unknownQuery', { values: { name: propText(block.props.data) } })
+      : $t('dashboard.needsData', { values: { tag: block.tag } }),
   )}
 {:else if bound.state === 'loading'}
-  <div class="my-3 flex min-h-24 items-center justify-center rounded-md border border-dashed border-edge text-fg-3" role="status" aria-label="Running query">
+  <div class="my-3 flex min-h-24 items-center justify-center rounded-md border border-dashed border-edge text-fg-3" role="status" aria-label={$t('dashboard.runningQuery')}>
     <Spinner size="sm" />
   </div>
 {:else if bound.state === 'error'}
   <div class="my-3 flex items-start gap-2 rounded-md border border-danger/40 bg-danger-soft p-3 text-xs text-fg" role="alert">
     <TriangleAlert size={14} class="mt-0.5 shrink-0 text-danger" />
-    <span class="min-w-0 break-words font-mono">{bound.error ?? 'Query failed'}</span>
+    <span class="min-w-0 break-words font-mono">{bound.error ?? $t('dashboard.queryFailed')}</span>
   </div>
 {:else}
   {@const result = bound.result}
@@ -180,7 +181,7 @@
   {:else if block.tag === 'DownloadData'}
     <Button size="sm" variant="outline" class="my-2" onclick={() => download(result)}>
       <Download size={13} />
-      {propText(block.props.title) ?? 'Download data'}
+      {propText(block.props.title) ?? $t('dashboard.downloadData')}
     </Button>
   {:else if block.tag === 'DataTable'}
     <div class="my-3 overflow-hidden rounded-md border border-edge" style="height: {tableHeight(result)}px">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Database, ExternalLink, Info, Pencil, Radio, Trash2 } from 'lucide-svelte'
   import type { ConnectionProvider } from '@/store/types'
   import Button from '../common/Button.svelte'
@@ -22,11 +23,11 @@
   function readOnlyReason(connection: ConnectionProvider): string | null {
     switch (connection.environment) {
       case 'ENV':
-        return 'Configured via environment variables, cannot be edited or deleted.'
+        return $t('connections.readOnlyEnv')
       case 'BUILT_IN':
-        return 'Built-in connection, cannot be edited or deleted.'
+        return $t('connections.readOnlyBuiltIn')
       case 'SESSION':
-        return 'Granted by a live session. It disappears when the session ends.'
+        return $t('connections.readOnlySession')
       default:
         return null
     }
@@ -47,12 +48,12 @@
   <table class="ds-table">
     <thead>
       <tr class="ds-table-head-row">
-        <th class="ds-table-th">Name</th>
-        <th class="ds-table-th">Scope</th>
-        <th class="ds-table-th">Host</th>
-        <th class="ds-table-th">Database</th>
-        <th class="ds-table-th">Environment</th>
-        <th class="ds-table-th-right">Actions</th>
+        <th class="ds-table-th">{$t('connections.name')}</th>
+        <th class="ds-table-th">{$t('connections.scope')}</th>
+        <th class="ds-table-th">{$t('connections.host')}</th>
+        <th class="ds-table-th">{$t('connections.database')}</th>
+        <th class="ds-table-th">{$t('connections.environment')}</th>
+        <th class="ds-table-th-right">{$t('connections.actions')}</th>
       </tr>
     </thead>
     <tbody>
@@ -73,14 +74,22 @@
             </div>
           </td>
           <td class="ds-td">{connection.scope}</td>
-          <td class="ds-td-mono">{connection.host || (connection.scope === 'WASM' ? 'Local' : '-')}</td>
-          <td class="ds-td">{connection.database || (connection.scope === 'WASM' ? 'memory' : '-')}</td>
+          <td class="ds-td-mono">
+            {connection.scope === 'OPFS'
+              ? $t('connections.local')
+              : connection.host || (connection.scope === 'WASM' ? $t('connections.local') : '-')}
+          </td>
+          <td class="ds-td">
+            {connection.scope === 'OPFS'
+              ? (connection.path ?? '').replace(/\.db$/, '') || '-'
+              : connection.database || (connection.scope === 'WASM' ? 'memory' : '-')}
+          </td>
           <td class="ds-td">{connection.environment}</td>
           <td class="ds-td">
             <div class="flex items-center justify-end gap-1.5">
               {#if connection.environment !== 'BUILT_IN'}
                 <Button size="sm" variant="outline" disabled={isCurrent || loading} onclick={() => onconnect(connection.id)}>
-                  {isCurrent ? 'Connected' : 'Connect'}
+                  {isCurrent ? $t('connections.connected') : $t('connections.connect')}
                 </Button>
               {/if}
 
@@ -100,7 +109,7 @@
                   size="sm"
                   variant="ghost"
                   disabled={connection.id === 'WASM'}
-                  aria-label={`Edit ${connection.name}`}
+                  aria-label={$t('connections.editAria', { values: { name: connection.name } })}
                   onclick={() => onedit(connection.id)}
                 >
                   <Pencil size={14} />
@@ -110,7 +119,7 @@
                   size="sm"
                   variant="ghost"
                   disabled={loading}
-                  aria-label={`Delete ${connection.name}`}
+                  aria-label={$t('connections.deleteAria', { values: { name: connection.name } })}
                   onclick={() => (deleteTarget = connection)}
                 >
                   <Trash2 size={14} class="text-danger" />
@@ -126,11 +135,11 @@
 
 <ConfirmDialog
   open={deleteTarget !== null}
-  title="Delete Connection"
+  title={$t('connections.deleteTitle')}
   description={deleteTarget
-    ? `Are you sure you want to delete the connection "${deleteTarget.name}"? This action cannot be undone.`
+    ? $t('connections.deleteDesc', { values: { name: deleteTarget.name } })
     : ''}
-  confirmLabel="Delete"
+  confirmLabel={$t('connections.delete')}
   destructive
   onconfirm={confirmDelete}
   oncancel={() => (deleteTarget = null)}

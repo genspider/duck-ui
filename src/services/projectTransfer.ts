@@ -1,4 +1,5 @@
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { generateUUID } from "@/lib/utils";
 import {
   buildBundleFiles,
@@ -130,10 +131,18 @@ export async function downloadProjectExport(profileId: string): Promise<void> {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     toast.success(
-      `Exported ${counts.queries} queries, ${counts.notebooks} notebooks, ${counts.dashboards} dashboards`
+      tr("projectTransfer.exported", {
+        queries: counts.queries,
+        notebooks: counts.notebooks,
+        dashboards: counts.dashboards,
+      })
     );
   } catch (error) {
-    toast.error(`Export failed: ${error instanceof Error ? error.message : "unknown error"}`);
+    toast.error(
+      tr("projectTransfer.exportFailed", {
+        message: error instanceof Error ? error.message : "unknown error",
+      })
+    );
   }
 }
 

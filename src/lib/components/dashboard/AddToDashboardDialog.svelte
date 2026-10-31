@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Plus } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
@@ -30,9 +31,9 @@
   const uid = $props.id()
 
   const KINDS: { kind: AddKind; label: string }[] = [
-    { kind: 'table', label: 'Table' },
-    { kind: 'chart', label: 'Chart' },
-    { kind: 'metric', label: 'Metric' },
+    { kind: 'table', label: $t('dashboard.widget.table') },
+    { kind: 'chart', label: $t('dashboard.widget.chart') },
+    { kind: 'metric', label: $t('dashboard.widget.metric') },
   ]
 
   const dashboards = $derived(duck((s) => s.dashboards))
@@ -61,7 +62,7 @@
     if (busy) return
     busy = true
     try {
-      const dashboard = await duckActions().createDashboard(newName.trim() || 'Untitled dashboard')
+      const dashboard = await duckActions().createDashboard(newName.trim() || $t('dashboard.untitled'))
       if (dashboard) {
         await duckActions().appendQueryToDashboard({ dashboardId: dashboard.id, kind, title, sql, chartConfig, columns })
         onclose()
@@ -77,12 +78,12 @@
   {open}
   {onclose}
   size="sm"
-  title="Add to dashboard"
-  description="The query is saved, not the rows. The widget re-runs it so the numbers stay current."
+  title={$t('dashboard.addToDashboard')}
+  description={$t('dashboard.addToDashboard.desc')}
 >
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-1.5">
-      <span id="{uid}-kind" class="text-[11px] uppercase tracking-wide text-fg-3">Show as</span>
+      <span id="{uid}-kind" class="text-[11px] uppercase tracking-wide text-fg-3">{$t('dashboard.showAs')}</span>
       <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="{uid}-kind">
         {#each KINDS as option (option.kind)}
           <Button
@@ -99,7 +100,7 @@
 
     {#if dashboards.length > 0}
       <div class="flex flex-col gap-1.5">
-        <span id="{uid}-existing" class="text-[11px] uppercase tracking-wide text-fg-3">Existing</span>
+        <span id="{uid}-existing" class="text-[11px] uppercase tracking-wide text-fg-3">{$t('dashboard.existing')}</span>
         <div class="flex max-h-40 flex-col gap-1 overflow-y-auto" role="group" aria-labelledby="{uid}-existing">
           {#each dashboards as dashboard (dashboard.id)}
             <Button variant="outline" class="w-full shrink-0 !justify-start" disabled={busy} onclick={() => addTo(dashboard.id)}>
@@ -111,23 +112,23 @@
     {/if}
 
     <div class="flex flex-col gap-1.5">
-      <label for="{uid}-new" class="text-[11px] uppercase tracking-wide text-fg-3">New dashboard</label>
+      <label for="{uid}-new" class="text-[11px] uppercase tracking-wide text-fg-3">{$t('dashboard.newDashboard')}</label>
       <div class="flex gap-2">
         <Input
           id="{uid}-new"
           bind:value={newName}
-          placeholder="Q3 overview"
+          placeholder={$t('dashboard.newName.placeholder')}
           onkeydown={(e) => e.key === 'Enter' && createAndAdd()}
         />
         <Button onclick={createAndAdd} disabled={busy}>
           <Plus size={13} />
-          Create
+          {$t('common.create')}
         </Button>
       </div>
     </div>
   </div>
 
   {#snippet footer()}
-    <Button size="sm" variant="ghost" onclick={onclose}>Cancel</Button>
+    <Button size="sm" variant="ghost" onclick={onclose}>{$t('common.cancel')}</Button>
   {/snippet}
 </Modal>

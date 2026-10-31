@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import Button from '../common/Button.svelte'
   import Textarea from '../common/Textarea.svelte'
   import * as toast from '../../stores/toast.svelte'
@@ -31,7 +32,7 @@
 
       const invite = await decodeInvite<ManualInvite>(fromUrl)
       if (!invite || !('offer' in invite)) {
-        toast.error("That code isn't readable. Ask for a fresh invite")
+        toast.error($t('liveSession.invalidCode'))
         return
       }
 
@@ -45,7 +46,7 @@
 </script>
 
 <div class="flex flex-col gap-3">
-  <label class="sr-only" for="{uid}-code">Invite link or code</label>
-  <Textarea id="{uid}-code" mono rows={5} bind:value={code} placeholder="Paste the invite link or code" />
-  <Button class="self-start" onclick={join} disabled={!code.trim()} loading={checking}>Continue</Button>
+  <label class="sr-only" for="{uid}-code">{$t('liveSession.inviteCodeAria')}</label>
+  <Textarea id="{uid}-code" mono rows={5} bind:value={code} placeholder={$t('liveSession.inviteCodePlaceholder')} />
+  <Button class="self-start" onclick={join} disabled={!code.trim()} loading={checking}>{$t('liveSession.continue')}</Button>
 </div>

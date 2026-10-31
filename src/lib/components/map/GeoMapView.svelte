@@ -63,6 +63,7 @@
   // Imported here, not in app.css, so the stylesheet ships with the map chunk.
   import 'maplibre-gl/dist/maplibre-gl.css'
   import { MapPinOff, TriangleAlert } from 'lucide-svelte'
+  import { tr } from '@/lib/i18n/translate'
   import { resultToGeoJson } from '@/lib/geoResult'
   import type { QueryResult } from '@/store/types'
   import { getTheme } from '../../stores/theme.svelte'
@@ -257,7 +258,7 @@
 <div class="geo-map flex h-full flex-col">
   <div class="flex items-center gap-3 border-b border-edge-subtle px-3 py-1.5 text-xs text-fg-3">
     {#if geometryColumns.length > 1}
-      <label class="sr-only" for="geo-column">Geometry column</label>
+      <label class="sr-only" for="geo-column">{tr('map.geometryColumn')}</label>
       <Select
         id="geo-column"
         size="sm"
@@ -269,21 +270,21 @@
     {:else}
       <span class="font-mono">{column}</span>
     {/if}
-    <span>{featureCount.toLocaleString()} {featureCount === 1 ? 'feature' : 'features'}</span>
+    <span>{tr('map.features', { count: featureCount })}</span>
     {#if conversion.skipped > 0}
       <span
         class="flex items-center gap-1 text-warning"
-        title="Rows whose geometry couldn't be parsed, was too large to decode, or isn't in lon/lat (try ST_Transform to EPSG:4326)"
+        title={tr('map.skippedTitle')}
       >
         <TriangleAlert size={13} />
-        {conversion.skipped.toLocaleString()} not drawn
+        {tr('map.notDrawn', { count: conversion.skipped })}
       </span>
     {/if}
     {#if result.truncated}
-      <span>first {result.rowCount.toLocaleString()} rows</span>
+      <span>{tr('map.firstRows', { count: result.rowCount })}</span>
     {/if}
     {#if basemapOff}
-      <span class="ml-auto">Basemap unavailable, offline view</span>
+      <span class="ml-auto">{tr('map.basemapOffline')}</span>
     {/if}
   </div>
   <div class="relative min-h-0 flex-1">
@@ -291,13 +292,13 @@
     {#if mapError}
       <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center">
         <MapPinOff size={28} class="text-fg-3" />
-        <p class="text-[13px] text-fg">The map couldn't be displayed.</p>
+        <p class="text-[13px] text-fg">{tr('map.loadError')}</p>
         <p class="max-w-md text-xs text-fg-3">{mapError}</p>
       </div>
     {:else if !mapReady}
       <div class="absolute inset-0 flex items-center justify-center gap-2 text-[13px] text-fg-3" role="status">
         <Spinner size="sm" />
-        Loading map…
+        {tr('map.loading')}
       </div>
     {/if}
   </div>

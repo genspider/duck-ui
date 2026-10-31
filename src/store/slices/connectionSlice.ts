@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import {
   asLocalDuckSession,
   closeSession,
@@ -184,11 +185,11 @@ export const createConnectionSlice: StateCreator<DuckStoreState, [], [], Connect
         ).catch((err) => console.warn("[Connection] Failed to persist:", err));
       }
 
-      toast.success(`Connection "${connection.name}" added successfully!`);
+      toast.success(tr("connection.added", { name: connection.name }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      set({ error: `Failed to add connection: ${errorMessage}` });
-      toast.error(`Failed to add connection: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : tr("common.unknownError");
+      set({ error: tr("connection.addFailedGeneric", { message: errorMessage }) });
+      toast.error(tr("connection.addFailed", { message: errorMessage }));
       throw error;
     } finally {
       set({ isLoadingExternalConnection: false });
@@ -247,18 +248,18 @@ export const createConnectionSlice: StateCreator<DuckStoreState, [], [], Connect
           },
           // Without a key nothing can be encrypted. Leaving the stored value
           // alone beats wiping credentials over a rename.
-          credentials: !encryptionKey
-            ? undefined
-            : Object.keys(credentialRecord).length > 0
+          credentials: encryptionKey
+            ? Object.keys(credentialRecord).length > 0
               ? credentialRecord
-              : null,
+              : null
+            : undefined,
           environment: merged.environment,
         },
         encryptionKey
       );
     } catch (error) {
       console.warn("[Connection] Failed to persist update:", error);
-      toast.error(`Connection "${merged.name}" was changed but could not be saved.`);
+      toast.error(tr("connection.saveFailed", { name: merged.name }));
     }
   },
 
@@ -283,14 +284,14 @@ export const createConnectionSlice: StateCreator<DuckStoreState, [], [], Connect
       set({ isLoading: true });
       const provider = get().connectionList.connections.find((c) => c.id === connectionId);
       if (!provider) {
-        throw new Error(`Connection with ID ${connectionId} not found.`);
+        throw new Error(tr("connection.notFound", { id: connectionId }));
       }
 
       const definition = toConnectionDefinition(provider);
 
       if (definition.config.kind === "opfs") {
         if (!getSession(definition.id)) {
-          toast.info("Initializing OPFS connection...");
+          toast.info(tr("connection.initializingOpfs"));
         }
         await closeOtherOpfsSessions(definition.id);
       }
@@ -309,15 +310,19 @@ export const createConnectionSlice: StateCreator<DuckStoreState, [], [], Connect
       } catch {
         // Schema fetch failure shouldn't prevent connection from completing
       }
-      toast.success(`Connected to ${provider.name}`);
+      toast.success(tr("connection.connectedTo", { name: provider.name }));
     } catch (error) {
       set({
-        error: `Failed to set current connection: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        error: tr("connection.setCurrentFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        }),
         isLoading: false,
       });
-      toast.error(`Failed to connect: ${error instanceof Error ? error.message : "Unknown error"}`);
+      toast.error(
+        tr("connection.connectFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     } finally {
       set({ isLoading: false });
     }

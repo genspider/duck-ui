@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Toaster } from 'svelte-sonner'
+  import { t } from 'svelte-i18n'
 </script>
 
 <Toaster
@@ -12,7 +13,7 @@
   offset={16}
   mobileOffset={12}
   gap={8}
-  containerAriaLabel="Duck-UI notifications"
+  containerAriaLabel={$t('toast.notificationsAria')}
 />
 
 <style>

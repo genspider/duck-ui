@@ -11,6 +11,7 @@
     X, Plus, Home, SquareTerminal, NotebookPen, LayoutDashboard, Table2, Columns2, PanelLeftClose,
   } from 'lucide-svelte'
   import { tick } from 'svelte'
+  import { t } from 'svelte-i18n'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
   import { duck, duckActions } from '../../stores/duck.svelte'
   import { isMobile } from '../../stores/layout.svelte'
@@ -84,27 +85,27 @@
     e.preventDefault()
     const home = isHomeTab(tab)
     const items: ContextMenuItem[] = [
-      { id: 'rename', label: 'Rename', disabled: !RENAMABLE.includes(tab.type), onSelect: () => startRename(tab) },
+      { id: 'rename', label: $t('tab.rename'), disabled: !RENAMABLE.includes(tab.type), onSelect: () => startRename(tab) },
     ]
     if (!isMobile()) {
       items.push(
         { id: 'sep-split', separator: true },
         {
           id: 'split',
-          label: split ? 'Move to other pane' : 'Split right',
+          label: split ? $t('tab.moveToOtherPane') : $t('tab.splitRight'),
           icon: Columns2,
           shortcut: '⌥S',
           disabled: home,
           onSelect: () => duckActions().splitTab(tab.id),
         },
       )
-      if (split) items.push({ id: 'join', label: 'Join panes', icon: PanelLeftClose, onSelect: () => duckActions().joinPanes() })
+      if (split) items.push({ id: 'join', label: $t('tab.joinPanes'), icon: PanelLeftClose, onSelect: () => duckActions().joinPanes() })
     }
     items.push(
       { id: 'sep', separator: true },
-      { id: 'close', label: 'Close', shortcut: '⌥W', disabled: home, onSelect: () => duckActions().closeTab(tab.id) },
-      { id: 'close-others', label: 'Close others', disabled: allTabs.length < 2, onSelect: () => closeOthers(tab.id) },
-      { id: 'close-all', label: 'Close all', onSelect: () => duckActions().closeAllTabs() },
+      { id: 'close', label: $t('tab.close'), shortcut: '⌥W', disabled: home, onSelect: () => duckActions().closeTab(tab.id) },
+      { id: 'close-others', label: $t('tab.closeOthers'), disabled: allTabs.length < 2, onSelect: () => closeOthers(tab.id) },
+      { id: 'close-all', label: $t('tab.closeAll'), onSelect: () => duckActions().closeAllTabs() },
     )
     menu = { x: e.clientX, y: e.clientY, items }
   }
@@ -182,7 +183,7 @@
   class="flex h-9 min-w-0 items-stretch border-b border-edge-subtle bg-sidebar"
   style="grid-row: 1; grid-column: {pane === 'right' ? 3 : 1}"
   role="tablist"
-  aria-label={pane === 'right' ? 'Right pane tabs' : 'Open tabs'}
+  aria-label={pane === 'right' ? $t('tab.rightPane') : $t('tab.openTabs')}
   tabindex="-1"
   ondragover={onBarDragOver}
   ondrop={onBarDrop}
@@ -224,7 +225,7 @@
               bind:this={renameEl}
               bind:value={renameValue}
               class="h-6 w-32 rounded-sm border border-accent bg-surface px-1 text-xs text-fg focus:outline-none"
-              aria-label="Tab name"
+              aria-label={$t('tab.name')}
               onblur={commitRename}
               onkeydown={onRenameKey}
               onclick={(e) => e.stopPropagation()}
@@ -233,13 +234,13 @@
             <span class="truncate">{tab.title}</span>
           {/if}
           {#if isRunning(tab.id)}
-            <span class="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-accent" role="img" aria-label="Running"></span>
+            <span class="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-accent" role="img" aria-label={$t('tab.running')}></span>
           {/if}
           <button
             class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-fg-4 opacity-0 hover:bg-active hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 {shown ? 'opacity-100' : ''}"
             onclick={(e) => { e.stopPropagation(); duckActions().closeTab(tab.id) }}
-            aria-label="Close {tab.title}"
-            title="Close"
+            aria-label={$t('tab.closeNamed', { values: { name: tab.title } })}
+            title={$t('tab.close')}
           >
             <X size={12} />
           </button>
@@ -251,16 +252,16 @@
   <button
     class="inline-flex w-9 shrink-0 items-center justify-center text-fg-3 hover:bg-hover hover:text-fg"
     onclick={() => createTab('sql')}
-    title="New query (⌥N)"
-    aria-label="New query"
+    title={$t('tab.newQuery')}
+    aria-label={$t('tab.newQuery')}
   >
     <Plus size={14} />
   </button>
   <button
     class="inline-flex w-9 shrink-0 items-center justify-center text-fg-3 hover:bg-hover hover:text-fg"
     onclick={() => createTab('notebook')}
-    title="New notebook"
-    aria-label="New notebook"
+    title={$t('tab.newNotebook')}
+    aria-label={$t('tab.newNotebook')}
   >
     <NotebookPen size={14} />
   </button>

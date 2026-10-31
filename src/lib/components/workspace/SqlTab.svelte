@@ -58,8 +58,8 @@
   const geometryColumns = $derived(tab?.result && !tab.result.error ? findGeometryColumns(tab.result) : [])
   // A rerun without a GEOMETRY column drops the Map view; the panel falls back to the table.
   const extraViews = $derived([
-    { id: 'charts', label: 'Charts', icon: ChartColumn },
-    ...(geometryColumns.length > 0 ? [{ id: 'map', label: 'Map', icon: MapIcon }] : []),
+    { id: 'charts', label: $t('common.charts'), icon: ChartColumn },
+    ...(geometryColumns.length > 0 ? [{ id: 'map', label: $t('common.map'), icon: MapIcon }] : []),
   ])
 
   let editor: CodeEditor | undefined = $state()
@@ -106,12 +106,12 @@
   function share() {
     const query = currentSql()
     if (!query || !tab) {
-      toast.error('No query to share')
+      toast.error($t('editor.noQueryToShare'))
       return
     }
     // The live editor text plus the tab's chart config. The result rides
     // along so the dialog can offer its columns as embed filters.
-    shareTab = { id: tabId, title: tab.title || 'Shared Query', type: 'sql', content: query, chartConfig: tab.chartConfig, result: tab.result ?? null }
+    shareTab = { id: tabId, title: tab.title || $t('editor.sharedQuery'), type: 'sql', content: query, chartConfig: tab.chartConfig, result: tab.result ?? null }
   }
   const profileId = $derived(duck((s) => s.currentProfileId))
 
@@ -129,7 +129,7 @@
   async function run(sql: string, from = 0) {
     if (executing) return
     if (!sql) {
-      toast.warning('Write a query first')
+      toast.warning($t('editor.writeQueryFirst'))
       return
     }
     lastRun = { sql, from }
@@ -138,7 +138,7 @@
       await duckActions().executeQuery(sql, tabId)
     } catch (error) {
       console.error('Query execution failed:', error)
-      toast.error('Query execution failed')
+      toast.error($t('editor.queryExecutionFailed'))
     }
   }
 
@@ -180,7 +180,7 @@
   async function cancel() {
     try {
       await duckActions().cancelQuery(tabId)
-      toast.info('Query cancelled')
+      toast.info($t('editor.queryCancelled'))
     } catch (error) {
       console.error('Failed to cancel query:', error)
     }
@@ -210,7 +210,7 @@
       }
     } catch (error) {
       console.error('Explain failed:', error)
-      toast.error('Explain query failed')
+      toast.error($t('editor.explainFailed'))
     } finally {
       explaining = false
     }
@@ -225,7 +225,7 @@
       const fixed = await duckActions().generateSQL(buildFixQueryRequest(sqlText, error))
       if (fixed) {
         duckActions().updateTabQuery(tabId, fixed)
-        toast.success('Duck Brain suggested a fix. Review it and run again')
+        toast.success($t('editor.brainFixSuggested'))
       }
     } finally {
       fixing = false
@@ -238,13 +238,10 @@
     const { rows, sourceRowCount, truncated } = pin.snapshot
     if (truncated) {
       toast.warning(
-        `Pinned ${rows.length.toLocaleString()} of ${sourceRowCount.toLocaleString()} rows. ` +
-          (rows.length >= PIN_ROW_LIMIT
-            ? `Pins keep at most ${PIN_ROW_LIMIT.toLocaleString()}`
-            : 'The result itself was truncated'),
+        $t('editor.pinTruncated', { values: { count: rows.length.toLocaleString(), total: sourceRowCount.toLocaleString(), limit: PIN_ROW_LIMIT.toLocaleString() } })
       )
     } else {
-      toast.success(`Pinned ${rows.length.toLocaleString()} rows for comparison`)
+      toast.success($t('editor.pinSuccess', { values: { count: rows.length.toLocaleString() } }))
     }
   }
 
@@ -293,17 +290,17 @@
         </Button>
         <Button size="sm" variant="ghost" onclick={explain} title={$t('editor.explain')} disabled={executing || !sqlText.trim()} loading={explaining}>
           {#if !explaining}<ListTree size={13} />{/if}
-          Explain
+          {$t('editor.explain')}
         </Button>
 
         <Button size="sm" variant="ghost" onclick={() => (saveOpen = true)} title={$t('editor.saveQuery')} disabled={!sqlText.trim() || !profileId}>
           <Bookmark size={13} />
-          Save
+          {$t('editor.saveQuery')}
         </Button>
 
         <Button size="sm" variant="ghost" onclick={share} title={$t('editor.share')} disabled={!sqlText.trim()}>
           <Share2 size={13} />
-          Share
+          {$t('editor.share')}
         </Button>
 
         <div class="ml-auto flex items-center">
@@ -314,13 +311,13 @@
               class={brainOpen ? 'text-accent' : ''}
               aria-pressed={brainOpen}
               onclick={() => duckActions().toggleBrainPanel()}
-              title="Ask Duck Brain"
+              title={$t('editor.askDuckBrain')}
             >
               <Brain size={13} />
-              Duck Brain
+              {$t('editor.duckBrain')}
             </Button>
           {/if}
-          <Tooltip text="Run selection or statement at cursor: {mod}+Enter. Run everything: {mod}+Shift+Enter. Format: Alt+F. Search: {mod}+F." side="bottom">
+          <Tooltip text={$t('editor.keyboardTooltip', { values: { mod } })} side="bottom">
             <span class="inline-flex h-7 w-7 items-center justify-center text-fg-4"><Keyboard size={14} /></span>
           </Tooltip>
         </div>
@@ -376,7 +373,7 @@
               {:then { default: GeoMapView }}
                 <GeoMapView {result} {geometryColumns} />
               {:catch}
-                <p class="p-4 text-xs text-danger" role="alert">The map could not be loaded.</p>
+                <p class="p-4 text-xs text-danger" role="alert">{$t('editor.mapLoadFailed')}</p>
               {/await}
             {:else}
               <ChartView

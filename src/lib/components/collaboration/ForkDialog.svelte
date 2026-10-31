@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Check, Database, Scissors, TriangleAlert } from 'lucide-svelte'
   import Modal from '../common/Modal.svelte'
   import Button from '../common/Button.svelte'
@@ -32,10 +33,10 @@
   // OPFS database (persists on this device). Never a remote or peer target:
   // "your copy, in your browser" is the whole promise.
   const destinations = $derived([
-    { value: WASM_CONNECTION_ID, label: 'This browser (in-memory)' },
+    { value: WASM_CONNECTION_ID, label: $t('liveSession.fork.memory') },
     ...connections
       .filter((connection) => connection.scope === 'OPFS')
-      .map((connection) => ({ value: connection.id, label: `${connection.name} (persistent)` })),
+      .map((connection) => ({ value: connection.id, label: $t('liveSession.fork.persistent', { values: { name: connection.name } }) })),
   ])
 
   const tables = $derived(
@@ -84,20 +85,20 @@
   {open}
   onclose={close}
   size="sm"
-  title="Fork “{capability.name}”"
-  description="Copies the selected tables into your browser. Afterwards your copy is independent: their changes don't reach you, and yours don't reach them."
+  title={$t('liveSession.fork.title', { values: { name: capability.name } })}
+  description={$t('liveSession.fork.description')}
 >
   <div class="flex flex-col gap-3">
     {#if rowLimit !== undefined}
       <p class="flex items-start gap-1.5 text-xs text-fg-3">
         <Scissors size={13} class="mt-0.5 shrink-0" />
-        The host's limit of {rowLimit.toLocaleString()} rows per table applies to the copy.
+        {$t('liveSession.fork.rowLimit', { values: { limit: rowLimit.toLocaleString() } })}
       </p>
     {/if}
 
     <div class="flex max-h-56 flex-col gap-1.5 overflow-y-auto pr-3">
       {#if tables.length === 0}
-        <p class="text-xs text-fg-3">This share lists no tables.</p>
+        <p class="text-xs text-fg-3">{$t('liveSession.fork.noTables')}</p>
       {/if}
       {#each tables as table (table)}
         {@const item = progress.get(table)}
@@ -116,13 +117,13 @@
             <span class="flex shrink-0 items-center gap-1.5 text-xs text-fg-3">
               {#if item.status === 'transferring'}
                 <Spinner size="sm" class="h-3 w-3" />
-                {item.rows.toLocaleString()} rows
+                {item.rows.toLocaleString()} {$t('liveSession.fork.rows')}
               {:else if item.status === 'importing'}
                 <Spinner size="sm" class="h-3 w-3" />
-                importing
+                {$t('liveSession.fork.importing')}
               {:else if item.status === 'done'}
                 <Check size={13} class="text-success" />
-                {item.rows.toLocaleString()} rows{item.truncated ? " (truncated by the host's limit)" : ''}
+                {item.rows.toLocaleString()} {$t('liveSession.fork.rows')}{item.truncated ? $t('liveSession.fork.truncated') : ''}
               {:else if item.status === 'error'}
                 <span class="flex items-center gap-1 text-danger">
                   <TriangleAlert size={13} />
@@ -139,28 +140,26 @@
       <div class="flex flex-col gap-1.5">
         <label class="flex items-center gap-1.5 text-xs text-fg-3" for="{uid}-destination">
           <Database size={13} />
-          Destination
+          {$t('liveSession.fork.destination')}
         </label>
         <Select id="{uid}-destination" bind:value={destination} options={destinations} disabled={running} />
         <p class="text-xs text-fg-3">
-          In-memory copies vanish when this tab closes. An OPFS database keeps them on this device.
+          {$t('liveSession.fork.destinationHint')}
         </p>
       </div>
     {/if}
 
     {#if finished}
       <p class="rounded-md border border-success/40 bg-success-soft p-2 text-xs text-fg" role="status">
-        Done. The copies are {destination === WASM_CONNECTION_ID
-          ? 'in your local in-memory database'
-          : 'saved in your persistent database'}. They stay even if the host leaves.
+        {$t(destination === WASM_CONNECTION_ID ? 'liveSession.fork.doneMemory' : 'liveSession.fork.donePersistent')}
       </p>
     {/if}
   </div>
 
   {#snippet footer()}
-    <Button variant="ghost" onclick={onclose} disabled={running}>{finished ? 'Close' : 'Cancel'}</Button>
+    <Button variant="ghost" onclick={onclose} disabled={running}>{finished ? $t('common.close') : $t('common.cancel')}</Button>
     <Button onclick={fork} loading={running} disabled={selected.size === 0}>
-      Fork {selected.size > 0 ? `${selected.size} ` : ''}{selected.size === 1 ? 'table' : 'tables'}
+      {$t('liveSession.fork.button', { values: { count: selected.size } })}
     </Button>
   {/snippet}
 </Modal>

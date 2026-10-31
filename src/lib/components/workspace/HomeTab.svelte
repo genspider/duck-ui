@@ -6,6 +6,8 @@
   import ProfileAvatar from '../profile/ProfileAvatar.svelte'
   import { duck, duckActions } from '../../stores/duck.svelte'
   import * as toast from '../../stores/toast.svelte'
+  import { t } from 'svelte-i18n'
+  import { tr } from '@/lib/i18n/translate'
   import { demoDatasets, type DemoDataset } from '@/lib/demoDatasets'
   import { stageRemoteTextFile } from '@/services/duckdb/utils'
   import { getUiConfig } from '@/lib/appConfig'
@@ -24,26 +26,26 @@
 
   const quickStart = $derived([
     {
-      title: 'SQL query',
-      description: 'Write and run SQL on DuckDB WASM.',
+      title: $t('home.quickStart.sql'),
+      description: $t('home.quickStart.sql.desc'),
       icon: SquareTerminal,
       run: () => duckActions().createTab('sql'),
     },
     {
-      title: 'Notebook',
-      description: 'SQL, Python and markdown cells in one document.',
+      title: $t('home.quickStart.notebook'),
+      description: $t('home.quickStart.notebook.desc'),
       icon: NotebookPen,
       run: () => duckActions().createTab('notebook'),
     },
     {
-      title: 'Dashboards',
-      description: 'Reports as markdown with live SQL, charts and inputs.',
+      title: tr('home.quickStart.dashboards'),
+      description: tr('home.quickStart.dashboards.desc'),
       icon: LayoutDashboard,
       run: () => goTo('dashboards'),
     },
     {
-      title: 'Share live',
-      description: 'Invite another browser into your workspace. No server.',
+      title: tr('home.quickStart.shareLive'),
+      description: tr('home.quickStart.shareLive.desc'),
       icon: Radio,
       run: () => goTo('live'),
     },
@@ -51,15 +53,15 @@
       ? []
       : [
           {
-            title: 'Duck Brain',
-            description: 'Ask questions in plain language, get SQL back.',
+            title: tr('home.quickStart.duckBrain'),
+            description: tr('home.quickStart.duckBrain.desc'),
             icon: Brain,
             run: () => duckActions().toggleBrainPanel(),
           },
         ]),
     {
-      title: 'Explore with examples',
-      description: 'Open a sample query over a public Parquet file.',
+      title: tr('home.quickStart.explore'),
+      description: tr('home.quickStart.explore.desc'),
       icon: FlaskConical,
       run: () =>
         duckActions().createTab(
@@ -72,24 +74,27 @@
       ? []
       : [
           {
-            title: 'Connect local DuckDB',
-            description: 'Query your own DuckDB instance over the HTTP server extension.',
+            title: tr('home.quickStart.connectLocal'),
+            description: tr('home.quickStart.connectLocal.desc'),
             icon: Server,
             run: () => goTo('connections'),
           },
         ]),
   ])
 
+  // $t can't be used at module init, so compute in template
+  const welcome = $derived(profile ? $t('home.welcome.back', { values: { name: profile.name } }) : $t('home.welcome.guest'))
+
   const resources = [
-    { title: 'Star us on GitHub', description: 'Support the project with a star.', link: 'https://github.com/caioricciuti/duck-ui', icon: Star },
-    { title: 'DuckDB docs', description: 'The DuckDB documentation.', link: 'https://duckdb.org/docs/', icon: BookOpen },
-    { title: 'Duck-UI documentation', description: 'Learn how to make the most of Duck-UI.', link: 'https://docs.duckui.com/', icon: ExternalLink },
+    { title: tr('home.resources.star'), description: tr('home.resources.star.desc'), link: 'https://github.com/caioricciuti/duck-ui', icon: Star },
+    { title: tr('home.resources.duckdbDocs'), description: tr('home.resources.duckdbDocs.desc'), link: 'https://duckdb.org/docs/', icon: BookOpen },
+    { title: tr('home.resources.duckuiDocs'), description: tr('home.resources.duckuiDocs.desc'), link: 'https://docs.duckui.com/', icon: ExternalLink },
   ]
 
   const products = [
-    { title: 'CH-UI', description: 'Your ClickHouse, one workspace: SQL editor, dashboards, pipelines, governance, scheduling, and an AI copilot.', link: 'https://ch-ui.com?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Database },
-    { title: 'Caio Ricciuti', description: 'Data engineering and analytics solutions.', link: 'https://caioricciuti.com?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Building2 },
-    { title: 'Dev Cockpit', description: 'Get under the hood of your Apple Silicon.', link: 'https://devcockpit.app?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Logs },
+    { title: tr('home.products.chui'), description: tr('home.products.chui.desc'), link: 'https://ch-ui.com?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Database },
+    { title: tr('home.products.caio'), description: tr('home.products.caio.desc'), link: 'https://caioricciuti.com?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Building2 },
+    { title: tr('home.products.devcockpit'), description: tr('home.products.devcockpit.desc'), link: 'https://devcockpit.app?utm_source=duck-ui&utm_medium=app&utm_campaign=cross-promo', icon: Logs },
   ]
 
   async function openDemo(dataset: DemoDataset) {
@@ -107,7 +112,7 @@
           if (localName) query = query.split(dataset.stage.url).join(localName)
         } catch (error) {
           console.error('Failed to stage demo dataset:', error)
-          toast.error("Couldn't download the demo dataset. Check your connection and try again.")
+          toast.error($t('home.demoDownloadError'))
           return
         }
       }
@@ -133,17 +138,17 @@
       <ProfileAvatar avatarEmoji="logo" size="xl" />
       <div class="min-w-0">
         <h1 class="text-xl text-fg">
-          {profile ? `Welcome back, ${profile.name}` : 'Welcome to Duck-UI'}
+          {welcome}
         </h1>
         <p class="text-[13px] text-fg-3">
-          DuckDB in your browser. Your data never leaves this tab.
+          {$t('home.welcome.desc')}
         </p>
       </div>
-      <span class="ml-auto shrink-0 font-mono text-[11px] text-fg-4" title="Released {releaseDate}">v{version}</span>
+      <span class="ml-auto shrink-0 font-mono text-[11px] text-fg-4" title="{$t('home.released', { values: { date: releaseDate } })}">v{version}</span>
     </header>
 
     <section>
-      <h2 class="mb-2 text-xs font-medium text-fg-3">Quick start</h2>
+      <h2 class="mb-2 text-xs font-medium text-fg-3">{$t('home.section.quickStart')}</h2>
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {#each quickStart as action}
           <button class={card} onclick={action.run}>
@@ -158,7 +163,7 @@
     </section>
 
     <section>
-      <h2 class="mb-2 text-xs font-medium text-fg-3">Try a dataset</h2>
+      <h2 class="mb-2 text-xs font-medium text-fg-3">{$t('home.section.tryDataset')}</h2>
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {#each demoDatasets as dataset (dataset.id)}
           <button class={card} disabled={openingDemo !== null} onclick={() => openDemo(dataset)}>
@@ -174,7 +179,7 @@
     </section>
 
     <section>
-      <h2 class="mb-2 text-xs font-medium text-fg-3">Resources</h2>
+      <h2 class="mb-2 text-xs font-medium text-fg-3">{$t('home.section.resources')}</h2>
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {#each resources as item}
           <a class={card} href={item.link} target="_blank" rel="noopener noreferrer">
@@ -192,7 +197,7 @@
     </section>
 
     <section>
-      <h2 class="mb-2 text-xs font-medium text-fg-3">More from the author</h2>
+      <h2 class="mb-2 text-xs font-medium text-fg-3">{$t('home.section.author')}</h2>
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {#each products as item}
           <a class={card} href={item.link} target="_blank" rel="noopener noreferrer">

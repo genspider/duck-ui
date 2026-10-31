@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Upload, Link, Code } from 'lucide-svelte'
   import Sheet from '../common/Sheet.svelte'
   import Tabs from '../common/Tabs.svelte'
@@ -45,9 +46,9 @@
   const canImport = $derived(supportsFileImport && !getUiConfig().hideImport)
 
   const tabs = [
-    { id: 'upload', label: 'Upload files', icon: Upload },
-    { id: 'url', label: 'From URL', icon: Link },
-    { id: 'query', label: 'From query', icon: Code },
+    { id: 'upload', label: $t('fileImporter.tabUpload'), icon: Upload },
+    { id: 'url', label: $t('fileImporter.tabUrl'), icon: Link },
+    { id: 'query', label: $t('fileImporter.tabQuery'), icon: Code },
   ]
 
   let consumed: File[] | undefined
@@ -81,7 +82,7 @@
   }
 </script>
 
-<Sheet open={open && canImport} title={url.isPreviewMode ? 'Preview data' : 'Import data'} size="lg" {onclose}>
+<Sheet open={open && canImport} title={url.isPreviewMode ? $t('fileImporter.previewData') : $t('fileImporter.importData')} size="lg" {onclose}>
   <div
     class="flex min-h-full flex-col gap-4"
     role="presentation"

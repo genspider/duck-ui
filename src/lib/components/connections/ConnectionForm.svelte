@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Info } from 'lucide-svelte'
   import Sheet from '../common/Sheet.svelte'
   import Button from '../common/Button.svelte'
@@ -38,9 +39,9 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
 
   const QUACK = 'Quack'
   const scopeOptions = $derived([
-    { value: 'External', label: 'DuckDB HTTP Server' },
-    { value: 'OPFS', label: 'Browser Storage (OPFS)' },
-    ...(onquack && !editMode ? [{ value: QUACK, label: 'Remote DuckDB (Quack)' }] : []),
+    { value: 'External', label: $t('connection.type.external') },
+    { value: 'OPFS', label: $t('connection.type.opfs') },
+    ...(onquack && !editMode ? [{ value: QUACK, label: $t('connection.type.quack') }] : []),
   ])
 
   function changeScope(value: string) {
@@ -50,11 +51,11 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
     }
     if (value === 'External' || value === 'OPFS') draft.scope = value
   }
-  const authOptions = [
-    { value: 'none', label: 'None' },
-    { value: 'password', label: 'Username/Password' },
-    { value: 'api_key', label: 'API Key' },
-  ]
+  const authOptions = $derived([
+    { value: 'none', label: $t('connection.auth.none') },
+    { value: 'password', label: $t('connection.auth.password') },
+    { value: 'api_key', label: $t('connection.auth.apiKey') },
+  ])
 
   let draft = $state<ConnectionDraft>(defaultConnectionDraft())
   let touched = $state<Partial<Record<ConnectionField, boolean>>>({})
@@ -106,23 +107,23 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
 <Sheet
   {open}
   size="sm"
-  title={editMode ? 'Edit Connection' : 'Add New Connection'}
-  description={editMode ? 'Modify existing connection details.' : 'Connect to a DuckDB instance or browser storage.'}
+  title={editMode ? $t('connection.title.edit') : $t('connection.title.add')}
+  description={editMode ? $t('connection.desc.edit') : $t('connection.desc.add')}
   {onclose}
 >
   <form id={FORM_ID} class="flex flex-col gap-4" novalidate onsubmit={submit}>
-    <FormField controlWidth="full" label="Connection Name" for="connection-name" error={errorFor('name')}>
+    <FormField controlWidth="full" label={$t('connection.name')} for="connection-name" error={errorFor('name')}>
       <Input
         id="connection-name"
         bind:value={draft.name}
-        placeholder="My Database"
+        placeholder={$t('connection.name.placeholder')}
         invalid={!!errorFor('name')}
         autocomplete="off"
         oninput={() => touch('name')}
       />
     </FormField>
 
-    <FormField controlWidth="full" label="Connection Type" for="connection-scope">
+    <FormField controlWidth="full" label={$t('connection.type')} for="connection-scope">
       <Select id="connection-scope" value={draft.scope} options={scopeOptions} onchange={changeScope} />
     </FormField>
 
@@ -130,23 +131,23 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
       <div class="flex gap-2 rounded-md bg-surface-2 p-3 text-xs text-fg-2">
         <Info size={14} class="mt-0.5 shrink-0 text-fg-3" />
         <div class="min-w-0 flex-1 space-y-1">
-          <p>Start HTTP server in DuckDB:</p>
+          <p>{$t('connection.startServer')}</p>
           <pre class="overflow-x-auto rounded-sm bg-canvas px-2 py-1 font-mono text-[10px] leading-relaxed text-fg">{HTTP_SERVER_SNIPPET}</pre>
         </div>
       </div>
 
       <FormField
         controlWidth="full"
-        label="Host URL"
+        label={$t('connection.hostUrl')}
         for="connection-host"
-        hint="Full URL including protocol (http/https)"
+        hint={$t('connection.hostUrl.hint')}
         error={errorFor('host')}
       >
         <Input
           id="connection-host"
           type="url"
           bind:value={draft.host}
-          placeholder="http://localhost:9999"
+          placeholder={$t('connection.hostUrl.placeholder')}
           invalid={!!errorFor('host')}
           autocomplete="off"
           spellcheck={false}
@@ -154,47 +155,47 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
         />
       </FormField>
 
-      <FormField controlWidth="full" label="Database (optional)" for="connection-database">
-        <Input id="connection-database" bind:value={draft.database} placeholder="my_database" autocomplete="off" spellcheck={false} />
+      <FormField controlWidth="full" label={$t('connection.database')} for="connection-database">
+        <Input id="connection-database" bind:value={draft.database} placeholder={$t('connection.database.placeholder')} autocomplete="off" spellcheck={false} />
       </FormField>
 
-      <FormField controlWidth="full" label="Authentication" for="connection-auth">
+      <FormField controlWidth="full" label={$t('connection.authentication')} for="connection-auth">
         <Select id="connection-auth" bind:value={draft.authMode} options={authOptions} />
       </FormField>
 
       {#if draft.authMode === 'password'}
         <div class="grid grid-cols-2 gap-3">
-          <FormField controlWidth="full" label="Username" for="connection-user">
-            <Input id="connection-user" bind:value={draft.user} placeholder="user" autocomplete="off" spellcheck={false} />
+          <FormField controlWidth="full" label={$t('connection.username')} for="connection-user">
+            <Input id="connection-user" bind:value={draft.user} placeholder={$t('connection.username.placeholder')} autocomplete="off" spellcheck={false} />
           </FormField>
-          <FormField controlWidth="full" label="Password" for="connection-password">
-            <Input id="connection-password" type="password" bind:value={draft.password} placeholder="********" autocomplete="off" />
+          <FormField controlWidth="full" label={$t('common.password')} for="connection-password">
+            <Input id="connection-password" type="password" bind:value={draft.password} placeholder={$t('connection.password.placeholder')} autocomplete="off" />
           </FormField>
         </div>
       {/if}
 
       {#if draft.authMode === 'api_key'}
-        <FormField controlWidth="full" label="API Key" for="connection-api-key">
-          <Input id="connection-api-key" type="password" bind:value={draft.apiKey} placeholder="Enter API key" autocomplete="off" />
+        <FormField controlWidth="full" label={$t('connection.apiKey')} for="connection-api-key">
+          <Input id="connection-api-key" type="password" bind:value={draft.apiKey} placeholder={$t('connection.apiKey.placeholder')} autocomplete="off" />
         </FormField>
       {/if}
     {:else}
       <div class="flex gap-2 rounded-md bg-surface-2 p-3 text-xs text-fg-2">
         <Info size={14} class="mt-0.5 shrink-0 text-fg-3" />
-        <p>Data persists in your browser across sessions.</p>
+        <p>{$t('connection.opfsHint')}</p>
       </div>
 
       <FormField
         controlWidth="full"
-        label="Database File"
+        label={$t('connection.databaseFile')}
         for="connection-path"
-        hint="Filename for your database (e.g., data.db)"
+        hint={$t('connection.databaseFile.hint')}
         error={errorFor('path')}
       >
         <Input
           id="connection-path"
           bind:value={draft.path}
-          placeholder="my_data.db"
+          placeholder={$t('connection.databaseFile.placeholder')}
           invalid={!!errorFor('path')}
           autocomplete="off"
           spellcheck={false}
@@ -205,9 +206,9 @@ SELECT httpserve_start('0.0.0.0', 9999, '');`
   </form>
 
   {#snippet footer()}
-    <Button size="sm" variant="outline" onclick={onclose} disabled={busy}>Cancel</Button>
+    <Button size="sm" variant="outline" onclick={onclose} disabled={busy}>{$t('common.cancel')}</Button>
     <Button size="sm" type="submit" form={FORM_ID} disabled={busy}>
-      {connecting ? 'Connecting...' : editMode ? 'Update' : 'Connect'}
+      {connecting ? $t('connection.connecting') : editMode ? $t('connection.update') : $t('connection.connect')}
     </Button>
   {/snippet}
 </Sheet>

@@ -1,4 +1,5 @@
 import { sqlEscapeIdentifier, sqlEscapeString } from "@/lib/sqlSanitize";
+import { tr } from "./i18n/translate";
 
 /**
  * A remote DuckDB reached over Quack, DuckDB's own client-server protocol.
@@ -49,16 +50,16 @@ export function validateQuackAttachment(
   }
   const lower = alias.toLowerCase();
   if (RESERVED_ALIASES.has(lower) || taken.some((name) => name.toLowerCase() === lower)) {
-    return `A database named "${alias}" already exists.`;
+    return tr("quack.validate.aliasExists", { alias });
   }
   const host = normalizeQuackHost(attachment.host);
-  if (!HOST_PATTERN.test(host)) return "Host: a name or address, with an optional :port.";
+  if (!HOST_PATTERN.test(host)) return tr("quack.validate.hostFormat");
   const port = host.match(/:(\d+)$/)?.[1];
-  if (port && (Number(port) < 1 || Number(port) > 65535)) return "Port must be 1 to 65535.";
+  if (port && (Number(port) < 1 || Number(port) > 65535)) return tr("quack.validate.portRange");
   const sameHost = existing.find((a) => a.host.toLowerCase() === host.toLowerCase());
-  if (sameHost) return `${host} is already attached as "${sameHost.alias}".`;
+  if (sameHost) return tr("quack.validate.hostDuplicate", { host, alias: sameHost.alias });
   if (attachment.token.length < MIN_TOKEN_LENGTH) {
-    return `Token: at least ${MIN_TOKEN_LENGTH} characters.`;
+    return tr("quack.validate.tokenLength", { min: MIN_TOKEN_LENGTH });
   }
   return null;
 }

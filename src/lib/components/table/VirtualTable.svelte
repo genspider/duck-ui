@@ -6,6 +6,7 @@
   import TableHeader from './TableHeader.svelte'
   import TableCell from './TableCell.svelte'
   import FilterPopover from './FilterPopover.svelte'
+  import { t } from 'svelte-i18n'
   import { SearchX, Copy, MousePointer2, Rows3, Columns3, Download } from 'lucide-svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
   import * as toast from '../../stores/toast.svelte'
@@ -120,21 +121,21 @@
     if (selection.length === 0) return
     try {
       await navigator.clipboard.writeText(selectionToTsv(selection, data, meta.length, cellText))
-      toast.success(`Copied ${selectedCount.toLocaleString()} ${selectedCount === 1 ? 'cell' : 'cells'}`, 1500)
+      toast.success($t('virtualTable.copied', { values: { count: selectedCount.toLocaleString(), unit: selectedCount === 1 ? '' : '' } }), 1500)
     } catch {
-      toast.error('Could not copy to the clipboard')
+      toast.error($t('virtualTable.copyFailed'))
     }
   }
 
   const menuItems = $derived.by((): ContextMenuItem[] => {
     const first = selection[0]
     return [
-      { id: 'copy', label: 'Copy', icon: Copy, shortcut: isMac ? '⌘C' : 'Ctrl+C', onSelect: () => void copySelection() },
-      { id: 'all', label: 'Select All', icon: MousePointer2, shortcut: isMac ? '⌘A' : 'Ctrl+A', onSelect: selectAll },
-      { id: 'row', label: 'Select Row', icon: Rows3, disabled: !first, onSelect: () => first && selectRow(first.row0) },
+      { id: 'copy', label: $t('virtualTable.copy'), icon: Copy, shortcut: isMac ? '⌘C' : 'Ctrl+C', onSelect: () => void copySelection() },
+      { id: 'all', label: $t('virtualTable.selectAll'), icon: MousePointer2, shortcut: isMac ? '⌘A' : 'Ctrl+A', onSelect: selectAll },
+      { id: 'row', label: $t('virtualTable.selectRow'), icon: Rows3, disabled: !first, onSelect: () => first && selectRow(first.row0) },
       {
         id: 'column',
-        label: 'Select Column',
+        label: $t('virtualTable.selectColumn'),
         icon: Columns3,
         disabled: !first,
         onSelect: () => {
@@ -142,7 +143,7 @@
         },
       },
       ...(onexport
-        ? [{ id: 'sep', separator: true }, { id: 'export', label: 'Export as CSV', icon: Download, onSelect: onexport }]
+        ? [{ id: 'sep', separator: true }, { id: 'export', label: $t('virtualTable.exportCsv'), icon: Download, onSelect: onexport }]
         : []),
     ]
   })
@@ -372,7 +373,7 @@
   class="relative flex-1 overflow-auto bg-canvas focus:outline-none"
   role="grid"
   tabindex="0"
-  aria-label="Query result"
+  aria-label={$t('virtualTable.ariaLabel')}
   aria-rowcount={rowCount}
   aria-colcount={meta.length}
   onscroll={handleScroll}
@@ -415,7 +416,7 @@
                 {absIdx % 2 === 1 ? 'bg-surface' : 'bg-canvas'}
                 group-hover:bg-hover"
               style="width:{ROW_NUMBER_WIDTH}px;max-width:{ROW_NUMBER_WIDTH}px;min-width:{ROW_NUMBER_WIDTH}px"
-              title="Select row"
+              title={$t('virtualTable.selectRow')}
               onmousedown={() => selectRow(absIdx)}
             >{absIdx + 1}</td>
             {#each meta as col, ci}
@@ -445,12 +446,12 @@
         <div class="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-fg-3">
           <SearchX size={18} />
         </div>
-        <p class="text-sm font-semibold text-fg">No rows returned</p>
+        <p class="text-sm font-semibold text-fg">{$t('virtualTable.noRows')}</p>
         <p class="mt-1 text-xs text-fg-3">
           {#if filters.length > 0}
-            No rows match the active filters.
+            {$t('virtualTable.noRowsWithFilter')}
           {:else}
-            Your query executed successfully, but returned no rows.
+            {$t('virtualTable.noRowsWithQuery')}
           {/if}
         </p>
       </div>

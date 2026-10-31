@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte'
   import { t } from 'svelte-i18n'
+  import { tr } from '@/lib/i18n/translate'
   import { ArrowLeftRight, Scissors, Trash2 } from 'lucide-svelte'
   import Modal from '../common/Modal.svelte'
   import Button from '../common/Button.svelte'
@@ -53,7 +54,7 @@
 
   function oneLine(sql: string, max = 60): string {
     const flat = sql.replace(/\s+/g, ' ').trim()
-    return flat.length > max ? `${flat.slice(0, max - 1)}…` : flat || '(empty query)'
+    return flat.length > max ? `${flat.slice(0, max - 1)}…` : flat || tr('compare.emptyQuery')
   }
 
   function pinLabel(pin: ResultPin): string {
@@ -91,7 +92,7 @@
   const activeView = $derived(view === 'changed' && diff?.rows.mode !== 'keyed' ? 'added' : view)
 
   const sideOptions = $derived([
-    ...(hasCurrent ? [{ value: CURRENT, label: 'Current result' }] : []),
+    ...(hasCurrent ? [{ value: CURRENT, label: $t('compare.currentResult') }] : []),
     ...[...pins].reverse().map((pin) => ({ value: pin.id, label: pinLabel(pin) })),
   ])
 
@@ -99,10 +100,10 @@
     if (!diff) return []
     const schemaCount = diff.schema.added.length + diff.schema.removed.length + diff.schema.typeChanged.length
     return [
-      ...(diff.rows.mode === 'keyed' ? [{ id: 'changed', label: 'Changed', count: diff.rows.changed.length.toLocaleString() }] : []),
-      { id: 'added', label: 'Added', count: diff.rows.added.length.toLocaleString() },
-      { id: 'removed', label: 'Removed', count: diff.rows.removed.length.toLocaleString() },
-      { id: 'schema', label: 'Schema', count: schemaCount },
+      ...(diff.rows.mode === 'keyed' ? [{ id: 'changed', label: $t('compare.changed'), count: diff.rows.changed.length.toLocaleString() }] : []),
+      { id: 'added', label: $t('compare.added'), count: diff.rows.added.length.toLocaleString() },
+      { id: 'removed', label: $t('compare.removed'), count: diff.rows.removed.length.toLocaleString() },
+      { id: 'schema', label: $t('compare.schema'), count: schemaCount },
     ]
   })
 
@@ -168,7 +169,7 @@
 
       {#if commonColumns.length > 0}
         <div class="text-xs text-fg-3" role="group" aria-label={$t('compare.keyColumns')}>
-          <span class="mb-1 block">Key columns. None selected compares whole rows.</span>
+          <span class="mb-1 block">{$t('compare.keyColumnsHint')}</span>
           <div class="flex max-h-16 flex-wrap gap-1 overflow-auto">
             {#each commonColumns as column (column)}
               {@const on = activeKeys.includes(column)}
@@ -194,12 +195,12 @@
             Rows {diff.rowCount.left.toLocaleString()} → {diff.rowCount.right.toLocaleString()}
             ({diff.rowCount.delta >= 0 ? '+' : ''}{diff.rowCount.delta.toLocaleString()})
           </Badge>
-          <Badge tone="success">+{diff.rows.added.length.toLocaleString()} added</Badge>
-          <Badge tone="danger">−{diff.rows.removed.length.toLocaleString()} removed</Badge>
+          <Badge tone="success">{$t('compare.rowsAdded', { values: { count: diff.rows.added.length.toLocaleString() } })}</Badge>
+          <Badge tone="danger">{$t('compare.rowsRemoved', { values: { count: diff.rows.removed.length.toLocaleString() } })}</Badge>
           {#if diff.rows.mode === 'keyed'}
-            <Badge tone="warning">~{diff.rows.changed.length.toLocaleString()} changed</Badge>
+            <Badge tone="warning">{$t('compare.rowsChanged', { values: { count: diff.rows.changed.length.toLocaleString() } })}</Badge>
           {/if}
-          <Badge>{diff.rows.unchangedCount.toLocaleString()} unchanged</Badge>
+          <Badge>{$t('compare.rowsUnchanged', { values: { count: diff.rows.unchangedCount.toLocaleString() } })}</Badge>
           {#if isIdentical(diff)}<Badge tone="brand">{$t('compare.identical')}</Badge>{/if}
         </div>
 
@@ -207,16 +208,13 @@
           <div class="flex items-start gap-2 rounded-md border border-warning/40 bg-warning-soft px-3 py-2 text-xs text-fg-2">
             <Scissors size={13} class="mt-0.5 shrink-0 text-warning" />
             <span>
-              At least one side holds only part of its result (pins keep the first
-              {PIN_ROW_LIMIT.toLocaleString()} rows, and the engine row limit may have applied).
-              Row-level differences cover the captured rows only.
+              {$t('compare.partialWarning', { values: { limit: PIN_ROW_LIMIT.toLocaleString() } })}
             </span>
           </div>
         {/if}
         {#if diff.rows.duplicateKeys.left > 0 || diff.rows.duplicateKeys.right > 0}
           <p class="text-xs text-warning">
-            The key is not unique ({diff.rows.duplicateKeys.left} duplicate(s) before,
-            {diff.rows.duplicateKeys.right} after); duplicates are paired in row order.
+            {$t('compare.duplicateKeys', { values: { before: diff.rows.duplicateKeys.left, after: diff.rows.duplicateKeys.right } })}
           </p>
         {/if}
 
@@ -230,8 +228,7 @@
               <div class="flex h-full flex-col">
                 {#if diff.rows.changed.length > changedShown.length}
                   <p class="px-2 py-1 text-xs text-fg-3">
-                    Showing the first {changedShown.length.toLocaleString()} of
-                    {diff.rows.changed.length.toLocaleString()} changed rows.
+                    {$t('compare.showingChanged', { values: { shown: changedShown.length.toLocaleString(), total: diff.rows.changed.length.toLocaleString() } })}
                   </p>
                 {/if}
                 <div class="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
@@ -242,7 +239,7 @@
                           <th class="ds-table-th-compact">
                             {column}
                             {#if diff.rows.keyColumns.includes(column)}
-                              <span class="ml-1 rounded border border-edge px-1 text-[10px] text-fg-3">key</span>
+                              <span class="ml-1 rounded border border-edge px-1 text-[10px] text-fg-3">{$t('compare.keyColumn')}</span>
                             {/if}
                           </th>
                         {/each}
@@ -270,15 +267,15 @@
               </div>
             {/if}
           {:else if activeView === 'added'}
-            {@render rowsGrid(diff.rows.added, 'No added rows.')}
+            {@render rowsGrid(diff.rows.added, $t('compare.noAddedRows'))}
           {:else if activeView === 'removed'}
-            {@render rowsGrid(diff.rows.removed, 'No removed rows.')}
+            {@render rowsGrid(diff.rows.removed, $t('compare.noRemovedRows'))}
           {:else}
             {@const schema = diff.schema}
             <div class="h-full overflow-auto">
               {#if schema.added.length + schema.removed.length + schema.typeChanged.length === 0}
                 <p class="p-4 text-xs text-fg-3">
-                  Same columns and types{schema.reordered ? ', in a different order' : ''}.
+                  {$t('compare.sameSchema')}{schema.reordered ? $t('compare.differentOrder') : ''}.
                 </p>
               {:else}
                 <div class="space-y-1 p-2 font-mono text-xs">
@@ -310,9 +307,9 @@
             <li class="flex items-center gap-2">
               <span class="min-w-0 flex-1 truncate text-fg-2" title={pin.query}>{pinLabel(pin)}</span>
               <span class="shrink-0 tabular-nums text-fg-3">
-                {pin.snapshot.rows.length.toLocaleString()} rows{pin.snapshot.truncated ? ' (partial)' : ''}
+                {$t('compare.rowCount', { values: { count: pin.snapshot.rows.length.toLocaleString() } })}{pin.snapshot.truncated ? $t('compare.partial') : ''}
               </span>
-              <Button icon size="xs" variant="ghost" title="Remove pin" aria-label="Remove pin" onclick={() => duckActions().removeResultPin(pin.id)}>
+              <Button icon size="xs" variant="ghost" title={$t('compare.removePin')} aria-label={$t('compare.removePin')} onclick={() => duckActions().removeResultPin(pin.id)}>
                 <Trash2 size={13} />
               </Button>
             </li>

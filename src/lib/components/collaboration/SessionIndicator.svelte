@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Radio } from 'lucide-svelte'
   import { duck } from '../../stores/duck.svelte'
   import { sessionPhase } from '@/lib/sessionPhase'
@@ -28,14 +29,14 @@
 
   const status = $derived(
     phase === 'dropped'
-      ? 'session disconnected'
+      ? $t('liveSession.badge.dropped')
       : phase === 'waiting'
-        ? 'waiting to connect'
+        ? $t('liveSession.badge.waiting')
         : phase === 'connected'
-          ? session.sessionName || 'in a session'
+          ? session.sessionName || $t('liveSession.badge.live')
           : '',
   )
-  const label = $derived(status ? `Share live: ${status}` : 'Share live')
+  const label = $derived(status ? `${$t('nav.shareLive')}: ${status}` : $t('nav.shareLive'))
   const tone = $derived(
     phase === 'dropped' ? 'text-danger' : phase === 'waiting' ? 'text-warning' : phase === 'connected' ? 'text-success' : '',
   )

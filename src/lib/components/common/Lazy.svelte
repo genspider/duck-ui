@@ -1,5 +1,6 @@
 <script lang="ts" generics="Props extends Record<string, unknown>">
   import type { Component } from 'svelte'
+  import { t } from 'svelte-i18n'
   import Spinner from './Spinner.svelte'
   import Button from './Button.svelte'
 
@@ -30,7 +31,7 @@
 {:catch}
   <!-- After a deploy the old chunk may be gone. A retry fetches the new one. -->
   <div class="flex h-full flex-col items-center justify-center gap-3 text-center" role="alert">
-    <p class="text-[13px] text-fg-3">This screen could not be loaded.</p>
-    <Button size="sm" variant="outline" onclick={() => attempt++}>Try again</Button>
+    <p class="text-[13px] text-fg-3">{$t('common.loadError')}</p>
+    <Button size="sm" variant="outline" onclick={() => attempt++}>{$t('common.tryAgain')}</Button>
   </div>
 {/await}

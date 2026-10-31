@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { getDisplayType, cellText, groupsDigits } from '../../utils/column-types'
   import { getFormatNumbers } from '../../stores/number-format.svelte'
 
@@ -54,7 +55,7 @@
 <td
   class="px-2.5 truncate border-r border-edge-subtle select-none {align} {selected ? 'bg-accent-soft shadow-[inset_0_0_0_1px_var(--accent-ring)]' : ''}"
   style="width:{width}px;max-width:{width}px;min-width:{width}px"
-  title={isNull ? 'NULL' : `${rawValue}\n\nDouble-click to copy`}
+  title={isNull ? $t('cell.null') : `${rawValue}\n\n${$t('cell.doubleClickCopy')}`}
   aria-selected={selected}
   ondblclick={handleCopyCell}
   {onmousedown}
@@ -62,7 +63,7 @@
   {oncontextmenu}
 >
   {#if isNull}
-    <span class="inline-flex items-center rounded-sm px-1 py-0.5 text-[10px] font-medium uppercase tracking-wide bg-surface-2 text-fg-3">Null</span>
+    <span class="inline-flex items-center rounded-sm px-1 py-0.5 text-[10px] font-medium uppercase tracking-wide bg-surface-2 text-fg-3">{$t('cell.null')}</span>
   {:else if displayType === 'bool'}
     <span class="inline-flex items-center rounded-sm px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide {value ? 'text-success bg-success-soft' : 'text-danger bg-danger-soft'}">
       {String(value)}

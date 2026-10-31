@@ -1,4 +1,5 @@
 import type { ChatCompletionMessageParam } from "@mlc-ai/web-llm";
+import { tr } from "@/lib/i18n/translate";
 
 export type AIProviderType = "webllm" | "openai" | "anthropic" | "openai-compatible";
 
@@ -98,25 +99,25 @@ export const OPENAI_MODELS: ModelOption[] = [
   {
     id: "gpt-5.1",
     name: "GPT-5.1",
-    description: "Most capable",
+    description: tr("ai.model.mostCapable"),
     contextLength: 400000,
   },
   {
     id: "gpt-5",
     name: "GPT-5",
-    description: "Capable, general purpose",
+    description: tr("ai.model.generalPurpose"),
     contextLength: 400000,
   },
   {
     id: "gpt-5-mini",
     name: "GPT-5 Mini",
-    description: "Fast and affordable",
+    description: tr("ai.model.fastAffordable"),
     contextLength: 400000,
   },
   {
     id: "gpt-4o",
     name: "GPT-4o",
-    description: "Previous generation",
+    description: tr("ai.model.previousGen"),
     contextLength: 128000,
   },
 ];
@@ -125,19 +126,19 @@ export const ANTHROPIC_MODELS: ModelOption[] = [
   {
     id: "claude-opus-5",
     name: "Claude Opus 5",
-    description: "Most capable, best for complex SQL",
+    description: tr("ai.model.bestComplexSql"),
     contextLength: 1000000,
   },
   {
     id: "claude-sonnet-5",
     name: "Claude Sonnet 5",
-    description: "Best balance of speed and capability",
+    description: tr("ai.model.bestBalance"),
     contextLength: 1000000,
   },
   {
     id: "claude-haiku-4-5",
     name: "Claude Haiku 4.5",
-    description: "Fastest, most affordable",
+    description: tr("ai.model.fastestAffordable"),
     contextLength: 200000,
   },
 ];

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { Extension } from '@codemirror/state'
   import CodeEditor from '../editor/CodeEditor.svelte'
   import { dashboardCompletion } from '@/lib/editor/dashboardCompletion'
@@ -23,7 +24,7 @@
     ariaLabel?: string
   }
 
-  let { value, onchange, collabExtensions = [], ariaLabel = 'Dashboard source' }: Props = $props()
+  let { value, onchange, collabExtensions = [], ariaLabel = $t('dashboard.sourceAria') }: Props = $props()
 
   // Dashboard specific autocomplete: component tags, props, query names and
   // ${inputs.…} variables. Given to this editor only, so notebook markdown

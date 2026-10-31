@@ -1,4 +1,4 @@
-import type { FileEntry } from "@/lib/fileSystem";
+import type { FileEntry, FolderEntry } from "@/lib/fileSystem";
 import type { ContextMenuItem } from "../common/ContextMenu.svelte";
 
 /** Callbacks every node of the folder tree hands up to FolderBrowser. */
@@ -11,4 +11,8 @@ export interface TreeActions {
   menu: (items: ContextMenuItem[], x: number, y: number) => void;
   /** "Quick Import as Table": no options popover. */
   quickImport: (folderId: string, file: FileEntry) => void;
+  /** "Bulk Import as Tables": one-click import of every file under a folder. */
+  quickImportFolder: (folderId: string, folder: FolderEntry) => void;
+  /** "Bulk Import as Tables" for a mounted top-level folder. */
+  quickImportMountedFolder: (folderId: string) => void;
 }

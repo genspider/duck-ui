@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import Select from '../common/Select.svelte'
   import Input from '../common/Input.svelte'
   import Button from '../common/Button.svelte'
@@ -103,7 +104,7 @@
   }
 </script>
 
-<div class="flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 px-4 pb-2" role="group" aria-label="Filters">
+<div class="flex shrink-0 flex-wrap items-end gap-x-3 gap-y-2 px-4 pb-2" role="group" aria-label={$t('embed.filtersTitle')}>
   {#each params as param, i (param.column)}
     {@const label = param.label || param.column}
     {@const current = values[param.column]}
@@ -117,7 +118,7 @@
           size="sm"
           class="w-40"
           value={current?.kind === 'select' ? current.value : ''}
-          options={[{ value: '', label: 'All' }, ...found.map((v) => ({ value: v, label: v }))]}
+          options={[{ value: '', label: $t('embed.filterAll') }, ...found.map((v) => ({ value: v, label: v }))]}
           onchange={(value) => setFilter(param.column, { kind: 'select', value }, true)}
         />
       {:else if param.type === 'search'}
@@ -126,7 +127,7 @@
           size="sm"
           type="search"
           class="w-40"
-          placeholder="Contains..."
+          placeholder={$t('filter.contains')}
           value={current?.kind === 'search' ? current.value : ''}
           oninput={(e) => setFilter(param.column, { kind: 'search', value: e.currentTarget.value }, false)}
         />
@@ -138,7 +139,7 @@
             size="sm"
             type="number"
             class="w-24"
-            placeholder="Min"
+            placeholder={$t('filter.min')}
             value={range.min}
             oninput={(e) => setFilter(param.column, { kind: 'range', min: e.currentTarget.value, max: range.max }, false)}
           />
@@ -148,7 +149,7 @@
             size="sm"
             type="number"
             class="w-24"
-            placeholder="Max"
+            placeholder={$t('filter.max')}
             value={range.max}
             oninput={(e) => setFilter(param.column, { kind: 'range', min: range.min, max: e.currentTarget.value }, false)}
           />
@@ -157,7 +158,7 @@
     </div>
   {/each}
   {#if hasActiveFilter}
-    <Button size="xs" variant="ghost" onclick={reset}>Reset</Button>
+    <Button size="xs" variant="ghost" onclick={reset}>{$t('common.reset')}</Button>
   {/if}
   {#if filtering}
     <Spinner size="sm" />

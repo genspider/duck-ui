@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { tick, untrack } from 'svelte'
   import { Import } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
@@ -68,37 +69,37 @@
     class="surface-card fixed z-[61] flex w-72 flex-col gap-3 rounded-md p-3"
     style="left:{left}px;top:{top}px;box-shadow: var(--shadow-popover)"
     role="dialog"
-    aria-label="Import options for {fileName}"
+    aria-label={$t('folder.importOptionsDesc', { values: { name: fileName } })}
     tabindex="-1"
     use:trapFocus
   >
     <div class="min-w-0">
-      <h4 class="text-[13px] font-semibold text-fg">Import options</h4>
+      <h4 class="text-[13px] font-semibold text-fg">{$t('folder.importOptionsTitle')}</h4>
       <p class="truncate text-xs text-fg-3" title={fileName}>{fileName}</p>
     </div>
 
-    <FormField controlWidth="full" label="Name" for="folder-import-name">
+    <FormField controlWidth="full" label={$t('folder.name')} for="folder-import-name">
       <Input
         id="folder-import-name"
         size="sm"
         mono
         bind:value={tableName}
-        placeholder="table_name"
+        placeholder={$t('folder.namePlaceholder')}
         onkeydown={(e) => e.key === 'Enter' && submit()}
       />
     </FormField>
 
     <div>
-      <p class="mb-1 text-xs font-medium text-fg-2">Mode</p>
-      <ImportModeSwitch block label="Mode" value={importMode} onchange={(mode) => (importMode = mode)} />
+      <p class="mb-1 text-xs font-medium text-fg-2">{$t('folder.mode')}</p>
+      <ImportModeSwitch block label={$t('folder.mode')} value={importMode} onchange={(mode) => (importMode = mode)} />
       <p class="mt-1 text-[11px] text-fg-3">
-        {importMode === 'table' ? 'Copies data into DuckDB (faster queries)' : 'Links to file (fresh data, less memory)'}
+        {importMode === 'table' ? $t('folder.importTable') : $t('folder.importLink')}
       </p>
     </div>
 
     <Button class="w-full" size="sm" onclick={submit} disabled={!tableName.trim()}>
       <Import size={13} />
-      {importMode === 'table' ? 'Import' : 'Link'}
+      {importMode === 'table' ? $t('folder.importAction') : $t('folder.linkAction')}
     </Button>
   </div>
 {/if}

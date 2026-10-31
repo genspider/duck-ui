@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Code, SquareTerminal, Type } from 'lucide-svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
   import type { NotebookCellType } from '@/store/types'
@@ -21,11 +22,12 @@
 
   let menu = $state<{ x: number; y: number } | null>(null)
 
-  const items: ContextMenuItem[] = [
-    { id: 'sql', label: 'SQL Cell', icon: Code, onSelect: () => onadd('sql') },
-    { id: 'python', label: 'Python Cell', icon: SquareTerminal, onSelect: () => onadd('python') },
-    { id: 'markdown', label: 'Markdown Cell', icon: Type, onSelect: () => onadd('markdown') },
-  ]
+  // $derived so labels follow a locale change.
+  const items: ContextMenuItem[] = $derived([
+    { id: 'sql', label: $t('notebook.cell.sql'), icon: Code, onSelect: () => onadd('sql') },
+    { id: 'python', label: $t('notebook.cell.python'), icon: SquareTerminal, onSelect: () => onadd('python') },
+    { id: 'markdown', label: $t('notebook.cell.markdown'), icon: Type, onSelect: () => onadd('markdown') },
+  ])
 
   function toggle(e: MouseEvent) {
     if (menu) {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Table2, Columns3 } from 'lucide-svelte'
   import type { SchemaSuggestion } from '@/lib/duckBrain/schemaSuggestions'
 
@@ -25,7 +26,7 @@
 
 {#if open && suggestions.length > 0}
   <div class="surface-card absolute bottom-full left-0 z-50 mb-1.5 w-64 overflow-hidden rounded-md">
-    <div bind:this={list} {id} class="max-h-48 overflow-auto py-1" role="listbox" aria-label="Tables and columns">
+    <div bind:this={list} {id} class="max-h-48 overflow-auto py-1" role="listbox" aria-label={$t('brain.tablesAndColumns')}>
       {#each suggestions as suggestion, index (`${suggestion.type}-${suggestion.fullPath}`)}
         <button
           type="button"

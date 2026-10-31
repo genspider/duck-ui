@@ -24,6 +24,7 @@
   import { formatNumberWithSuffix } from '@/lib/chartUtils'
   import { getTheme } from '../../stores/theme.svelte'
   import { success, error as toastError } from '../../stores/toast.svelte'
+  import { tr } from '@/lib/i18n/translate'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
   import Select from '../common/Select.svelte'
@@ -48,24 +49,24 @@
   let { result, chartConfig, onconfigchange, readonly = false }: Props = $props()
 
   const CHART_TYPES: { value: ChartType; label: string; icon: typeof ChartColumn }[] = [
-    { value: 'bar', label: 'Bar', icon: ChartColumn },
-    { value: 'grouped_bar', label: 'Grouped Bar', icon: Layers },
-    { value: 'stacked_bar', label: 'Stacked Bar', icon: ChartColumnStacked },
-    { value: 'line', label: 'Line', icon: ChartLine },
-    { value: 'area', label: 'Area', icon: ChartArea },
-    { value: 'stacked_area', label: 'Stacked Area', icon: TrendingUp },
-    { value: 'pie', label: 'Pie', icon: ChartPie },
-    { value: 'donut', label: 'Donut', icon: CircleDot },
-    { value: 'scatter', label: 'Scatter', icon: ChartScatter },
+    { value: 'bar', label: tr('chart.type.bar'), icon: ChartColumn },
+    { value: 'grouped_bar', label: tr('chart.type.groupedBar'), icon: Layers },
+    { value: 'stacked_bar', label: tr('chart.type.stackedBar'), icon: ChartColumnStacked },
+    { value: 'line', label: tr('chart.type.line'), icon: ChartLine },
+    { value: 'area', label: tr('chart.type.area'), icon: ChartArea },
+    { value: 'stacked_area', label: tr('chart.type.stackedArea'), icon: TrendingUp },
+    { value: 'pie', label: tr('chart.type.pie'), icon: ChartPie },
+    { value: 'donut', label: tr('chart.type.donut'), icon: CircleDot },
+    { value: 'scatter', label: tr('chart.type.scatter'), icon: ChartScatter },
   ]
 
   const AGGREGATIONS: { value: AggregationType; label: string }[] = [
-    { value: 'none', label: 'None' },
-    { value: 'sum', label: 'Sum' },
-    { value: 'avg', label: 'Average' },
-    { value: 'count', label: 'Count' },
-    { value: 'min', label: 'Min' },
-    { value: 'max', label: 'Max' },
+    { value: 'none', label: tr('chart.agg.none') },
+    { value: 'sum', label: tr('chart.agg.sum') },
+    { value: 'avg', label: tr('chart.agg.avg') },
+    { value: 'count', label: tr('chart.agg.count') },
+    { value: 'min', label: tr('chart.agg.min') },
+    { value: 'max', label: tr('chart.agg.max') },
   ]
 
   const NO_SORT = '__none__'
@@ -163,7 +164,7 @@
 
   async function exportPNG() {
     if (!chartEl) {
-      toastError('No chart to export')
+      toastError(tr('chart.noChartToExport'))
       return
     }
     const theme = chartTheme()
@@ -181,9 +182,9 @@
         textColor: theme.text,
         fontFamily: theme.fontFamily,
       })
-      success('Chart exported as PNG')
+      success(tr('chart.exportSuccess'))
     } catch (err) {
-      toastError(`Failed to export chart: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      toastError(tr('chart.exportFailed', { message: err instanceof Error ? err.message : tr('common.unknownError') }))
     }
   }
 </script>
@@ -234,7 +235,7 @@
                   type="button"
                   class="flex items-center gap-1.5 transition-opacity hover:opacity-80 {shown ? '' : 'opacity-35'}"
                   aria-pressed={shown}
-                  title={shown ? 'Hide series' : 'Show series'}
+                  title={shown ? tr('chart.hideSeries') : tr('chart.showSeries')}
                   onclick={() => toggleSeries(s.column)}
                 >
                   <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: {s.color}"></span>
@@ -246,7 +247,7 @@
         </div>
       {:else}
         <div class="flex h-full items-center justify-center text-[13px] text-fg-3">
-          Pick a column for the X axis and at least one value column.
+          {tr('chart.noChart')}
         </div>
       {/if}
     </div>
@@ -255,7 +256,7 @@
 
 {#if !hasData}
   <div class="flex h-full items-center justify-center text-[13px] text-fg-3">
-    No data available for visualization
+    {tr('chart.noData')}
   </div>
 {:else if readonly}
   <div class="h-full min-h-0">{@render chart()}</div>
@@ -267,7 +268,7 @@
           {@const Icon = typeInfo.icon}
           <Icon size={14} class="text-fg-3" />
         {/if}
-        <label class="sr-only" for="{uid}-type">Chart type</label>
+        <label class="sr-only" for="{uid}-type">{tr('chart.typeLabel')}</label>
         <Select
           id="{uid}-type"
           size="sm"
@@ -284,14 +285,14 @@
           id="{uid}-x"
           size="sm"
           class="w-36"
-          placeholder="Column"
+          placeholder={tr('chart.xColumnPlaceholder')}
           value={config.xAxis}
           options={result.columns.map((col) => ({ value: col, label: col }))}
           onchange={(value) => updateConfig({ xAxis: value })}
         />
       </div>
 
-      <Popover label="Value columns" panelClass="w-56 p-1.5" class="shrink-0">
+      <Popover label={tr('chart.yAxis')} panelClass="w-56 p-1.5" class="shrink-0">
         {#snippet trigger({ open, toggle: togglePanel })}
           <button
             type="button"
@@ -302,14 +303,14 @@
           >
             <span class="text-fg-3">Y</span>
             <span class="min-w-0 flex-1 truncate {selectedColumns.length ? '' : 'text-fg-4'}">
-              {selectedColumns.length ? selectedColumns.join(', ') : 'Values...'}
+              {selectedColumns.length ? selectedColumns.join(', ') : tr('chart.valuesPlaceholder')}
             </span>
             <ChevronDown size={13} class="shrink-0 text-fg-4" />
           </button>
         {/snippet}
         {#if valueColumns.length === 0}
           <p class="px-2 py-3 text-center text-xs text-fg-3">
-            {numericColumns.length ? 'The X column is the group key' : 'No numeric columns in this result'}
+            {numericColumns.length ? tr('chart.xIsGroupKey') : tr('chart.noNumericColumns')}
           </p>
         {:else}
           <ul class="max-h-56 overflow-y-auto">
@@ -336,14 +337,14 @@
       </Popover>
 
       <div class="ml-auto flex items-center gap-0.5">
-        <Popover label="Chart settings" align="end" panelClass="w-64">
+          <Popover label={tr('chart.settings')} align="end" panelClass="w-64">
           {#snippet trigger({ open, toggle: togglePanel })}
             <Button
               icon
               variant="ghost"
               size="sm"
-              title="Chart settings"
-              aria-label="Chart settings"
+              title={tr('chart.settings')}
+              aria-label={tr('chart.settings')}
               aria-expanded={open}
               onclick={togglePanel}
             >
@@ -351,14 +352,14 @@
             </Button>
           {/snippet}
           <div class="flex flex-col gap-3">
-            <h4 class="text-[13px] font-semibold text-fg">Chart settings</h4>
+            <h4 class="text-[13px] font-semibold text-fg">{tr('chart.settings')}</h4>
 
             <div class="flex flex-col gap-1">
-              <label class="text-xs text-fg-3" for="{uid}-title">Title</label>
+              <label class="text-xs text-fg-3" for="{uid}-title">{tr('chart.title')}</label>
               <Input
                 id="{uid}-title"
                 size="sm"
-                placeholder="No title"
+                placeholder={tr('chart.titlePlaceholder')}
                 value={config.title ?? ''}
                 oninput={(e) => updateConfig({ title: e.currentTarget.value || undefined })}
               />
@@ -366,7 +367,7 @@
 
             <div class="flex flex-col gap-1">
               <label class="flex items-center gap-1 text-xs text-fg-3" for="{uid}-sort">
-                <ArrowUpDown size={12} /> Sort by
+                <ArrowUpDown size={12} /> {tr('chart.sortBy')}
               </label>
               <div class="flex gap-1.5">
                 <Select
@@ -374,7 +375,7 @@
                   size="sm"
                   class="min-w-0 flex-1"
                   value={config.transform?.sortBy ?? NO_SORT}
-                  options={[{ value: NO_SORT, label: 'None' }, ...sortColumns.map((col) => ({ value: col, label: col }))]}
+                  options={[{ value: NO_SORT, label: tr('chart.sortNone') }, ...sortColumns.map((col) => ({ value: col, label: col }))]}
                   onchange={(value) =>
                     updateTransform(
                       value === NO_SORT
@@ -384,15 +385,15 @@
                     )}
                 />
                 {#if config.transform?.sortBy}
-                  <label class="sr-only" for="{uid}-order">Sort order</label>
+                  <label class="sr-only" for="{uid}-order">{tr('chart.sortOrder')}</label>
                   <Select
                     id="{uid}-order"
                     size="sm"
                     class="w-20"
                     value={config.transform.sortOrder ?? 'asc'}
                     options={[
-                      { value: 'asc', label: 'Asc' },
-                      { value: 'desc', label: 'Desc' },
+                      { value: 'asc', label: tr('chart.sortAsc') },
+                      { value: 'desc', label: tr('chart.sortDesc') },
                     ]}
                     onchange={(value) => updateTransform({ sortOrder: value as 'asc' | 'desc' })}
                   />
@@ -401,13 +402,13 @@
             </div>
 
             <div class="flex flex-col gap-1">
-              <label class="text-xs text-fg-3" for="{uid}-limit">Limit rows</label>
+              <label class="text-xs text-fg-3" for="{uid}-limit">{tr('chart.limitRows')}</label>
               <Input
                 id="{uid}-limit"
                 type="number"
                 size="sm"
                 min={0}
-                placeholder="No limit"
+                placeholder={tr('chart.limitPlaceholder')}
                 value={config.transform?.limit ?? ''}
                 oninput={(e) => {
                   const limit = parseInt(e.currentTarget.value, 10)
@@ -417,7 +418,7 @@
             </div>
 
             <div class="flex flex-col gap-1">
-              <label class="text-xs text-fg-3" for="{uid}-agg">Aggregation</label>
+              <label class="text-xs text-fg-3" for="{uid}-agg">{tr('chart.aggregation')}</label>
               <Select
                 id="{uid}-agg"
                 size="sm"
@@ -432,19 +433,19 @@
             </div>
 
             <div class="flex flex-col gap-2.5 border-t border-edge-subtle pt-3">
-              {@render toggle('Show values', config.showValues ?? false, (v) => updateConfig({ showValues: v }))}
-              {@render toggle('Show grid', config.showGrid ?? true, (v) => updateConfig({ showGrid: v }))}
+              {@render toggle(tr('chart.showValues'), config.showValues ?? false, (v) => updateConfig({ showValues: v }))}
+              {@render toggle(tr('chart.showGrid'), config.showGrid ?? true, (v) => updateConfig({ showGrid: v }))}
               {#if isLineOrArea}
-                {@render toggle('Smooth lines', config.smooth ?? false, (v) => updateConfig({ smooth: v }))}
+                {@render toggle(tr('chart.smoothLines'), config.smooth ?? false, (v) => updateConfig({ smooth: v }))}
               {/if}
             </div>
           </div>
         </Popover>
 
-        <Button icon variant="ghost" size="sm" title="Download as PNG" aria-label="Download chart as PNG" onclick={exportPNG}>
+        <Button icon variant="ghost" size="sm" title={tr('chart.downloadPng')} aria-label={tr('chart.downloadPng')} onclick={exportPNG}>
           <Download size={14} />
         </Button>
-        <Button icon variant="ghost" size="sm" title="Reset chart" aria-label="Reset chart" onclick={reset}>
+        <Button icon variant="ghost" size="sm" title={tr('chart.resetChart')} aria-label={tr('chart.resetChart')} onclick={reset}>
           <RotateCcw size={13} />
         </Button>
       </div>

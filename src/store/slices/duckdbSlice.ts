@@ -1,4 +1,5 @@
 import type { StateCreator } from "@/store/createStore";
+import { tr } from "@/lib/i18n/translate";
 import {
   builtInWasmConnection,
   closeAllSessions,
@@ -11,7 +12,9 @@ import { localHandles, mergeConnections, toCurrentConnection } from "./connectio
 import { getSetting } from "@/services/persistence/repositories/settingsRepository";
 import { clampMaxResultRows, DEFAULT_MAX_RESULT_ROWS } from "./querySlice";
 import { loadAppConfig } from "@/lib/appConfig";
+import { buildExtensionSql } from "@/lib/duckdbExtensions";
 import { loadRangeReadsPreference } from "@/services/duckdb/rangeReads";
+import { ENABLE_HTTP_METADATA_CACHE_SQL, buildMemoryLimitSql } from "@/services/duckdb/engineBoot";
 import { toast } from "svelte-sonner";
 
 export const DEFAULT_DUCKDB_MEMORY_LIMIT_MB = 4096;
@@ -102,7 +105,7 @@ export const createDuckdbSlice: StateCreator<DuckStoreState, [], [], DuckdbSlice
     const failedExtensions: string[] = [];
 
     try {
-      await connection.query(`SET enable_http_metadata_cache=true`);
+      await connection.query(ENABLE_HTTP_METADATA_CACHE_SQL);
     } catch {
       console.warn("[DuckDB] Failed to set enable_http_metadata_cache");
     }
@@ -120,7 +123,7 @@ export const createDuckdbSlice: StateCreator<DuckStoreState, [], [], DuckdbSlice
           }
         }
       }
-      await connection.query(`SET memory_limit='${memoryLimitMb}MB'`);
+      await connection.query(buildMemoryLimitSql(memoryLimitMb));
     } catch {
       console.warn("[DuckDB] Failed to set memory_limit");
     }
@@ -145,9 +148,9 @@ export const createDuckdbSlice: StateCreator<DuckStoreState, [], [], DuckdbSlice
     // extension of that name provides no reader in DuckDB WASM.
     for (const ext of ["parquet", "ducklake"]) {
       try {
-        await connection.query(`INSTALL ${ext}`);
+        await connection.query(buildExtensionSql("install", ext));
         if (ext === "ducklake") {
-          await connection.query(`LOAD ${ext}`);
+          await connection.query(buildExtensionSql("load", ext));
         }
       } catch {
         console.warn(`[DuckDB] Failed to install ${ext} extension`);
@@ -156,9 +159,7 @@ export const createDuckdbSlice: StateCreator<DuckStoreState, [], [], DuckdbSlice
     }
 
     if (failedExtensions.length > 0) {
-      toast.warning(
-        `Some extensions failed to load (${failedExtensions.join(", ")}). You may be offline — basic SQL features still work.`
-      );
+      toast.warning(tr("duckdb.extensionsFailed", { names: failedExtensions.join(", ") }));
     }
 
     // Before the catalog loads, so remote databases show up in it. A server

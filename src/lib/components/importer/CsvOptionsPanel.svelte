@@ -20,10 +20,10 @@
   let showOptions = $state(false)
 
   const toggles: { key: 'header' | 'autoDetect' | 'ignoreErrors' | 'nullPadding'; label: string }[] = [
-    { key: 'header', label: 'Has header row' },
-    { key: 'autoDetect', label: 'Auto-detect types' },
-    { key: 'ignoreErrors', label: 'Ignore errors' },
-    { key: 'nullPadding', label: 'Pad missing columns' },
+    { key: 'header', label: tr('csv.hasHeader') },
+    { key: 'autoDetect', label: tr('csv.autoDetect') },
+    { key: 'ignoreErrors', label: tr('csv.ignoreErrors') },
+    { key: 'nullPadding', label: tr('csv.nullPadding') },
   ]
 
   const toCount = (raw: string): number | undefined => parseInt(raw, 10) || undefined
@@ -31,9 +31,9 @@
 
 <div class="mt-3">
   <div class="flex items-center justify-between">
-    <h4 class="text-xs font-medium text-fg-2">CSV import options</h4>
+    <h4 class="text-xs font-medium text-fg-2">{tr('csv.importOptions')}</h4>
     <Button variant="ghost" size="xs" aria-expanded={showOptions} onclick={() => (showOptions = !showOptions)}>
-      {showOptions ? 'Hide options' : 'Show options'}
+      {showOptions ? tr('csv.hideOptions') : tr('csv.showOptions')}
     </Button>
   </div>
 
@@ -66,7 +66,7 @@
       </FormField>
 
       <div class="flex flex-col gap-3 border-t border-edge-subtle pt-3">
-        <h5 class="text-xs font-medium text-fg-3">Advanced options</h5>
+        <h5 class="text-xs font-medium text-fg-3">{tr('csv.advancedOptions')}</h5>
 
         <div class="grid grid-cols-2 gap-3">
           <FormField controlWidth="full" label={tr('csv.quoteChar')} for="quote-{idSuffix}">
@@ -111,7 +111,7 @@
               type="number"
               min={1}
               value={csvOptions.sampleSize ?? ''}
-              placeholder="Auto"
+              placeholder={tr('csv.samplePlaceholder')}
               {disabled}
               oninput={(e) => onchange('sampleSize', toCount(e.currentTarget.value))}
             />
@@ -122,7 +122,7 @@
           controlWidth="full"
           label={tr('csv.nullString')}
           for="null-str-{idSuffix}"
-          hint="Values matching this string will be treated as NULL"
+          hint={tr('csv.nullStringHint')}
         >
           <Input
             id="null-str-{idSuffix}"
@@ -140,7 +140,7 @@
               id="date-format-{idSuffix}"
               size="sm"
               value={csvOptions.dateFormat ?? ''}
-              placeholder="ISO 8601"
+              placeholder={tr('csv.datePlaceholder')}
               {disabled}
               oninput={(e) => onchange('dateFormat', e.currentTarget.value)}
             />
@@ -151,7 +151,7 @@
               id="timestamp-format-{idSuffix}"
               size="sm"
               value={csvOptions.timestampFormat ?? ''}
-              placeholder="ISO 8601"
+              placeholder={tr('csv.timestampPlaceholder')}
               {disabled}
               oninput={(e) => onchange('timestampFormat', e.currentTarget.value)}
             />

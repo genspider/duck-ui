@@ -1,4 +1,5 @@
 import { useDuckStore, type QueryResult } from "@/store";
+import { tr } from "@/lib/i18n/translate";
 import { stageRemoteTextFile } from "@/services/duckdb";
 import * as toast from "@/lib/stores/toast.svelte";
 import { PREVIEW_ROW_LIMIT } from "./constants";
@@ -55,11 +56,11 @@ export function createUrlImport(ctx: ImporterContext) {
   /** Shared checks for Preview and Import Directly. Toasts and returns false when invalid. */
   const validateInputs = (): boolean => {
     if (!urlInput.trim()) {
-      toast.error("Please enter a URL");
+      toast.error(tr("fileImporter.enterUrl"));
       return false;
     }
     if (!urlTableName.trim()) {
-      toast.error("Please enter a table name");
+      toast.error(tr("fileImporter.enterTableName"));
       return false;
     }
     const nameError = tableNameError(urlTableName);
@@ -79,7 +80,7 @@ export function createUrlImport(ctx: ImporterContext) {
       const source = await resolveUrlSource(url, extension);
 
       const read = buildReadExpression(source, extension);
-      if (!read) throw new Error(`Unsupported file type for preview: .${extension}`);
+      if (!read) throw new Error(tr("fileImporter.unsupportedPreview", { ext: extension ?? "" }));
 
       const result = await runImportQuery(`SELECT * FROM ${read} LIMIT ${PREVIEW_ROW_LIMIT}`);
       previewData = result;
@@ -97,7 +98,7 @@ export function createUrlImport(ctx: ImporterContext) {
       }));
     } catch (e) {
       const errorMessage = errorMessageOf(e);
-      toast.error(`Preview failed: ${errorMessage}`);
+      toast.error(tr("fileImporter.previewFailed", { message: errorMessage }));
       ctx.setErrors([toUploadError(errorMessage)]);
     } finally {
       isPreviewing = false;
@@ -140,7 +141,7 @@ export function createUrlImport(ctx: ImporterContext) {
         // sniff a different CSV dialect than the one the user just approved.
         const source = await resolveUrlSource(url, extension);
         const read = buildReadExpression(source, extension, { ignoreErrors: true });
-        if (!read) throw new Error(`Unsupported file type: .${extension}`);
+        if (!read) throw new Error(tr("fileImporter.unsupportedType", { ext: extension ?? "" }));
         const query = buildCreateAs(
           createType,
           previewTableName,
@@ -148,7 +149,9 @@ export function createUrlImport(ctx: ImporterContext) {
         );
 
         await runImportQuery(query);
-        toast.success(`Successfully created ${resultType} '${previewTableName}'`);
+        toast.success(
+          tr("fileImporter.createdFromResult", { type: resultType, name: previewTableName })
+        );
 
         handleBackFromPreview();
         ctx.close();
@@ -156,7 +159,7 @@ export function createUrlImport(ctx: ImporterContext) {
     } catch (e) {
       const errorMessage = errorMessageOf(e);
       ctx.setErrors([toUploadError(errorMessage)]);
-      toast.error(`Failed to import: ${errorMessage}`);
+      toast.error(tr("fileImporter.importFailed", { message: errorMessage }));
     } finally {
       isUrlImporting = false;
     }
@@ -199,19 +202,19 @@ export function createUrlImport(ctx: ImporterContext) {
 
       const read = buildReadExpression(source, extension, { ignoreErrors: true });
       if (!read) {
-        throw new Error(`Unsupported file type: .${extension}. Supported: CSV, JSON, Parquet`);
+        throw new Error(tr("fileImporter.unsupportedSupported", { ext: extension ?? "" }));
       }
 
       await runImportQuery(buildCreateAs(createType, urlTableName, `SELECT * FROM ${read}`));
 
-      toast.success(`Successfully created ${resultType} '${urlTableName}' from URL`);
+      toast.success(tr("fileImporter.createdFromUri", { type: resultType, name: urlTableName }));
       urlInput = "";
       urlTableName = "";
       ctx.close();
     } catch (e) {
       const errorMessage = errorMessageOf(e);
       ctx.setErrors([toUploadError(errorMessage)]);
-      toast.error(`Failed to import from URL: ${errorMessage}`);
+      toast.error(tr("fileImporter.urlImportFailed", { message: errorMessage }));
     } finally {
       isUrlImporting = false;
     }

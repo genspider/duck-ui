@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatNumber, formatNumberWithSuffix } from '@/lib/chartUtils'
+  import { tr } from '@/lib/i18n/translate'
   import { getTheme } from '../../stores/theme.svelte'
   import { chartTheme, inkOn } from './palette'
 
@@ -63,7 +64,7 @@
 </script>
 
 {#if total === 0}
-  <div class="flex h-full items-center justify-center text-[13px] text-fg-3">No data</div>
+  <div class="flex h-full items-center justify-center text-[13px] text-fg-3">{tr('chart.pie.noData')}</div>
 {:else}
   <div class="flex h-full items-center justify-center gap-6">
     <div class="relative shrink-0">
@@ -72,7 +73,7 @@
         class="max-h-[360px] w-full min-w-[200px] max-w-[360px]"
         font-family={theme.fontFamily}
         role="img"
-        aria-label="{donut ? 'Donut' : 'Pie'} chart, total {formatNumber(total)}"
+        aria-label={tr('chart.pie.ariaLabel', { type: donut ? tr('chart.pie.donut') : tr('chart.pie.pie'), total: formatNumber(total) })}
       >
         {#each arcs as arc, i (i)}
           {@const active = hovered === i}
@@ -110,7 +111,7 @@
         {/each}
         {#if donut}
           <text x="0" y="-0.06" text-anchor="middle" dominant-baseline="central" fill={theme.axis} font-size="0.12">
-            Total
+            {tr('chart.pie.total')}
           </text>
           <text
             x="0"

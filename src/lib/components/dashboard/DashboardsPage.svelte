@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Copy, EllipsisVertical, LayoutDashboard, Plus, Trash2 } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
   import Button from '../common/Button.svelte'
   import ConfirmDialog from '../common/ConfirmDialog.svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
@@ -30,8 +31,8 @@
   const menuItems = $derived<ContextMenuItem[]>(
     menu
       ? [
-          { id: 'duplicate', label: 'Duplicate', icon: Copy, onSelect: duplicate(menu.dashboard) },
-          { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: askDelete(menu.dashboard) },
+          { id: 'duplicate', label: $t('dashboard.duplicate'), icon: Copy, onSelect: duplicate(menu.dashboard) },
+          { id: 'delete', label: $t('dashboard.delete'), icon: Trash2, danger: true, onSelect: askDelete(menu.dashboard) },
         ]
       : [],
   )
@@ -81,24 +82,24 @@
   }
 </script>
 
-<PageHeader title="Dashboards" subtitle="Reports written as markdown, with live SQL">
+<PageHeader title={$t('dashboard.title')} subtitle={$t('dashboard.subtitle')}>
   {#snippet meta()}
     {#if dashboards.length > 0}<Badge>{dashboards.length}</Badge>{/if}
   {/snippet}
   {#snippet actions()}
-    <label class="sr-only" for="new-dashboard-name">New dashboard name</label>
+    <label class="sr-only" for="new-dashboard-name">{$t('dashboard.newDashboardName')}</label>
     <div class="w-56">
       <Input
         id="new-dashboard-name"
         size="sm"
         bind:value={newName}
-        placeholder="New dashboard name"
+        placeholder={$t('dashboard.newName.placeholder')}
         onkeydown={(e) => e.key === 'Enter' && create()}
       />
     </div>
     <Button size="sm" onclick={create} disabled={creating}>
       <Plus size={13} />
-      New
+      {$t('common.new')}
     </Button>
   {/snippet}
 </PageHeader>
@@ -107,8 +108,8 @@
   {#if dashboards.length === 0}
     <EmptyState
       icon={LayoutDashboard}
-      title="No dashboards yet"
-      description="Create one above, or run a query and use Add to dashboard."
+      title={$t('dashboard.noDashboards')}
+      description={$t('dashboard.noDashboards.desc')}
     />
   {:else}
     <ul class="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -118,7 +119,7 @@
           <button type="button" class="min-w-0 flex-1 text-left" onclick={() => openDashboard(dashboard)}>
             <span class="block truncate text-[13px] font-medium text-fg">{dashboard.name}</span>
             <span class="block text-[11px] text-fg-3" title={new Date(dashboard.updatedAt).toLocaleString()}>
-              Updated {formatRelativeTime(dashboard.updatedAt)}
+              {$t('dashboard.updated', { values: { time: formatRelativeTime(dashboard.updatedAt) } })}
             </span>
           </button>
           <Button
@@ -141,8 +142,8 @@
 
 <ConfirmDialog
   open={deleting !== null}
-  title="Delete {deleting?.name ?? 'dashboard'}?"
-  description="The dashboard and its open tab are removed. This cannot be undone."
+  title={$t('dashboard.deleteTitle', { values: { name: deleting?.name ?? 'dashboard' } })}
+  description={$t('dashboard.deleteDesc')}
   confirmLabel="Delete"
   destructive
   onconfirm={confirmDelete}

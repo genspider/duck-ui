@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { generateUUID } from "@/lib/utils";
 import { runQuery } from "@/services/engine";
 import type { DuckStoreState, DuckBrainSlice, DuckBrainMessage, QueryResult } from "../types";
@@ -17,18 +18,14 @@ let activeGeneration: AbortController | null = null;
 function getProviderSetupError(duckBrain: DuckStoreState["duckBrain"]): string | null {
   const { aiProvider, providerConfigs } = duckBrain;
   if (aiProvider === "webllm") {
-    return duckBrain.modelStatus === "ready"
-      ? null
-      : "Duck Brain is not ready. Please wait for the model to load.";
+    return duckBrain.modelStatus === "ready" ? null : tr("brain.notReady");
   }
   if (aiProvider === "openai-compatible") {
     const config = providerConfigs["openai-compatible"];
-    return config?.baseUrl && config?.modelId
-      ? null
-      : "Pick a model in Settings → AI. With Ollama running it is one click.";
+    return config?.baseUrl && config?.modelId ? null : tr("brain.pickModel");
   }
   const config = providerConfigs[aiProvider];
-  return config?.apiKey ? null : `Add your ${aiProvider} API key in Settings → AI.`;
+  return config?.apiKey ? null : tr("brain.apiKeyHint", { provider: aiProvider });
 }
 
 export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrainSlice> = (
@@ -80,9 +77,9 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
       await duckBrainService.initialize(modelId);
     } catch (error) {
       toast.error(
-        `Failed to initialize Duck Brain: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+        tr("brain.initFailed", {
+          message: error instanceof Error ? error.message : "Unknown error",
+        })
       );
     }
   },
@@ -201,10 +198,10 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
                   error: error.message,
                 },
               }));
-              toast.error(`Generation failed: ${error.message}`);
+              toast.error(tr("brain.generationFailed", { message: error.message }));
             },
           },
-          { maxTokens: 512, temperature: 0.2, signal: generation.signal }
+          { maxTokens: 4096, temperature: 0.2, signal: generation.signal }
         );
 
         await provider.cleanup();
@@ -254,7 +251,7 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
                   error: error.message,
                 },
               }));
-              toast.error(`Generation failed: ${error.message}`);
+              toast.error(tr("brain.generationFailed", { message: error.message }));
             },
           },
           { maxTokens: 512, temperature: 0.2 }
@@ -279,7 +276,9 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
       }));
       if (!failureReported) {
         toast.error(
-          `Failed to generate SQL: ${error instanceof Error ? error.message : "Unknown error"}`
+          tr("brain.sqlGenerationFailed", {
+            message: error instanceof Error ? error.message : "Unknown error",
+          })
         );
       }
       return null;
@@ -331,7 +330,9 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
       // Stop is not a failure.
       if (stopped()) return null;
       toast.error(
-        `Duck Brain request failed: ${error instanceof Error ? error.message : "Unknown error"}`
+        tr("brain.requestFailed", {
+          message: error instanceof Error ? error.message : "Unknown error",
+        })
       );
       return null;
     }
@@ -411,7 +412,7 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
 
     try {
       if (!currentSession) {
-        throw new Error("No active connection");
+        throw new Error(tr("brain.noActiveConnection"));
       }
       const queryResult: QueryResult = await runQuery(currentSession, sql, "duck-brain", {
         maxRows: get().maxResultRows,
@@ -425,7 +426,9 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
         return null;
       }
 
-      const serializeValue = (value: unknown): unknown => {
+      const serializeValue = (
+        value: unknown
+      ): string | number | boolean | null | Record<string, unknown> | unknown[] => {
         if (typeof value === "bigint") {
           return Number(value);
         }
@@ -439,10 +442,11 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
           }
           return result;
         }
-        return value;
+        return value as string | number | boolean | null;
       };
 
-      const serializedResult = serializeValue(queryResult) as QueryResult;
+      // SAFETY: serializeValue recursively strips BigInts, keeping the shape of QueryResult's nested data intact
+      const serializedResult = serializeValue(queryResult) as unknown as QueryResult;
 
       updateMessageQueryResult(messageId, {
         status: "success",
@@ -452,7 +456,8 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
 
       return serializedResult;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Query execution failed";
+      const errorMessage =
+        error instanceof Error ? error.message : tr("error.queryExecutionFailed");
 
       updateMessageQueryResult(messageId, {
         status: "error",
@@ -502,6 +507,18 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
         },
       },
     }));
+
+    // Persist immediately so the config survives a refresh.
+    const { currentProfileId, encryptionKey } = get();
+    if (currentProfileId) {
+      const apiKey = "apiKey" in providerConfig ? providerConfig.apiKey : null;
+      const safeConfig: Record<string, unknown> = { modelId: providerConfig.modelId };
+      if ("baseUrl" in providerConfig) safeConfig.baseUrl = providerConfig.baseUrl;
+      import("@/services/persistence/repositories/aiConfigRepository").then(
+        ({ saveProviderConfig }) =>
+          saveProviderConfig(currentProfileId, provider, safeConfig, apiKey ?? null, encryptionKey)
+      );
+    }
   },
 
   initializeExternalProvider: async () => {
@@ -516,14 +533,12 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
 
     if (aiProvider === "openai-compatible") {
       if (!config || !("baseUrl" in config) || !config.baseUrl || !config.modelId) {
-        toast.error("Please configure the Base URL and Model ID first");
+        toast.error(tr("brain.baseUrlRequired"));
         return;
       }
-    } else {
-      if (!config || !("apiKey" in config) || !config.apiKey) {
-        toast.error(`Please configure your ${aiProvider} API key first`);
-        return;
-      }
+    } else if (!config || !("apiKey" in config) || !config.apiKey) {
+      toast.error(tr("brain.apiKeyRequired", { provider: aiProvider }));
+      return;
     }
 
     set((state) => ({
@@ -563,7 +578,7 @@ export const createDuckBrainSlice: StateCreator<DuckStoreState, [], [], DuckBrai
           error: errorMessage,
         },
       }));
-      toast.error(`Failed to connect: ${errorMessage}`);
+      toast.error(tr("brain.connectFailed", { message: errorMessage }));
     }
   },
 });

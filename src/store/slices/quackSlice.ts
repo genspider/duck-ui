@@ -1,6 +1,7 @@
 import type { StateCreator } from "@/store/createStore";
 import type { AsyncDuckDBConnection } from "@duckdb/duckdb-wasm";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { getSession, requireLocalDuckSession, WASM_CONNECTION_ID } from "@/services/engine";
 import {
   normalizeQuackHost,
@@ -129,7 +130,7 @@ export const createQuackSlice: StateCreator<DuckStoreState, [], [], QuackSlice> 
         quackAttachments: [...state.quackAttachments, { ...attachment, status: "attached" }],
       }));
       if (!get().encryptionKey) {
-        toast.warning("Attached until reload: this profile has no key to store the token with.");
+        toast.warning(tr("quack.tokenNoKey"));
       }
       await persist();
       await refreshCatalog();

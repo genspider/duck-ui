@@ -3,6 +3,7 @@
   import { createSubscriber } from 'svelte/reactivity'
   import type { Extension } from '@codemirror/state'
   import { Copy, Eye, Pencil, RefreshCw, Share2, Timer } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
   import Select from '../common/Select.svelte'
@@ -281,7 +282,8 @@
       : [...REFRESH_INTERVAL_OPTIONS, { seconds: selectedInterval, label: '' }]
     ).map((option) => ({
       value: String(option.seconds),
-      label: option.seconds === 0 ? 'Auto-refresh off' : `Every ${formatRefreshInterval(option.seconds)}`,
+      label:
+        option.seconds === 0 ? $t('dashboard.autoRefreshOff') : $t('dashboard.every', { values: { interval: formatRefreshInterval(option.seconds) } }),
     })),
   )
 
@@ -350,15 +352,15 @@
 
 {#if !dashboard}
   <div class="flex h-full flex-col items-center justify-center gap-1">
-    <p class="text-[13px] text-fg-2">This dashboard is not available.</p>
-    <p class="text-xs text-fg-3">It may still be loading, or it was deleted.</p>
+    <p class="text-[13px] text-fg-2">{$t('dashboard.notAvailable')}</p>
+    <p class="text-xs text-fg-3">{$t('dashboard.notAvailableHint')}</p>
   </div>
 {:else}
   <div class="flex h-full flex-col">
     <div class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-b border-edge-subtle px-3 py-1.5">
       <div class="min-w-0 flex-1">
         {#if isEditing && canEdit}
-          <label class="sr-only" for="{uid}-name">Dashboard name</label>
+          <label class="sr-only" for="{uid}-name">{$t('dashboard.nameLabel')}</label>
           <Input
             id="{uid}-name"
             size="sm"
@@ -373,13 +375,15 @@
 
       {#if lastRefreshedAt !== null && hasQueries}
         <span class="text-xs text-fg-3" title={new Date(lastRefreshedAt).toLocaleString()}>
-          {hidden && intervalSeconds > 0 ? 'Paused · ' : ''}Updated {formatRelativeTime(lastRefreshedAt, Math.max(now, lastRefreshedAt))}
+          {hidden && intervalSeconds > 0
+            ? $t('dashboard.pausedPrefix')
+            : ''}{$t('dashboard.updated', { values: { time: formatRelativeTime(lastRefreshedAt, Math.max(now, lastRefreshedAt)) } })}
         </span>
       {/if}
 
-      <div class="flex items-center gap-1" title="Auto-refresh (paused while this tab is hidden)">
+      <div class="flex items-center gap-1" title={$t('dashboard.autoRefreshPaused')}>
         <Timer size={13} class="text-fg-3" />
-        <label class="sr-only" for="{uid}-interval">Auto-refresh interval</label>
+        <label class="sr-only" for="{uid}-interval">{$t('dashboard.autoRefreshInterval')}</label>
         <Select
           id="{uid}-interval"
           size="sm"
@@ -392,12 +396,12 @@
 
       <Button size="sm" variant="outline" onclick={refreshAll} disabled={!hasQueries} loading={refreshing}>
         {#if !refreshing}<RefreshCw size={13} />{/if}
-        Refresh all
+        {$t('dashboard.refreshAll')}
       </Button>
 
       <Button size="sm" variant="outline" onclick={() => (shareOpen = true)}>
         <Share2 size={13} />
-        Share
+        {$t('editor.share')}
       </Button>
 
       {#if !canEdit}
@@ -405,7 +409,7 @@
              this browser. Offer the honest path to editing, an owned copy. -->
         <Button size="sm" variant="outline" onclick={saveEditableCopy}>
           <Copy size={13} />
-          Save editable copy
+          {$t('dashboard.saveEditableCopy')}
         </Button>
       {:else}
         <Button
@@ -414,7 +418,7 @@
           onclick={() => duckActions().setDashboardEditing(!isEditing, dashboardId)}
         >
           {#if isEditing}<Eye size={13} />{:else}<Pencil size={13} />{/if}
-          {isEditing ? 'Done' : 'Edit'}
+          {isEditing ? $t('common.done') : $t('common.edit')}
         </Button>
       {/if}
     </div>
@@ -427,7 +431,7 @@
               value={source}
               onchange={handleSourceChange}
               {collabExtensions}
-              ariaLabel="Source of {dashboard.name}"
+              ariaLabel={$t('dashboard.sourceOf', { values: { name: dashboard.name } })}
             />
           </div>
 
@@ -437,7 +441,7 @@
             class="group/split flex w-1 shrink-0 cursor-col-resize items-center justify-center transition-colors hover:bg-active focus-visible:bg-active focus-visible:outline-none {resizing ? 'bg-accent/60' : 'bg-edge-subtle'}"
             role="separator"
             aria-orientation="vertical"
-            aria-label="Resize source and preview"
+            aria-label={$t('dashboard.resizeSplit')}
             aria-valuemin={MIN_SPLIT}
             aria-valuemax={MAX_SPLIT}
             aria-valuenow={Math.round(splitPercent)}

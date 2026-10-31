@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { ChevronRight, Database, Table, Table2, SquareTerminal, Trash2 } from 'lucide-svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
   import ConfirmDialog from '../common/ConfirmDialog.svelte'
@@ -96,23 +97,23 @@
     pendingDelete = null
     try {
       await duckActions().deleteTable(table.name, database, table.schema)
-      toast.success(`Table "${table.name}" deleted`)
+      toast.success($t('schema.tableDeleted', { values: { name: table.name } }))
       await duckActions().fetchDatabasesAndTablesInfo()
     } catch (e) {
-      toast.error(`Failed to delete table "${table.name}": ${e instanceof Error ? e.message : 'Unknown error'}`)
+      toast.error($t('schema.tableDeleteFailed', { values: { name: table.name, message: e instanceof Error ? e.message : $t('common.unknownError') } }))
     }
   }
 
   function openMenu(e: MouseEvent, database: string, table: TableInfo) {
     e.preventDefault()
     const items: ContextMenuItem[] = [
-      { id: 'open', label: 'Open table', icon: Table2, onSelect: () => openTable(database, table) },
-      { id: 'query', label: 'Query table', icon: SquareTerminal, onSelect: () => queryTable(database, table) },
+      { id: 'open', label: $t('schema.openTable'), icon: Table2, onSelect: () => openTable(database, table) },
+      { id: 'query', label: $t('schema.queryTable'), icon: SquareTerminal, onSelect: () => queryTable(database, table) },
     ]
     if (!ui.readOnly) {
       items.push(
         { id: 'sep', separator: true },
-        { id: 'delete', label: 'Delete table', icon: Trash2, danger: true, onSelect: () => (pendingDelete = { database, table }) },
+        { id: 'delete', label: $t('schema.deleteTable'), icon: Trash2, danger: true, onSelect: () => (pendingDelete = { database, table }) },
       )
     }
     menu = { x: e.clientX, y: e.clientY, items }
@@ -121,7 +122,7 @@
   const row = 'flex h-7 w-full items-center gap-1.5 rounded-md px-1.5 text-left text-[13px] text-fg-2 hover:bg-hover hover:text-fg'
 </script>
 
-<ul role="tree" aria-label="Database schema" class="px-1.5 pb-2">
+<ul role="tree" aria-label={$t('explorer.schemaAria')} class="px-1.5 pb-2">
   {#each visible as db (db.name)}
     {@const dbOpen = isOpen(db.name, true) || !!needle}
     <li role="treeitem" aria-expanded={dbOpen} aria-selected="false">
@@ -162,7 +163,7 @@
               {/if}
             </li>
           {:else}
-            <li class="px-1.5 py-1 text-xs text-fg-4">No tables</li>
+            <li class="px-1.5 py-1 text-xs text-fg-4">{$t('schema.noTables')}</li>
           {/each}
         </ul>
       {/if}
@@ -174,9 +175,9 @@
 
 <ConfirmDialog
   open={pendingDelete !== null}
-  title="Delete table"
-  description={pendingDelete ? `This permanently deletes "${pendingDelete.table.name}" and its data.` : ''}
-  confirmLabel="Delete"
+  title={$t('schema.deleteTableTitle')}
+  description={pendingDelete ? $t('schema.deleteTableDesc', { values: { name: pendingDelete.table.name } }) : ''}
+  confirmLabel={$t('schema.deleteTable')}
   destructive
   onconfirm={confirmDelete}
   oncancel={() => (pendingDelete = null)}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Eye, Pencil } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Modal from '../common/Modal.svelte'
@@ -89,26 +90,24 @@
 </script>
 
 {#if payload}
-  <Modal open onclose={dismiss} size="sm" title="Open “{payload.name}”">
+  <Modal open onclose={dismiss} size="sm" title={$t('dashboard.openShared', { values: { name: payload.name } })}>
     <div class="flex flex-col gap-3">
       <p class="flex items-center gap-1.5 text-[13px] text-fg-2">
         {#if isViewer}<Eye size={13} />{:else}<Pencil size={13} />{/if}
         <span>
-          Shared {isViewer ? 'read-only' : 'as editable'} · {queryCount}
-          {queryCount === 1 ? 'query' : 'queries'}{refreshSeconds
-            ? ` · refreshes every ${formatRefreshInterval(refreshSeconds)}`
+          {$t('dashboard.sharedSummary', { values: { mode: isViewer ? $t('dashboard.readOnly') : $t('dashboard.editable'), count: queryCount.toLocaleString() } })}{refreshSeconds
+            ? $t('dashboard.refreshEvery', { values: { interval: formatRefreshInterval(refreshSeconds) } })
             : ''}
         </span>
       </p>
       <p class="text-xs text-fg-3">
-        The queries run in your browser, against data your browser can reach. Nothing runs until
-        you open it.
+        {$t('dashboard.sharedRunLocally')}
       </p>
     </div>
 
     {#snippet footer()}
-      <Button size="sm" variant="ghost" onclick={dismiss}>Not now</Button>
-      <Button size="sm" onclick={open} disabled={importing}>Open</Button>
+      <Button size="sm" variant="ghost" onclick={dismiss}>{$t('common.notNow')}</Button>
+      <Button size="sm" onclick={open} disabled={importing}>{$t('dashboard.open')}</Button>
     {/snippet}
   </Modal>
 {/if}

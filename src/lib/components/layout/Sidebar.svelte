@@ -41,7 +41,7 @@
   class="flex shrink-0 items-center bg-sidebar {mobile
     ? 'h-12 w-full flex-row justify-between gap-1 border-t border-edge-subtle px-2 pb-[env(safe-area-inset-bottom)]'
     : 'h-full w-12 flex-col border-r border-edge-subtle py-2'}"
-  aria-label="Primary"
+  aria-label={$t('nav.primaryAria')}
 >
   {#if mobile}
     <Button icon variant="ghost" size="sm" onclick={openDrawer} title={$t('nav.openPanel')} aria-label={$t('nav.openPanel')}>

@@ -31,10 +31,10 @@
 
   type View = 'data' | 'schema' | 'stats' | 'ddl'
   const VIEWS: TabItem[] = [
-    { id: 'data', label: 'Data', icon: Rows3 },
-    { id: 'schema', label: 'Schema', icon: ListTree },
-    { id: 'stats', label: 'Stats', icon: Sigma },
-    { id: 'ddl', label: 'DDL', icon: Code2 },
+    { id: 'data', label: $t('table.viewData'), icon: Rows3 },
+    { id: 'schema', label: $t('table.viewSchema'), icon: ListTree },
+    { id: 'stats', label: $t('table.viewStats'), icon: Sigma },
+    { id: 'ddl', label: $t('table.viewDdl'), icon: Code2 },
   ]
   const none = (): Record<View, boolean> => ({ data: false, schema: false, stats: false, ddl: false })
 
@@ -177,9 +177,9 @@
     if (!ddl) return
     try {
       await navigator.clipboard.writeText(ddl)
-      toast.success('Copied', 1500)
+      toast.success($t('common.copied'), 1500)
     } catch {
-      toast.error('Could not copy to the clipboard')
+      toast.error($t('common.copyFailed'))
     }
   }
 
@@ -192,7 +192,7 @@
     <div class="rounded-md border border-danger/40 bg-danger-soft p-3" role="alert">
       <div class="flex items-center gap-2 text-[13px] font-medium text-danger">
         <TriangleAlert size={14} />
-        Could not read the table
+        {$t('table.readFailed')}
       </div>
       <pre class="mt-2 whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-fg-2">{message}</pre>
     </div>
@@ -212,15 +212,17 @@
       </h2>
       {#if info}
         <span class="shrink-0 text-xs text-fg-3 tabular-nums">
-          {formatNumber(info.rowCount)} {info.rowCount === 1 ? 'row' : 'rows'} · {info.columns.length} {info.columns.length === 1 ? 'column' : 'columns'}
+          {#if info.rowCount !== null && info.rowCount !== undefined}
+            {formatNumber(info.rowCount)} {$t('common.rows')} · {info.columns.length} {$t('common.columns')}
+          {/if}
         </span>
       {/if}
       <div class="ml-auto flex items-center gap-1">
-        <Button size="sm" variant="ghost" onclick={queryInNewTab} disabled={missing} title="Open a query on this table">
+        <Button size="sm" variant="ghost" onclick={queryInNewTab} disabled={missing} title={$t('table.openQuery')}>
           <SquareTerminal size={13} />
-          Query
+          {$t('table.query')}
         </Button>
-        <Button size="sm" variant="ghost" icon onclick={refresh} disabled={missing} title="Read the table again" aria-label="Refresh">
+        <Button size="sm" variant="ghost" icon onclick={refresh} disabled={missing} title={$t('table.readAgain')} aria-label={$t('common.refresh')}>
           <RefreshCw size={13} class={busy[view] ? 'animate-spin' : ''} />
         </Button>
       </div>
@@ -229,8 +231,8 @@
     {#if missing}
       <EmptyState
         icon={SearchX}
-        title="Table not found"
-        description="{database}.{schema}.{table} is not in the current connection. It may have been dropped, or it belongs to another connection."
+        title={$t('table.notFound')}
+        description={$t('table.notFoundDesc', { values: { qualified } })}
         class="h-full"
       />
     {:else}
@@ -245,7 +247,7 @@
               {#if data.truncated}
                 <div class="flex shrink-0 items-center gap-2 border-b border-edge-subtle px-3 py-1.5 text-xs text-fg-3">
                   <Scissors size={12} class="shrink-0 text-warning" />
-                  Showing the first {formatNumber(data.rowCount)} rows. Sorting and filtering still cover the whole table.
+                  {$t('table.truncatedNotice', { values: { count: formatNumber(data.rowCount) } })}
                 </div>
               {/if}
               <div class="min-h-0 flex-1">
@@ -259,13 +261,13 @@
               </div>
             </div>
           {:else}
-            {@render waiting('Reading rows...')}
+            {@render waiting($t('table.readingRows'))}
           {/if}
         {:else if view === 'schema'}
           {#if description && schemaGrid}
             <ResultGrid meta={schemaGrid.meta} data={schemaGrid.data} rows={description.data} compact />
           {:else}
-            {@render waiting('Reading the schema...')}
+            {@render waiting($t('table.readingSchema'))}
           {/if}
         {:else if view === 'stats'}
           {#if stats && stats.length > 0}
@@ -306,14 +308,14 @@
               </Button>
             </div>
             <div class="min-h-0 flex-1">
-              <CodeEditor value={ddl} language="sql" readonly ariaLabel="Definition of {table}" />
+              <CodeEditor value={ddl} language="sql" readonly ariaLabel={$t('table.ddlAria', { values: { table } })} />
             </div>
           </div>
         {:else}
           <EmptyState
             icon={Code2}
-            title="No definition available"
-            description="This connection does not expose the statement that created the table."
+            title={$t('table.noDefinition')}
+            description={$t('table.noDefinitionDesc')}
             size="compact"
             class="h-full"
           />

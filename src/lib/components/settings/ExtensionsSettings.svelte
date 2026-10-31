@@ -44,7 +44,7 @@
       extensions = await duckActions().fetchExtensions()
       loadError = null
     } catch (error) {
-      loadError = error instanceof Error ? error.message : 'Failed to list extensions'
+      loadError = error instanceof Error ? error.message : $t('ext.listFailed')
     } finally {
       refreshing = false
     }
@@ -60,7 +60,7 @@
         if (!cancelled) extensions = list
       })
       .catch((error: unknown) => {
-        if (!cancelled) loadError = error instanceof Error ? error.message : 'Failed to list extensions'
+        if (!cancelled) loadError = error instanceof Error ? error.message : $t('ext.listFailed')
       })
     return () => {
       cancelled = true
@@ -71,12 +71,12 @@
     pending[name] = action
     try {
       await duckActions().runExtensionAction(action, name)
-      toast.success(`${action === 'install' ? 'Installed' : 'Loaded'} ${name}`)
+      toast.success($t('ext.extensionRunned', { values: { action: action === 'install' ? $t('ext.installed') : $t('ext.loaded'), name } }))
       delete unavailable[name]
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error'
+      const message = error instanceof Error ? error.message : $t('common.unknownError')
       if (isUnavailableExtensionError(message)) unavailable[name] = true
-      toast.error(`Failed to ${action} ${name}`, { description: message })
+      toast.error($t('ext.failedAction', { values: { action, name } }), { description: message })
     } finally {
       delete pending[name]
       await refresh()
@@ -89,14 +89,14 @@
     <div class="min-w-0">
       <h2 class="flex items-center gap-2 text-[13px] font-semibold text-fg">
         <Puzzle size={14} class="text-fg-3" />
-        DuckDB extensions
+        DuckDB {$t('ext.extensions')}
       </h2>
       <p class="mt-0.5 max-w-[64ch] text-xs leading-relaxed text-fg-3">
-        Extensions available to
-        <span class="font-medium text-fg-2">{connectionName ?? 'the active connection'}</span>.
+        {$t('ext.availableTo')}
+        <span class="font-medium text-fg-2">{connectionName ?? $t('ext.activeConnection')}</span>.
         {isRemote
-          ? 'They install on the remote server.'
-          : 'In the browser they download from extensions.duckdb.org, so installing needs a network connection the first time. Not every extension is built for WASM.'}
+          ? $t('ext.installRemote')
+          : $t('ext.installWasm')}
       </p>
     </div>
     <Button icon size="sm" variant="outline" disabled={refreshing} aria-label={$t('ext.refreshList')} onclick={refresh}>
@@ -154,7 +154,7 @@
                 onclick={() => run('install', ext.name)}
               >
                 {#if busy !== 'install'}<Download size={13} />{/if}
-                Install
+                {$t('ext.install')}
               </Button>
             {/if}
             {#if !ext.loaded}
@@ -166,14 +166,14 @@
                 onclick={() => run('load', ext.name)}
               >
                 {#if busy !== 'load'}<Play size={13} />{/if}
-                Load
+                {$t('ext.load')}
               </Button>
             {/if}
           </div>
         </li>
       {/each}
       {#if visible.length === 0}
-        <li class="px-3 py-4 text-center text-xs text-fg-3">No extensions match "{filter}".</li>
+        <li class="px-3 py-4 text-center text-xs text-fg-3">{$t('ext.noMatch', { values: { filter } })}</li>
       {/if}
     </ul>
   {/if}

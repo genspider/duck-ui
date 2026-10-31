@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ChevronRight, Hash, Type, Calendar, ToggleLeft, Braces } from 'lucide-svelte'
+  import { tr } from '@/lib/i18n/translate'
   import Spinner from '../common/Spinner.svelte'
   import ColumnStatsBody from './ColumnStatsBody.svelte'
   import { duckActions } from '../../stores/duck.svelte'
@@ -71,11 +72,11 @@
   {#if open}
     <div class="mb-1.5 ml-4 mt-0.5 space-y-2 rounded-md bg-surface-2 p-2 text-[11px]" role="group" aria-label="{column.name} statistics">
       {#if loading}
-        <div class="flex items-center gap-2 text-fg-3"><Spinner size="sm" /> Reading column statistics...</div>
+        <div class="flex items-center gap-2 text-fg-3"><Spinner size="sm" /> {tr('schema.loadingStats')}</div>
       {:else if failed}
-        <p class="text-danger">Could not read statistics for this column.</p>
+        <p class="text-danger">{tr('schema.loadStatsFailed')}</p>
       {:else if !stats}
-        <p class="text-fg-3">No statistics available.</p>
+        <p class="text-fg-3">{tr('schema.noStats')}</p>
       {:else}
         <ColumnStatsBody {stats} {distribution} numeric={isNumeric} />
       {/if}

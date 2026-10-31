@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatNumber, formatNumberWithSuffix } from '@/lib/chartUtils'
+  import { tr } from '@/lib/i18n/translate'
   import { HEATMAP_MAX_CATEGORIES, heatLevel, type HeatmapData } from '@/lib/heatmap'
   import { getTheme } from '../../stores/theme.svelte'
   import { chartTheme, heatColor, inkOn } from './palette'
@@ -59,12 +60,12 @@
 <div class="relative flex h-full w-full flex-col">
   {#if grid.cut}
     <p class="mb-1 text-[11px] text-fg-3">
-      Showing the first {HEATMAP_MAX_CATEGORIES} categories per axis. Filter or group the query to see the rest.
+      {tr('chart.heatmap.categoriesCut', { count: HEATMAP_MAX_CATEGORIES })}
     </p>
   {/if}
   <div class="relative min-h-0 flex-1" bind:clientWidth={width} bind:clientHeight={height}>
     {#if grid.cells.length === 0}
-      <div class="flex h-full items-center justify-center text-[13px] text-fg-3">No numeric values</div>
+      <div class="flex h-full items-center justify-center text-[13px] text-fg-3">{tr('chart.heatmap.noNumericValues')}</div>
     {:else if width > 0 && height > 0}
       <svg
         {width}
@@ -72,7 +73,7 @@
         font-family={colors.fontFamily}
         font-size="11"
         role="img"
-        aria-label="Heatmap of {valueLabel} by {xLabel} and {yLabel}, from {formatNumber(grid.min)} to {formatNumber(grid.max)}"
+        aria-label={tr('chart.heatmap.ariaLabel', { valueLabel: valueLabel, xLabel: xLabel, yLabel: yLabel, min: formatNumber(grid.min), max: formatNumber(grid.max) })}
       >
         <defs>
           <linearGradient id={gradientId}>

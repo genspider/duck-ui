@@ -138,7 +138,7 @@
       {#snippet actions()}
         <Button size="sm" variant="outline" onclick={() => (showCreate = true)}>
           <UserPlus size={14} />
-          Create New Profile
+          {tr('profile.createNew')}
         </Button>
       {/snippet}
     </SectionHeader>
@@ -154,18 +154,18 @@
             >
               <ProfileAvatar avatarEmoji={profile.avatarEmoji} size="md" />
               <span class="min-w-0 flex-1 truncate text-[13px] font-medium text-fg">{profile.name}</span>
-              <span class="text-xs text-fg-3">Switch</span>
+              <span class="text-xs text-fg-3">{tr('profile.switch')}</span>
             </button>
           </li>
         {/each}
       </ul>
     {:else}
-      <p class="text-xs text-fg-3">No other profiles yet.</p>
+      <p class="text-xs text-fg-3">{tr('profile.noOtherProfiles')}</p>
     {/if}
   </section>
 
   <section class="border-t border-edge-subtle pt-6">
-    <h2 class="mb-3 text-[13px] font-semibold text-danger">Danger Zone</h2>
+    <h2 class="mb-3 text-[13px] font-semibold text-danger">{tr('profile.dangerZone')}</h2>
     <Button
       size="sm"
       variant="danger"
@@ -174,10 +174,10 @@
       onclick={() => (showDeleteConfirm = true)}
     >
       <Trash2 size={14} />
-      Delete Profile
+      {tr('profile.deleteProfile')}
     </Button>
     {#if profiles.length <= 1}
-      <p class="mt-2 text-xs text-fg-3">Cannot delete the only profile. Create another profile first.</p>
+      <p class="mt-2 text-xs text-fg-3">{tr('profile.cannotDeleteOnly')}</p>
     {/if}
   </section>
 </div>
@@ -185,8 +185,8 @@
 <ConfirmDialog
   open={showDeleteConfirm}
   title={tr('profile.deleteTitle')}
-  description={`This will permanently delete "${currentProfile?.name ?? ''}" and all associated data including saved connections, query history, and AI configurations. This action cannot be undone.`}
-  confirmLabel="Delete"
+  description={tr('profile.deleteDesc', { name: currentProfile?.name ?? '' })}
+  confirmLabel={tr('common.delete')}
   destructive
   onconfirm={deleteProfile}
   oncancel={() => (showDeleteConfirm = false)}

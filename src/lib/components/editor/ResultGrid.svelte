@@ -85,8 +85,8 @@
           engine = null
           toast.warning(
             result?.error
-              ? `Could not filter in DuckDB, showing the loaded rows instead. ${result.error.split('\n')[0]}`
-              : 'This query cannot be filtered in DuckDB. Showing the loaded rows instead.',
+              ? $t('grid.filterDuckdbFailed', { values: { message: result.error.split('\n')[0] } })
+              : $t('grid.filterUnavailable'),
           )
           return
         }

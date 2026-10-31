@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import Modal from '../common/Modal.svelte'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
@@ -55,28 +56,28 @@
         description: description.trim() || undefined,
       })
       duckActions().bumpSavedQueriesVersion()
-      success('Query saved')
+      success($t('saved.saveSuccess'))
       onsaved?.(saved)
       onclose()
     } catch {
-      toastError('Failed to save query')
+      toastError($t('saved.saveFailed'))
     } finally {
       saving = false
     }
   }
 </script>
 
-<Modal {open} title="Save query" size="sm" {onclose}>
+<Modal {open} title={$t('saved.saveTitle')} size="sm" {onclose}>
   <form id="save-query-form" class="flex flex-col gap-4" onsubmit={save}>
-    <FormField controlWidth="full" label="Name" for="query-name">
-      <Input id="query-name" bind:ref={nameInput} bind:value={name} placeholder="Query name" />
+    <FormField controlWidth="full" label={$t('saved.saveName')} for="query-name">
+      <Input id="query-name" bind:ref={nameInput} bind:value={name} placeholder={$t('saved.saveName')} />
     </FormField>
-    <FormField controlWidth="full" label="Description (optional)" for="query-description">
-      <Textarea id="query-description" bind:value={description} placeholder="What does this query do?" rows={2} />
+    <FormField controlWidth="full" label={$t('saved.saveDesc')} for="query-description">
+      <Textarea id="query-description" bind:value={description} placeholder={$t('saved.saveDescPlaceholder')} rows={2} />
     </FormField>
   </form>
   {#snippet footer()}
-    <Button size="sm" variant="ghost" onclick={onclose} disabled={saving}>Cancel</Button>
-    <Button size="sm" type="submit" form="save-query-form" disabled={!canSave} loading={saving}>Save</Button>
+    <Button size="sm" variant="ghost" onclick={onclose} disabled={saving}>{$t('common.cancel')}</Button>
+    <Button size="sm" type="submit" form="save-query-form" disabled={!canSave} loading={saving}>{$t('saved.save')}</Button>
   {/snippet}
 </Modal>

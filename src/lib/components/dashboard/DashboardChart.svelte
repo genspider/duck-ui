@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import ChartView from '../charts/ChartView.svelte'
   import UPlotChart from '../charts/UPlotChart.svelte'
   import BoxPlotChart from '../charts/BoxPlotChart.svelte'
@@ -133,10 +134,10 @@
   </figure>
 {:else if !DRAWABLE.has(chart.config.type)}
   <div class="my-3 flex min-h-24 items-center justify-center rounded-md border border-dashed border-edge px-3 text-xs text-fg-3">
-    &lt;{block.tag}&gt; has no renderer in this version yet
+    &lt;{block.tag}&gt; {$t('dashboard.noRenderer')}
   </div>
 {:else if isSparkline}
-  <div class="my-3 h-12" role="img" aria-label={title ?? `Sparkline of ${chart.config.yAxis ?? 'values'}`}>
+  <div class="my-3 h-12" role="img" aria-label={title ?? $t('dashboard.chartSparkline', { values: { name: chart.config.yAxis ?? $t('dashboard.values') } })}>
     {#if sparkline}
       <UPlotChart options={sparkline.options} data={sparkline.data} class="h-full w-full" />
     {/if}

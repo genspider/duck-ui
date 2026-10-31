@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { Check, Copy, ShieldCheck, UserPlus, Waypoints } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
@@ -19,16 +20,16 @@
   type ShareMode = 'none' | 'all' | 'selected'
 
   const MODES: { id: ShareMode; label: string; hint: string }[] = [
-    { id: 'none', label: 'No data access', hint: 'They see the workspace. They cannot query your data.' },
+    { id: 'none', label: $t('liveSession.dataAccess.none'), hint: $t('liveSession.dataAccess.noneHint') },
     {
       id: 'all',
-      label: 'All data',
-      hint: 'Every table on this connection, including ones you add while the session is running. Read-only, copied into an isolated engine.',
+      label: $t('liveSession.dataAccess.all'),
+      hint: $t('liveSession.dataAccess.allHint'),
     },
     {
       id: 'selected',
-      label: 'Share selected tables',
-      hint: 'Read-only. Copied into an isolated engine, so the rest of your data stays out of reach.',
+      label: $t('liveSession.dataAccess.selected'),
+      hint: $t('liveSession.dataAccess.selectedHint'),
     },
   ]
 
@@ -45,7 +46,7 @@
   let copied = $state(false)
   let turnCheck = $state<TurnCheckResult | 'checking' | null>(null)
 
-  const sessionName = $derived(sessionNameDraft ?? `${profileName ?? 'My'} session`)
+  const sessionName = $derived(sessionNameDraft ?? $t('liveSession.mySession', { values: { name: profileName ?? '' } }))
   const isStarting = $derived(session.status === 'connecting')
   const hasInvite = $derived(Boolean(session.inviteUrl))
   const isConnected = $derived(session.status === 'connected')
@@ -74,9 +75,9 @@
       await navigator.clipboard.writeText(value)
       copied = true
       setTimeout(() => (copied = false), 1500)
-      toast.success('Copied')
+      toast.success($t('liveSession.copied'))
     } catch {
-      toast.error('Could not copy. Select the text and copy it manually')
+      toast.error($t('liveSession.copyFailed'))
     }
   }
 
@@ -102,7 +103,7 @@
 </script>
 
 {#snippet rowLimitField(id: string)}
-  <FormField label="Result limit (rows)" for={id} controlWidth="sm">
+  <FormField label={$t('liveSession.resultLimit')} for={id} controlWidth="sm">
     <Input
       {id}
       type="number"
@@ -117,17 +118,17 @@
 
 {#if !hasInvite}
   <div class="flex flex-col gap-5">
-    <FormField label="Session name" for="{uid}-name" controlWidth="full">
+    <FormField label={$t('liveSession.sessionName')} for="{uid}-name" controlWidth="full">
       <Input
         id="{uid}-name"
         value={sessionName}
-        placeholder="Q3 analysis"
+        placeholder={$t('liveSession.sessionNamePlaceholder')}
         oninput={(e) => (sessionNameDraft = e.currentTarget.value)}
       />
     </FormField>
 
     <fieldset class="flex flex-col gap-3">
-      <legend class="mb-2 text-xs font-medium text-fg-2">Data access</legend>
+      <legend class="mb-2 text-xs font-medium text-fg-2">{$t('liveSession.dataAccess')}</legend>
       {#each MODES as mode (mode.id)}
         <label class="flex cursor-pointer items-start gap-2">
           <input
@@ -151,9 +152,9 @@
         {@render rowLimitField(`${uid}-limit-all`)}
         <p class="text-xs text-fg-3">
           {#if tables.length === 0}
-            Nothing here yet. Tables you create or import will be shared as they appear.
+            {$t('liveSession.noTablesAll')}
           {:else}
-            {tables.length} {tables.length === 1 ? 'table' : 'tables'} now, plus whatever you add later.
+            {$t('liveSession.tablesCount', { values: { count: tables.length } })}
           {/if}
         </p>
       </div>
@@ -161,10 +162,10 @@
 
     {#if shareMode === 'selected'}
       <div class="flex flex-col gap-3 rounded-md border border-edge-subtle p-3">
-        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">Tables</p>
+        <p class="text-[11px] font-medium uppercase tracking-wide text-fg-3">{$t('liveSession.tables')}</p>
         <div class="flex max-h-40 flex-col gap-2 overflow-y-auto pr-3">
           {#if tables.length === 0}
-            <p class="text-xs text-fg-3">No tables to share on this connection.</p>
+            <p class="text-xs text-fg-3">{$t('liveSession.noTables')}</p>
           {/if}
           {#each tables as table (table.qualifiedName)}
             <label class="ds-checkbox-label">
@@ -184,7 +185,7 @@
 
     <div class="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-xs text-fg-3">
       <ShieldCheck size={14} class="mt-0.5 shrink-0 text-success" />
-      <span>Database passwords and API keys never leave this browser, whatever you share here.</span>
+      <span>{$t('liveSession.privacyNote')}</span>
     </div>
 
     {#if isTurnConfigured()}
@@ -192,10 +193,10 @@
         <Waypoints size={14} class="mt-0.5 shrink-0" />
         <span class="flex-1">
           {#if turnCheck === null}
-            This deployment has a TURN relay for strict networks.
-            <button type="button" class="underline underline-offset-2 hover:text-fg" onclick={testRelay}>Test it</button>
+            {$t('liveSession.turnRelay')}
+            <button type="button" class="underline underline-offset-2 hover:text-fg" onclick={testRelay}>{$t('liveSession.testRelay')}</button>
           {:else if turnCheck === 'checking'}
-            Asking the relay for a candidate...
+            {$t('liveSession.testingRelay')}
           {:else}
             <span class={turnCheck.reachable ? 'text-success' : 'text-danger'}>{turnCheck.detail}</span>
           {/if}
@@ -208,37 +209,37 @@
     {/if}
 
     <Button class="self-start" onclick={start} loading={isStarting} disabled={shareMode === 'selected' && selected.size === 0}>
-      Create session
+      {$t('liveSession.createSession')}
     </Button>
   </div>
 {:else}
   <div class="flex flex-col gap-5">
-    <FormField label="1. Send them this link" for="{uid}-invite" controlWidth="full">
+    <FormField label={$t('liveSession.sendLink')} for="{uid}-invite" controlWidth="full">
       <div class="flex gap-2">
         <Input id="{uid}-invite" readonly mono class="text-xs" value={session.inviteUrl ?? ''} />
-        <Button icon variant="outline" onclick={() => copy(session.inviteUrl ?? '')} aria-label="Copy invite link">
+        <Button icon variant="outline" onclick={() => copy(session.inviteUrl ?? '')} aria-label={$t('liveSession.copyLinkAria')}>
           {#if copied}<Check size={14} />{:else}<Copy size={14} />{/if}
         </Button>
       </div>
     </FormField>
 
     <FormField
-      label="2. Paste the code they send back"
+      label={$t('liveSession.pasteCode')}
       for="{uid}-code"
       controlWidth="full"
-      hint="Two links, no server. Nothing about this session touches the internet beyond your browsers finding each other."
+      hint={$t('liveSession.pasteCodeHint')}
     >
-      <Textarea id="{uid}-code" mono rows={4} bind:value={guestCode} placeholder="Paste their connection code here" />
+      <Textarea id="{uid}-code" mono rows={4} bind:value={guestCode} placeholder={$t('liveSession.pasteCodePlaceholder')} />
     </FormField>
-    <Button class="w-full" onclick={connect} disabled={!guestCode.trim()} loading={isStarting}>Connect</Button>
+    <Button class="w-full" onclick={connect} disabled={!guestCode.trim()} loading={isStarting}>{$t('liveSession.connect')}</Button>
 
     {#if isConnected}
       <div class="flex flex-col items-start gap-2 rounded-md border border-success/40 bg-success-soft p-3 text-[13px] text-fg">
-        <p>Connected · {people} {people === 1 ? 'person' : 'people'} in this session</p>
-        <p class="text-xs text-fg-3">Each invite works once. To add someone else, create a new one.</p>
+        <p>{$t('liveSession.connected')} · {people} 人</p>
+        <p class="text-xs text-fg-3">{$t('liveSession.inviteNote')}</p>
         <Button size="sm" variant="outline" onclick={() => duckActions().inviteAnotherGuest()} disabled={isStarting}>
           <UserPlus size={13} />
-          Invite someone else
+          {$t('liveSession.inviteAnother')}
         </Button>
       </div>
     {/if}

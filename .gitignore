@@ -40,3 +40,7 @@ WORK_LOG.md
 
 # agent worktrees
 .claude/worktrees/
+nul
+.pi/
+report.txt
+.vitest/

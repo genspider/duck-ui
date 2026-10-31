@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
+  import { tr } from '@/lib/i18n/translate'
   import { ChartColumn, FileText, Gauge, Sparkles, Square } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import ContextMenu, { type ContextMenuItem } from '../common/ContextMenu.svelte'
@@ -93,7 +95,7 @@
       if (response === null) return
       const summary = parseExplanation(response)
       if (!summary) {
-        toast.error('Duck Brain returned an empty explanation')
+        toast.error(tr('brain.emptyExplanation'))
         return
       }
       outcome = { kind: 'explain', summary }
@@ -121,12 +123,12 @@
 
   async function handleOptimize() {
     if (!isSingleReadOnlyQuery(sql)) {
-      toast.info('Optimize works on a single read-only query (SELECT / WITH / FROM).')
+      toast.info(tr('brain.optimizeReadonly'))
       return
     }
     const { currentSession, maxResultRows, databases, tabs, runBrainTask } = duckActions()
     if (!currentSession) {
-      toast.error('No active connection')
+      toast.error(tr('brain.noActiveConnection'))
       return
     }
     // EXPLAIN needs the $param values bound, the model still sees the placeholders.
@@ -146,7 +148,7 @@
       )
       if (signal.aborted) return
       if (explained.error) {
-        toast.error(`EXPLAIN failed: ${explained.error}`)
+        toast.error(tr('brain.explainFailed', { message: explained.error }))
         return
       }
       const plan = extractPlanText(explained.data)
@@ -163,7 +165,7 @@
       }
       outcome = { kind: 'optimize', sql: parsed.sql, reasons: parsed.reasons, unchanged: parsed.unchanged }
     } catch (error) {
-      toast.error(`Optimize failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      toast.error(tr('brain.optimizeFailed', { message: error instanceof Error ? error.message : 'Unknown error' }))
     } finally {
       if (controller?.signal === signal) {
         controller = null
@@ -175,7 +177,7 @@
   async function handleSuggestChart() {
     const numericColumns = result.columns.filter((col) => isNumericColumn(result.data, col))
     if (numericColumns.length === 0) {
-      toast.info('This result has no numeric column to chart.')
+      toast.info(tr('brain.noNumericColumn'))
       return
     }
     const signal = begin('chart')
@@ -199,9 +201,9 @@
       duckActions().updateTabChartConfig(tabId, config)
       onchartapplied?.()
       if (fromModel) {
-        toast.success('Chart suggested by Duck Brain')
+        toast.success(tr('brain.chartSuggested'))
       } else {
-        toast.warning("Duck Brain's chart suggestion was not usable, showing the automatic chart")
+        toast.warning(tr('brain.chartUnusable'))
       }
     } finally {
       if (controller?.signal === signal) {
@@ -215,13 +217,13 @@
     if (outcome?.kind !== 'optimize') return
     duckActions().updateTabQuery(tabId, outcome.sql)
     outcome = null
-    toast.success("Duck Brain's rewrite applied. Review it and run again.")
+    toast.success(tr('brain.rewriteApplied'))
   }
 
   const menuItems: ContextMenuItem[] = [
-    { id: 'explain', label: 'Explain results', icon: FileText, onSelect: handleExplain },
-    { id: 'optimize', label: 'Optimize query', icon: Gauge, onSelect: () => void handleOptimize() },
-    { id: 'chart', label: 'Suggest chart', icon: ChartColumn, onSelect: () => void handleSuggestChart() },
+    { id: 'explain', label: $t('brain.explain'), icon: FileText, onSelect: handleExplain },
+    { id: 'optimize', label: $t('brain.optimize'), icon: Gauge, onSelect: () => void handleOptimize() },
+    { id: 'chart', label: $t('brain.suggestChart'), icon: ChartColumn, onSelect: () => void handleSuggestChart() },
   ]
 
   function toggleMenu(e: MouseEvent) {
@@ -244,15 +246,15 @@
     onclick={toggleMenu}
   >
     {#if busy}
-      <span class="inline-flex" role="status" aria-label="Working"><Sparkles size={14} class="animate-pulse" /></span>
-      Duck Brain is thinking...
+      <span class="inline-flex" role="status" aria-label={$t('brain.thinking')}><Sparkles size={14} class="animate-pulse" /></span>
+      {$t('brain.thinking')}
     {:else}
       <Sparkles size={14} />
       Duck Brain
     {/if}
   </Button>
   {#if busy}
-    <Button size="xs" variant="ghost" icon title="Stop" aria-label="Stop Duck Brain" onclick={stop}>
+    <Button size="xs" variant="ghost" icon title={$t('brain.stop')} aria-label={$t('brain.stop')} onclick={stop}>
       <Square size={12} />
     </Button>
   {/if}
@@ -261,27 +263,26 @@
 
   <Modal
     open={consentOpen}
-    title="Send sample rows to {destination}?"
+    title={$t('brain.sendToTitle', { values: { destination } })}
     size="md"
     onclose={() => (consentOpen = false)}
   >
     <div class="space-y-2 text-[13px] leading-relaxed text-fg-2">
       <p>
-        Duck Brain normally sends only your schema. To explain these results it needs to send actual data from this
-        result to <strong class="font-semibold text-fg">{destination}</strong>:
+        {$t('brain.consentExplain')} <strong class="font-semibold text-fg">{destination}</strong>：
       </p>
       <ul class="list-disc space-y-1 pl-5">
-        <li>the query text and column names and types</li>
+        <li>{$t('brain.consentBulletQuery')}</li>
         <li>
-          the first {RESULT_SAMPLE_MAX_ROWS} rows (each value cut to {RESULT_SAMPLE_MAX_CELL_CHARS} characters)
+          {$t('brain.consentBulletRows', { values: { max: RESULT_SAMPLE_MAX_ROWS, chars: RESULT_SAMPLE_MAX_CELL_CHARS } })}
         </li>
-        <li>per-column counts, null counts and numeric min / max / mean</li>
+        <li>{$t('brain.consentBulletStats')}</li>
       </ul>
-      <p>This is asked every time. Nothing is sent if you cancel.</p>
+      <p>{$t('brain.consentMsg')}</p>
     </div>
     {#snippet footer()}
-      <Button size="sm" variant="outline" onclick={() => (consentOpen = false)}>Cancel</Button>
-      <Button size="sm" onclick={confirmConsent}>Send and explain</Button>
+      <Button size="sm" variant="outline" onclick={() => (consentOpen = false)}>{$t('common.cancel')}</Button>
+      <Button size="sm" onclick={confirmConsent}>{$t('brain.sendAndExplain')}</Button>
     {/snippet}
   </Modal>
 
@@ -293,12 +294,12 @@
 
   <Modal
     open={outcome !== null}
-    title={outcome?.kind === 'optimize' ? 'Optimized query' : 'Result explanation'}
+    title={outcome?.kind === 'optimize' ? $t('brain.optimizedQuery') : $t('brain.resultExplanation')}
     description={outcome?.kind === 'optimize'
       ? outcome.unchanged
-        ? 'Duck Brain thinks this query is already efficient.'
-        : 'Suggested by Duck Brain from the EXPLAIN plan and schema. Review before running.'
-      : 'Written by Duck Brain from a small sample. Check anything important.'}
+        ? $t('brain.alreadyEfficient')
+        : $t('brain.descOptimized')
+      : $t('brain.descExplained')}
     size="lg"
     onclose={() => (outcome = null)}
     footer={outcome?.kind === 'optimize' && !outcome.unchanged ? applyFooter : undefined}
@@ -318,6 +319,6 @@
 {/if}
 
 {#snippet applyFooter()}
-  <Button size="sm" variant="outline" onclick={() => (outcome = null)}>Close</Button>
-  <Button size="sm" onclick={handleApplyOptimized}>Apply to editor</Button>
+  <Button size="sm" variant="outline" onclick={() => (outcome = null)}>{$t('common.close')}</Button>
+  <Button size="sm" onclick={handleApplyOptimized}>{$t('brain.applyToEditor')}</Button>
 {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { tick } from 'svelte'
   import { ArrowDown, Bot, Columns3, Table2, User } from 'lucide-svelte'
   import AssistantMessage from './AssistantMessage.svelte'
@@ -68,14 +69,14 @@
   <div class="flex min-h-0 flex-1 items-center justify-center p-4">
     <div class="text-center text-fg-3">
       <Bot size={40} class="mx-auto mb-3 opacity-50" />
-      <p class="text-[13px] font-medium text-fg-2">Hi! I'm Duck Brain</p>
-      <p class="mt-1 text-xs">Ask me to write SQL queries for your data</p>
+      <p class="text-[13px] font-medium text-fg-2">{$t('brain.greeting')}</p>
+      <p class="mt-1 text-xs">{$t('brain.emptyHint')}</p>
     </div>
   </div>
 {:else}
   <div class="relative flex min-h-0 flex-1 flex-col">
     <div bind:this={scroller} class="min-h-0 flex-1 overflow-y-auto" onscroll={handleScroll}>
-      <div bind:this={inner} class="space-y-4 p-3" role="log" aria-label="Conversation">
+    <div bind:this={inner} class="space-y-4 p-3" role="log" aria-label={$t('brain.conversation')}>
         {#each messages as message (message.id)}
           <div class="flex gap-2.5 {message.role === 'user' ? 'justify-end' : 'justify-start'}">
             {#if message.role === 'assistant'}
@@ -119,7 +120,7 @@
                 <StreamingMarkdown content={streamingContent} />
               </div>
             {:else}
-              <div class="rounded-lg rounded-bl-sm bg-surface-2 px-3 py-2.5" role="status" aria-label="Duck Brain is thinking">
+              <div class="rounded-lg rounded-bl-sm bg-surface-2 px-3 py-2.5" role="status" aria-label={$t('brain.isThinking')}>
                 <div class="flex gap-1">
                   <span class="h-2 w-2 animate-bounce rounded-full bg-fg-4"></span>
                   <span class="h-2 w-2 animate-bounce rounded-full bg-fg-4 [animation-delay:150ms]"></span>
@@ -139,7 +140,7 @@
         onclick={jumpToLatest}
       >
         <ArrowDown size={13} />
-        Latest
+        {$t('brain.latest')}
       </button>
     {/if}
   </div>

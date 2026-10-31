@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n/translate";
 import type { ChartConfig } from "@/store/types";
 
 /**
@@ -40,8 +41,8 @@ export const demoDatasets: DemoDataset[] = [
   {
     id: "seattle-weather",
     name: "Seattle Weather",
-    description: "Four years of daily weather — average high temperature by month.",
-    rows: "1.4K rows",
+    description: tr("demo.seattleWeather"),
+    rows: "1.4K 行",
     source: "vega-datasets · CSV",
     stage: {
       url: "https://raw.githubusercontent.com/vega/vega-datasets/main/data/seattle-weather.csv",
@@ -58,8 +59,8 @@ ORDER BY month;`,
   {
     id: "train-services",
     name: "Dutch Train Services",
-    description: "380K real railway stops — find the busiest stations in the network.",
-    rows: "380K rows",
+    description: tr("demo.trainServices"),
+    rows: "380K 行",
     source: "blobs.duckdb.org · Parquet",
     query: `-- Busiest stations by number of stops
 SELECT
@@ -74,8 +75,8 @@ LIMIT 15;`,
   {
     id: "stations",
     name: "Train Stations",
-    description: "578 European train stations by country and type.",
-    rows: "578 rows",
+    description: tr("demo.stations"),
+    rows: "578 行",
     source: "blobs.duckdb.org · Parquet",
     query: `-- Stations per country
 SELECT
@@ -89,8 +90,8 @@ ORDER BY stations DESC;`,
   {
     id: "star-trek",
     name: "Star Trek S1 🖖",
-    description: "A fun one — redshirts lost per episode of the original series.",
-    rows: "30 rows",
+    description: tr("demo.starTrek"),
+    rows: "30 行",
     source: "blobs.duckdb.org · CSV",
     stage: {
       url: "https://blobs.duckdb.org/data/Star_Trek-Season_1.csv",

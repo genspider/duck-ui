@@ -40,10 +40,10 @@
   const CLOUD_LABEL: Record<CloudProvider, string> = { openai: 'OpenAI', anthropic: 'Anthropic' }
 
   const providers: { value: AIProviderType; label: string; icon: typeof Server }[] = [
-    { value: 'openai-compatible', label: 'Local server (Ollama)', icon: Server },
-    { value: 'openai', label: 'OpenAI', icon: Cloud },
-    { value: 'anthropic', label: 'Anthropic', icon: Cloud },
-    { value: 'webllm', label: 'In-browser (experimental)', icon: FlaskConical },
+    { value: 'openai-compatible', label: $t('ai.localServer'), icon: Server },
+    { value: 'openai', label: $t('ai.openai'), icon: Cloud },
+    { value: 'anthropic', label: $t('ai.anthropic'), icon: Cloud },
+    { value: 'webllm', label: $t('ai.webllm'), icon: FlaskConical },
   ]
 
   const brain = $derived(duck((s) => s.duckBrain))
@@ -84,11 +84,11 @@
       if (result.models.length > 0) {
         foundModels = result.models
         if (!modelId || !result.models.includes(modelId)) modelId = result.models[0]
-        toast.success(`Found ${result.models.length} model${result.models.length === 1 ? '' : 's'}`)
+        toast.success($t('ai.foundModels', { values: { count: result.models.length } }))
       } else {
         foundModels = []
         toast.error(
-          result.error ? `Couldn't list models: ${result.error}` : 'The server answered but offers no models',
+          result.error ? $t('ai.listModelsFailed', { values: { message: result.error } }) : $t('ai.noModelsFound'),
         )
       }
     } finally {
@@ -98,7 +98,7 @@
 
   async function saveCompatible() {
     if (!baseUrl || !modelId) {
-      toast.error('A base URL and a model are both needed')
+      toast.error($t('ai.needBaseUrlAndModel'))
       return
     }
     testing = true
@@ -109,9 +109,9 @@
       if (result.success) {
         duckActions().updateProviderConfig('openai-compatible', config)
         duckActions().setAIProvider('openai-compatible')
-        toast.success(`Connected. Duck Brain now uses ${modelId}.`)
+        toast.success($t('ai.connectedUsing', { values: { model: modelId } }))
       } else {
-        toast.error(`Connection failed: ${result.error ?? 'unknown error'}`)
+        toast.error($t('ai.connectionFailed', { values: { message: result.error ?? 'unknown error' } }))
       }
     } finally {
       testing = false
@@ -121,7 +121,7 @@
   async function saveCloudKey(provider: CloudProvider) {
     const apiKey = apiKeys[provider]
     if (!apiKey) {
-      toast.error('Enter an API key first')
+      toast.error($t('ai.enterApiKey'))
       return
     }
     const model = providerConfigs[provider]?.modelId || DEFAULT_CLOUD_MODEL[provider]
@@ -133,12 +133,12 @@
       const result = await testProviderConnection(provider, { apiKey, modelId: model })
       if (result.success) {
         duckActions().setAIProvider(provider)
-        toast.success(`${CLOUD_LABEL[provider]} key verified`)
+        toast.success($t('ai.keyVerified', { values: { provider: CLOUD_LABEL[provider] } }))
       } else {
-        toast.error(`Connection failed: ${result.error}`)
+        toast.error($t('ai.connectionFailed', { values: { message: result.error ?? 'unknown error' } }))
       }
     } catch {
-      toast.success('API key saved')
+      toast.success($t('ai.apiKeySaved'))
     } finally {
       testing = false
     }
@@ -175,9 +175,9 @@
           }
         }
       }
-      toast.success(cleared > 0 ? `Cleared ${cleared} cached items. Reload to finish.` : 'No cached model data.')
+      toast.success(cleared > 0 ? $t('ai.clearedCache', { values: { count: cleared } }) : $t('ai.noCachedModel'))
     } catch {
-      toast.error("Couldn't clear the cache. Try your browser's site-data settings.")
+      toast.error($t('ai.clearCacheFailed'))
     } finally {
       clearing = false
     }
@@ -191,7 +191,7 @@
   <button
     type="button"
     class="absolute inset-y-0 right-0 inline-flex w-8 items-center justify-center rounded-md text-fg-3 hover:text-fg"
-    aria-label={showKey[id] ? 'Hide API key' : 'Show API key'}
+    aria-label={showKey[id] ? $t('ai.hideApiKey') : $t('ai.showApiKey')}
     aria-pressed={!!showKey[id]}
     onclick={() => (showKey[id] = !showKey[id])}
   >
@@ -205,7 +205,7 @@
     description={$t('ai.providerDesc')}
   >
     <div class="flex flex-col gap-4">
-      <div class="flex flex-wrap gap-2" role="group" aria-label="AI provider">
+      <div class="flex flex-wrap gap-2" role="group" aria-label={$t('ai.providerTitle')}>
         {#each providers as provider (provider.value)}
           <Button
             size="sm"
@@ -227,7 +227,7 @@
           </div>
 
           <div>
-            <label class={labelClass} for="ai-base-url">Server</label>
+            <label class={labelClass} for="ai-base-url">{$t('ai.server')}</label>
             <div class="mb-2 flex flex-wrap gap-2">
               {#each LOCAL_PRESETS as preset (preset.label)}
                 <Button
@@ -321,7 +321,7 @@
           <div>
             <label class={labelClass} for="{provider}-key">
               <Key size={13} class="text-fg-3" />
-              {CLOUD_LABEL[provider]} API key
+              {CLOUD_LABEL[provider]} {$t('ai.apiKeyLabel', { values: { provider: '' } })}
             </label>
             <div class="flex gap-2">
               <div class="relative min-w-0 flex-1">
@@ -336,17 +336,16 @@
                 {@render keyToggle(provider)}
               </div>
               <Button disabled={!apiKeys[provider]} loading={testing} onclick={() => saveCloudKey(provider)}>
-                Save
+                {$t('ai.save')}
               </Button>
             </div>
             <p class="mt-1 text-xs text-fg-3">
-              Stored encrypted on this device, sent only to
-              {provider === 'openai' ? 'api.openai.com' : 'api.anthropic.com'}.
+              {$t('ai.encryptedNote', { values: { host: provider === 'openai' ? 'api.openai.com' : 'api.anthropic.com' } })}
             </p>
           </div>
 
           <div>
-            <label class={labelClass} for="{provider}-model">Model</label>
+            <label class={labelClass} for="{provider}-model">{$t('ai.model')}</label>
             <Select
               id="{provider}-model"
               value={providerConfigs[provider]?.modelId || DEFAULT_CLOUD_MODEL[provider]}
@@ -362,7 +361,7 @@
             <div>
               <Badge tone="success">
                 <Check size={11} />
-                API key configured
+                {$t('ai.apiKeyConfigured')}
               </Badge>
             </div>
           {/if}
@@ -373,9 +372,8 @@
         <div class={noteClass}>
           <FlaskConical size={14} class="mt-0.5 shrink-0 text-fg-3" />
           <p>
-            <strong class="font-semibold text-fg">Experimental.</strong> Small models running inside this tab via
-            WebGPU: a gigabyte-plus download, short context, and noticeably weaker SQL than a local Ollama. Its one
-            real advantage is needing nothing installed, including offline.
+            <strong class="font-semibold text-fg">{$t('ai.experimental')}</strong>
+            {$t('ai.webllmNote')}
           </p>
         </div>
       {/if}
@@ -393,10 +391,10 @@
       <span class="min-w-0">
         <span class="flex items-center gap-2 text-[13px] font-semibold text-fg">
           <FlaskConical size={14} class="text-fg-3" />
-          In-browser models (experimental)
+          {$t('ai.webllmSectionTitle')}
         </span>
         <span class="mt-0.5 block text-xs text-fg-3">
-          Zero-install, works offline. Weak at SQL, prefer a local server if you can run one.
+          {$t('ai.webllmSectionDesc')}
         </span>
       </span>
       <ChevronDown size={14} class="mt-0.5 shrink-0 text-fg-3 transition-transform {webllmExpanded ? 'rotate-180' : ''}" />
@@ -407,7 +405,7 @@
         {#if brain.isWebGPUSupported === false}
           <div class="flex gap-2 rounded-md bg-danger-soft p-3 text-xs text-danger" role="alert">
             <AlertCircle size={14} class="mt-0.5 shrink-0" />
-            <p>This browser has no WebGPU, which in-browser models require. Every other provider still works.</p>
+            <p>{$t('ai.noWebGPU')}</p>
           </div>
         {/if}
 
@@ -416,14 +414,14 @@
             <div class="flex items-center justify-between text-[13px]">
               <span class="flex items-center gap-2 text-fg-2">
                 <Spinner size="sm" class="text-accent" />
-                {brain.modelStatus === 'downloading' ? 'Downloading model...' : 'Loading model...'}
+                {brain.modelStatus === 'downloading' ? $t('ai.downloadingModel') : $t('ai.loadingModel')}
               </span>
               <span class="tabular-nums text-fg-3">{brain.downloadProgress}%</span>
             </div>
             <div
               class="h-1.5 overflow-hidden rounded-full bg-surface-2"
               role="progressbar"
-              aria-label="Model download progress"
+              aria-label={$t('ai.modelDownloadProgress')}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={brain.downloadProgress}
@@ -453,7 +451,7 @@
                   {#if isActive}
                     <Badge tone="success">
                       <Check size={11} />
-                      Active
+                      {$t('ai.active')}
                     </Badge>
                   {/if}
                 </div>
@@ -463,7 +461,7 @@
                     <HardDrive size={12} />
                     {model.size}
                   </span>
-                  <span>Context: {model.contextLength.toLocaleString()} tokens</span>
+                  <span>{$t('ai.contextTokens', { values: { count: model.contextLength.toLocaleString() } })}</span>
                 </div>
               </div>
               <Button
@@ -471,14 +469,14 @@
                 variant="outline"
                 disabled={isActive || isDownloading || brain.isWebGPUSupported === false}
                 loading={isLoadingThis}
-                aria-label={isActive ? 'Model loaded' : isLoadingThis ? 'Loading model' : `Load ${model.displayName}`}
+                aria-label={isActive ? $t('ai.modelLoaded') : isLoadingThis ? $t('ai.loadingModel') : $t('ai.loadModel', { values: { name: model.displayName } })}
                 onclick={() => loadWebllmModel(model.id)}
               >
                 {#if isActive}
                   <Check size={14} />
                 {:else if !isLoadingThis}
                   <Download size={14} />
-                  Load
+                  {$t('ai.load')}
                 {/if}
               </Button>
             </li>
@@ -486,10 +484,10 @@
         </ul>
 
         <div class="flex items-center justify-between gap-3 border-t border-edge-subtle pt-3">
-          <p class="text-xs text-fg-3">Models cache in this browser's storage.</p>
+          <p class="text-xs text-fg-3">{$t('ai.cacheNote')}</p>
           <Button size="sm" variant="outline" loading={clearing} onclick={clearWebllmCache}>
             {#if !clearing}<Trash2 size={14} />{/if}
-            Clear cache
+            {$t('ai.clearCache')}
           </Button>
         </div>
       </div>

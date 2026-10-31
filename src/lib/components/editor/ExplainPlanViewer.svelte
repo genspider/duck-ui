@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import Sheet from '../common/Sheet.svelte'
 
   interface Props {
@@ -39,7 +40,7 @@
   )
 </script>
 
-<Sheet {open} title="Explain analyze" description="Query execution plan from DuckDB" size="lg" {onclose}>
+<Sheet {open} title={$t('explain.analyze')} description={$t('explain.desc')} size="lg" {onclose}>
   <pre class="overflow-x-auto whitespace-pre font-mono text-xs leading-relaxed text-fg-2">{#if explainText.trim()}{#each lines as line}<span class={line.tone}>{line.text}
-</span>{/each}{:else}No explain plan available{/if}</pre>
+</span>{/each}{:else}{$t('explain.noPlan')}{/if}</pre>
 </Sheet>

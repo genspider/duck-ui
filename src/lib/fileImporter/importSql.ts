@@ -113,7 +113,7 @@ export function buildColumnSelection(columns: SchemaColumn[]): string {
       if (typeChanged(column)) {
         return `CAST(${source} AS ${castType(column.type)}) AS ${sqlEscapeIdentifier(name)}`;
       }
-      return name !== column.originalName ? `${source} AS ${sqlEscapeIdentifier(name)}` : source;
+      return name === column.originalName ? source : `${source} AS ${sqlEscapeIdentifier(name)}`;
     })
     .join(", ");
 }
@@ -125,4 +125,48 @@ export function buildCreateAs(
   query: string
 ): string {
   return `CREATE OR REPLACE ${createType} ${sqlEscapeIdentifier(tableName.trim())} AS ${query}`;
+}
+
+/** `DROP TABLE IF EXISTS "name"`, before an insert that creates as it writes. */
+export function buildDropTable(tableName: string): string {
+  return `DROP TABLE IF EXISTS ${sqlEscapeIdentifier(tableName)}`;
+}
+
+/** `ATTACH DATABASE 'file' AS "name"`, which lands a .duckdb file as a catalog. */
+export function buildAttachDatabase(fileName: string, tableName: string): string {
+  return `ATTACH DATABASE '${sqlEscapeString(fileName)}' AS ${sqlEscapeIdentifier(tableName)}`;
+}
+
+/**
+ * The CREATE-AS statement importing a staged file, through the reader for its
+ * extension: `read_csv` with the collected options, `read_json` with the
+ * sniffer on, and anything else through its `read_<ext>` table function.
+ */
+export function buildImportTable(
+  createType: "TABLE" | "VIEW",
+  tableName: string,
+  fileName: string,
+  fileType: string,
+  csvOptions?: string,
+  xlsxOptions?: { allVarchar: boolean }
+): string {
+  const file = quoted(fileName);
+  const kind = fileType.toLowerCase();
+  const read =
+    kind === "csv"
+      ? `read_csv(${file}, ${csvOptions ?? buildCsvReadOptions()})`
+      : kind === "json"
+        ? `read_json(${file}, auto_detect=true, ignore_errors=true)`
+        : kind === "xlsx" || kind === "xls"
+          ? `read_xlsx(${file}${xlsxOptions?.allVarchar ? ", all_varchar=true" : ""})`
+          : `read_${kind}(${file})`;
+  return buildCreateAs(createType, tableName, `SELECT * FROM ${read}`);
+}
+
+/** The COUNT(*) probe confirming the statement above created what it claims. */
+export function buildImportVerification(tableName: string, database: string): string {
+  return `SELECT COUNT(*) AS count
+    FROM information_schema.tables
+    WHERE table_name = '${sqlEscapeString(tableName)}'
+      AND table_catalog = '${sqlEscapeString(database)}'`;
 }

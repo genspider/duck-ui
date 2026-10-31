@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { Lock, UserPlus } from 'lucide-svelte'
   import type { Profile } from '@/store/types'
   import Modal from '../common/Modal.svelte'
@@ -83,12 +84,12 @@
   <div class="relative w-full max-w-3xl text-center">
     <ProfileAvatar avatarEmoji="logo" size="xl" class="mx-auto" />
     <h1 class="mt-5 text-2xl font-semibold text-fg">
-      {profiles.length === 0 ? 'Welcome to Duck-UI' : 'Choose profile'}
+      {profiles.length === 0 ? $t('profile.picker.welcome') : $t('profile.picker.choose')}
     </h1>
     <p class="mt-1 text-[13px] text-fg-3">
       {profiles.length === 0
-        ? 'Create a profile to keep your queries, connections and settings in this browser.'
-        : 'Everything stays in this browser.'}
+        ? $t('profile.picker.welcomeDesc')
+        : $t('profile.picker.chooseDesc')}
     </p>
 
     {#if error}
@@ -106,9 +107,9 @@
             <ProfileAvatar avatarEmoji={profile.avatarEmoji} size="lg" />
             <span class="flex items-center gap-1.5 text-[13px] font-medium text-fg">
               {profile.name}
-              {#if profile.hasPassword}<Lock size={12} class="text-fg-3" aria-label="Password protected" />{/if}
+              {#if profile.hasPassword}<Lock size={12} class="text-fg-3" aria-label={$t('profile.picker.lockedAria')} />{/if}
             </span>
-            <span class="text-xs text-fg-3">Active {formatRelativeTime(profile.lastActive)}</span>
+            <span class="text-xs text-fg-3">{$t('profile.picker.activeAt', { values: { time: formatRelativeTime(profile.lastActive) } })}</span>
           </button>
         {/each}
       </div>
@@ -117,38 +118,38 @@
         {#if busy}<Spinner size="sm" />{/if}
         <Button variant="outline" onclick={() => (creating = true)} disabled={busy}>
           <UserPlus size={14} />
-          New profile
+          {$t('profile.picker.newProfile')}
         </Button>
       </div>
     {:else}
       <div class="mt-8">
         <Button onclick={() => (creating = true)}>
           <UserPlus size={14} />
-          Create profile
+          {$t('profile.picker.createProfile')}
         </Button>
       </div>
     {/if}
   </div>
 </div>
 
-<Modal open={creating} title="New profile" size="sm" onclose={() => (creating = false)}>
+<Modal open={creating} title={$t('profile.picker.newProfileTitle')} size="sm" onclose={() => (creating = false)}>
   <ProfileEditor mode="create" loading={busy} onsave={create} oncancel={() => (creating = false)} />
 </Modal>
 
 <Modal
   open={locked !== null}
-  title={locked ? `Unlock ${locked.name}` : ''}
-  description="Enter the profile password."
+  title={locked ? $t('profile.picker.unlockTitle', { values: { name: locked.name } }) : ''}
+  description={$t('profile.picker.unlockDesc')}
   size="sm"
   onclose={() => (locked = null)}
 >
   <form class="flex flex-col gap-4" onsubmit={unlock}>
-    <FormField controlWidth="full" label="Password" for="unlock-password" error={passwordError}>
+    <FormField controlWidth="full" label={$t('profile.picker.passwordLabel')} for="unlock-password" error={passwordError}>
       <Input id="unlock-password" type="password" bind:value={password} invalid={!!passwordError} autocomplete="current-password" />
     </FormField>
     <div class="flex justify-end gap-2">
-      <Button variant="ghost" onclick={() => (locked = null)}>Cancel</Button>
-      <Button type="submit" disabled={!password} loading={busy}>Unlock</Button>
+      <Button variant="ghost" onclick={() => (locked = null)}>{$t('common.cancel')}</Button>
+      <Button type="submit" disabled={!password} loading={busy}>{$t('profile.picker.unlock')}</Button>
     </div>
   </form>
 </Modal>

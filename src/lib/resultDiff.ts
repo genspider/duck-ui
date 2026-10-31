@@ -14,6 +14,8 @@
  *   as one removed plus one added, and duplicates are counted, not collapsed.
  */
 
+import { tr } from "./i18n/translate";
+
 export type DiffRow = Record<string, unknown>;
 
 /** Default row cap for a pinned result. */
@@ -303,7 +305,7 @@ export const diffResults = (
   const missing = keyColumns.filter((c) => !schema.common.includes(c));
   if (missing.length > 0) {
     throw new ResultDiffError(
-      `Key column${missing.length > 1 ? "s" : ""} not present in both results: ${missing.join(", ")}`
+      tr("diff.keyMissing", { count: missing.length, columns: missing.join(", ") })
     );
   }
 

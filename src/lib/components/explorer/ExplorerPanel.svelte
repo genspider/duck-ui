@@ -155,8 +155,8 @@
           size="compact"
           icon={Database}
           title={$t('explorer.noData')}
-          description="Drop a file here, import one, or run CREATE TABLE."
-          primary={canImport ? { label: 'Import data', onclick: () => (importerOpen = true) } : undefined}
+          description={$t('explorer.emptyDesc')}
+          primary={canImport ? { label: $t('explorer.importData'), onclick: () => (importerOpen = true) } : undefined}
         />
       {:else}
         <SchemaTree {search} />

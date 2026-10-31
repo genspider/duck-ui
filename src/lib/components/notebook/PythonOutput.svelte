@@ -1,5 +1,6 @@
 <script lang="ts">
   import CellResults from './CellResults.svelte'
+  import { tr } from '@/lib/i18n/translate'
   import type { ChartConfig, PythonCellOutput } from '@/store/types'
   import type { PythonLiveState } from './cells'
 
@@ -45,23 +46,22 @@
       <CellResults result={output.table} {chartConfig} {onchartconfigchange} />
       {#if output.table.truncated}
         <div class="px-3 py-1 text-fg-3">
-          Showing first {output.table.data.length.toLocaleString()} of
-          {output.table.rowCount.toLocaleString()} rows.
+          {tr('notebook.cell.showingRows', { shown: output.table.data.length.toLocaleString(), total: output.table.rowCount.toLocaleString() })}
         </div>
       {/if}
     {:else}
-      <div class="px-3 py-2 text-fg-3">Empty DataFrame ({output.table.columns.length} columns).</div>
+      <div class="px-3 py-2 text-fg-3">{tr('notebook.cell.emptyDataFrame', { columns: output.table.columns.length })}</div>
     {/if}
   {/if}
   {#each output?.images ?? [] as image, index (index)}
     <!-- Matplotlib draws on white, so the frame is white in both themes. -->
     <div class="bg-white px-3 py-2">
-      <img src="data:image/png;base64,{image}" alt="Figure {index + 1}" class="h-auto max-w-full" />
+      <img src="data:image/png;base64,{image}" alt={tr('notebook.cell.figure', { n: index + 1 })} class="h-auto max-w-full" />
     </div>
   {/each}
   {#if isEmpty}
     <div class="px-3 py-2 text-fg-3">
-      Ran successfully{output?.durationMs !== undefined ? ` in ${output.durationMs} ms` : ''}.
+      {tr('notebook.cell.ranSuccessfully', { duration: output?.durationMs })}
     </div>
   {/if}
 </div>

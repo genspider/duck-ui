@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { tick } from 'svelte'
   import { Send, Square } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
@@ -25,7 +26,7 @@
     onabort,
     generating,
     disabled = false,
-    placeholder = 'Ask Duck Brain to write SQL... (@ for tables)',
+    placeholder = $t('brain.askPlaceholder'),
     databases = [],
     baselineTokens,
   }: Props = $props()
@@ -47,7 +48,7 @@
 
   // Auto-resize with the draft, up to MAX_HEIGHT, then the textarea scrolls.
   $effect(() => {
-    input
+    void input
     if (!textarea) return
     textarea.style.height = 'auto'
     textarea.style.height = `${Math.min(textarea.scrollHeight, MAX_HEIGHT)}px`
@@ -175,7 +176,7 @@
       {placeholder}
       disabled={disabled || generating}
       role="combobox"
-      aria-label="Message Duck Brain"
+      aria-label={$t('brain.messageDuckBrain')}
       aria-autocomplete="list"
       aria-expanded={autocompleteOpen}
       aria-controls={autocompleteOpen ? listId : undefined}
@@ -197,11 +198,11 @@
 
     <div class="absolute bottom-1 right-1">
       {#if generating}
-        <Button icon variant="ghost" size="sm" class="text-danger hover:text-danger" aria-label="Stop generating" onclick={() => onabort?.()}>
+        <Button icon variant="ghost" size="sm" class="text-danger hover:text-danger" aria-label={$t('brain.stopGenerating')} onclick={() => onabort?.()}>
           <Square size={14} />
         </Button>
       {:else}
-        <Button icon variant="ghost" size="sm" type="submit" disabled={!input.trim() || disabled} aria-label="Send message">
+        <Button icon variant="ghost" size="sm" type="submit" disabled={!input.trim() || disabled} aria-label={$t('brain.sendMessage')}>
           {#if disabled}
             <Spinner size="sm" class="h-3.5 w-3.5" />
           {:else}
@@ -216,9 +217,9 @@
   {#if baselineTokens !== undefined}
     <div
       class="select-none px-1 pt-1 text-[10px] text-fg-3"
-      title="Rough estimate of tokens sent with this request (schema context, chat history, system prompt, and your message)"
+      title={$t('brain.tokenEstimate')}
     >
-      ~{formatTokenCount(baselineTokens + estimateTokens(input))} tokens will be sent
+      ~{formatTokenCount(baselineTokens + estimateTokens(input))} {$t('brain.tokensSent')}
     </div>
   {/if}
 </form>

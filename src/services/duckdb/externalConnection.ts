@@ -1,5 +1,6 @@
 import { rawResultToJSON } from "./resultParser";
 import { sqlEscapeString, qualifyTable } from "@/lib/sqlSanitize";
+import { tr } from "@/lib/i18n/translate";
 import type { QueryResult, ColumnInfo, TableInfo, DatabaseInfo } from "@/store/types";
 
 /**
@@ -31,10 +32,10 @@ const buildConnectionUrl = (host: string, port?: string | number): string => {
   if (port) {
     try {
       const parsed = new URL(url);
-      if (!parsed.port) {
-        parsed.port = String(port);
+      if (parsed.port) {
         url = parsed.toString();
       } else {
+        parsed.port = String(port);
         url = parsed.toString();
       }
     } catch {
@@ -62,7 +63,7 @@ export const executeExternalQuery = async (
   signal?: AbortSignal
 ): Promise<QueryResult> => {
   if (!connection.host) {
-    throw new Error("Host must be defined for external connections.");
+    throw new Error(tr("connection.hostRequired"));
   }
 
   const url = buildConnectionUrl(connection.host, connection.port);
@@ -91,23 +92,21 @@ export const executeExternalQuery = async (
     if (!response.ok) {
       const errorText = await response.text();
       if (response.status === 401) {
-        throw new Error("Authentication failed - check your credentials");
+        throw new Error(tr("connection.authFailed"));
       } else if (response.status === 404) {
-        throw new Error(`Cannot reach server at ${url}`);
+        throw new Error(tr("connection.cannotReach", { url }));
       }
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+      throw new Error(tr("connection.httpError", { status: response.status, message: errorText }));
     }
 
     const rawResult = await response.text();
     return rawResultToJSON(rawResult);
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("Query cancelled");
+      throw new Error(tr("connection.queryCancelled"));
     }
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error(
-        `Network error: Cannot reach ${url}. Check your connection and CORS settings.`
-      );
+      throw new Error(tr("connection.networkError", { url }));
     }
     throw error;
   }
@@ -118,7 +117,7 @@ export const executeExternalQuery = async (
  */
 export const testExternalConnection = async (connection: ExternalEndpoint): Promise<void> => {
   if (!connection.host) {
-    throw new Error("Host must be defined for external connections.");
+    throw new Error(tr("connection.hostRequired"));
   }
 
   const url = buildConnectionUrl(connection.host, connection.port);
@@ -145,17 +144,15 @@ export const testExternalConnection = async (connection: ExternalEndpoint): Prom
     if (!response.ok) {
       const errorText = await response.text();
       if (response.status === 401) {
-        throw new Error("Authentication failed - check your credentials");
+        throw new Error(tr("connection.authFailed"));
       } else if (response.status === 404) {
-        throw new Error(`Cannot reach server at ${url}`);
+        throw new Error(tr("connection.cannotReach", { url }));
       }
-      throw new Error(`Connection test failed! Status: ${response.status}, Message: ${errorText}`);
+      throw new Error(tr("connection.testFailed", { status: response.status, message: errorText }));
     }
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error(
-        `Network error: Cannot reach ${url}. Check your connection and CORS settings.`
-      );
+      throw new Error(tr("connection.networkError", { url }));
     }
     throw error;
   }

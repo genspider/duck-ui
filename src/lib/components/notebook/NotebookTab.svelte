@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SvelteSet } from 'svelte/reactivity'
+  import { tr } from '@/lib/i18n/translate'
   import NotebookCell from './NotebookCell.svelte'
   import NotebookToolbar, { type KernelState } from './NotebookToolbar.svelte'
   import QueryParamsBar from '../editor/QueryParamsBar.svelte'
@@ -74,7 +75,7 @@
       getSession: () => duckActions().currentSession,
       getMaxRows: () => duckActions().maxResultRows,
     })
-    setLive(cellId, { status: pythonKernel.isBusy ? 'Queued...' : '' })
+    setLive(cellId, { status: pythonKernel.isBusy ? tr('notebook.cell.status.queued') : '' })
     try {
       const output = await pythonKernel.run(code, {
         onStatus: (status) => {
@@ -151,7 +152,7 @@
     } finally {
       runningAll = false
     }
-    if (!aborted) toast.success(`Executed ${completed} cell${completed !== 1 ? 's' : ''}`)
+    if (!aborted) toast.success(tr('notebook.tab.executed', { count: completed }))
   }
 
   function addCellAtEnd(type: NotebookCellType) {

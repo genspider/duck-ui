@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { ColumnFilter, FilterOperator } from '../../utils/result-filters'
   import { OPERATOR_LABELS, operatorsFor, isUnaryOperator, isValidFilterValue } from '../../utils/result-filters'
   import { Filter, X } from 'lucide-svelte'
@@ -69,7 +70,7 @@
       <Filter size={12} class="text-accent shrink-0" />
       <span class="truncate" title={column}>{column}</span>
     </div>
-    <Button icon variant="ghost" size="sm" onclick={onclose} title="Close" aria-label="Close filter">
+    <Button icon variant="ghost" size="sm" onclick={onclose} title={$t('grid.close')} aria-label={$t('grid.closeFilter')}>
       <X size={13} />
     </Button>
   </div>
@@ -91,13 +92,13 @@
           {valueInvalid
             ? 'border-danger focus:border-danger'
             : 'border-edge focus:border-accent'}"
-        placeholder="Value"
+        placeholder={$t('filter.value')}
         bind:value
         spellcheck="false"
         onkeydown={(e) => { if (e.key === 'Enter') apply() }}
       />
       {#if valueInvalid}
-        <p class="text-[11px] text-danger">This column is numeric. Enter a number.</p>
+        <p class="text-[11px] text-danger">{$t('grid.numericOnly')}</p>
       {/if}
     {/if}
 
@@ -106,13 +107,13 @@
         <button
           class="px-2 py-1 text-xs text-fg-3 hover:text-fg rounded hover:bg-hover"
           onclick={onclear}
-        >Clear</button>
+        >{$t('common.clear')}</button>
       {/if}
       <button
         class="px-2.5 py-1 text-xs bg-accent text-accent-fg rounded hover:bg-accent/80 disabled:opacity-50"
         onclick={apply}
         disabled={!canApply}
-      >Apply</button>
+      >{$t('common.apply')}</button>
     </div>
   </div>
 </div>

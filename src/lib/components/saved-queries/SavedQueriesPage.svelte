@@ -74,7 +74,7 @@
       queries = queries.map((q) => (q.id === id ? { ...q, name } : q))
       duckActions().bumpSavedQueriesVersion()
     } catch {
-      toastError('Failed to rename query')
+      toastError($t('saved.renameFailed'))
     }
   }
 
@@ -83,9 +83,9 @@
       await deleteSavedQuery(id)
       queries = queries.filter((q) => q.id !== id)
       duckActions().bumpSavedQueriesVersion()
-      success('Query deleted')
+      success($t('saved.deleteSuccess'))
     } catch {
-      toastError('Failed to delete query')
+      toastError($t('saved.deleteFailed'))
     }
   }
 
@@ -102,10 +102,10 @@
       x: rect.right - 220,
       y: rect.bottom + 4,
       items: [
-        { id: 'open', label: 'Open in new tab', icon: ExternalLink, onSelect: () => openQuery(query) },
-        { id: 'rename', label: 'Rename', icon: Pencil, onSelect: () => void startRename(query) },
+    { id: 'open', label: $t('saved.openNewTab'), icon: ExternalLink, onSelect: () => openQuery(query) },
+        { id: 'rename', label: $t('saved.renameAction'), icon: Pencil, onSelect: () => void startRename(query) },
         { id: 'separator', separator: true },
-        { id: 'delete', label: 'Delete', icon: Trash2, danger: true, onSelect: () => void remove(query.id) },
+        { id: 'delete', label: $t('saved.deleteAction'), icon: Trash2, danger: true, onSelect: () => void remove(query.id) },
       ],
     }
   }
@@ -126,7 +126,7 @@
     <EmptyState
       icon={Bookmark}
       title={$t('saved.empty')}
-      description="Save a query from the editor toolbar and it shows up here."
+      description={$t('saved.empty')}
     />
   {:else}
     <ul class="grid grid-cols-1 gap-2 lg:grid-cols-2">

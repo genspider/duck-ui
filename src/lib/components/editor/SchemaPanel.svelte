@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { ColumnMeta } from '../../types/query'
   import { getDisplayType } from '../../utils/column-types'
 
@@ -24,9 +25,9 @@
     <thead class="sticky top-0 z-10 bg-surface">
       <tr class="border-b border-edge">
         <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3 w-10">#</th>
-        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">Column Name</th>
-        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">Type</th>
-        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">Category</th>
+        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">{$t('schemaPanel.columnName')}</th>
+        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.type')}</th>
+        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">{$t('schemaPanel.category')}</th>
       </tr>
     </thead>
     <tbody>

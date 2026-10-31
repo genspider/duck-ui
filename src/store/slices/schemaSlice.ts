@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import {
   catalogToDatabaseInfo,
   requireLocalDuckSession,
@@ -7,13 +8,19 @@ import {
   type DataSession,
 } from "@/services/engine";
 import { sqlEscapeIdentifier, sqlEscapeString, qualifyTable } from "@/lib/sqlSanitize";
-import { buildCsvReadOptions } from "@/lib/fileImporter/importSql";
+import {
+  buildAttachDatabase,
+  buildCsvReadOptions,
+  buildDropTable,
+  buildImportTable,
+  buildImportVerification,
+} from "@/lib/fileImporter/importSql";
 import { buildExtensionSql, LIST_EXTENSIONS_SQL, parseExtensionRows } from "@/lib/duckdbExtensions";
 import type { DuckStoreState, SchemaSlice, ColumnStats, QueryResult } from "../types";
 
 /** The active session, or a clear error when nothing is connected. */
 const requireSession = (session: DataSession | null): DataSession => {
-  if (!session) throw new Error("No active connection");
+  if (!session) throw new Error(tr("error.noActiveConnection"));
   return session;
 };
 
@@ -35,9 +42,9 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
       const snapshot = await session.introspect();
       set({ databases: catalogToDatabaseInfo(snapshot), schemaFetchError: null });
     } catch (error) {
-      const errorMessage = `Failed to load schema: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`;
+      const errorMessage = tr("error.schemaLoadFailed", {
+        message: error instanceof Error ? error.message : tr("common.unknownError"),
+      });
       set({
         schemaFetchError: errorMessage,
       });
@@ -85,7 +92,7 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
       return columnStats;
     } catch (error) {
       console.error("Failed to fetch column stats:", error);
-      toast.error("Failed to load column statistics");
+      toast.error(tr("schema.loadStatsFailed"));
       return [];
     }
   },
@@ -172,7 +179,7 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
     try {
       const session = requireSession(get().currentSession);
       if (!session.capabilities.writable) {
-        throw new Error("This connection is read-only.");
+        throw new Error(tr("error.readOnly"));
       }
       set({ isLoading: true });
       const result = await runQuery(
@@ -186,9 +193,9 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
     } catch (error) {
       set({
         isLoading: false,
-        error: `Failed to delete table: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        error: tr("error.deleteTableFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        }),
       });
       throw error;
     }
@@ -207,7 +214,7 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
   runExtensionAction: async (action, name) => {
     const session = requireSession(get().currentSession);
     if (session.capabilities.readonly) {
-      throw new Error("This connection is read-only.");
+      throw new Error(tr("error.readOnly"));
     }
     const result = await runQuery(session, buildExtensionSql(action, name), `${action}-extension`);
     if (result.error) throw new Error(result.error);
@@ -218,15 +225,13 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
     fileContent,
     tableName,
     fileType,
-    database = "memory",
+    _database = "memory",
     options = {}
   ) => {
     try {
       const session = requireSession(get().currentSession);
       if (!session.capabilities.supportsFileImport) {
-        throw new Error(
-          "This connection can't import local files. Switch to an in-browser (memory or OPFS) connection."
-        );
+        throw new Error(tr("error.cannotImportLocal"));
       }
       // Registering a file buffer has no SQL expression — it needs the engine
       // handle directly.
@@ -243,7 +248,7 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
       if (fileType.toLowerCase() === "arrow") {
         const { tableFromIPC, tableToIPC } = await import("apache-arrow");
         const ipc = tableToIPC(tableFromIPC(buffer), "stream");
-        await connection.query(`DROP TABLE IF EXISTS ${sqlEscapeIdentifier(tableName)}`);
+        await connection.query(buildDropTable(tableName));
         await connection.insertArrowFromIPCStream(ipc, { name: tableName, create: true });
         await get().fetchDatabasesAndTablesInfo();
         return;
@@ -257,49 +262,59 @@ export const createSchemaSlice: StateCreator<DuckStoreState, [], [], SchemaSlice
       await db.registerFileBuffer(fileName, buffer);
       // Handle DuckDB database files (.duckdb, .db, .ddb)
       if (fileType === "duckdb" || fileType === "db" || fileType === "ddb") {
-        await connection.query(
-          `ATTACH DATABASE '${sqlEscapeString(fileName)}' AS ${sqlEscapeIdentifier(tableName)}`
-        );
+        await connection.query(buildAttachDatabase(fileName, tableName));
         await get().fetchDatabasesAndTablesInfo();
         return;
       }
 
       const createType = importMode === "view" ? "VIEW" : "TABLE";
 
-      if (fileType.toLowerCase() === "csv") {
-        const optionsString = buildCsvReadOptions(options.csv || {});
+      const kind = fileType.toLowerCase();
+      const isXlsx = kind === "xlsx" || kind === "xls";
 
-        await connection.query(`
-          CREATE OR REPLACE ${createType} ${sqlEscapeIdentifier(tableName)} AS
-          SELECT * FROM read_csv('${sqlEscapeString(fileName)}', ${optionsString})
-        `);
-      } else if (fileType.toLowerCase() === "json") {
-        await connection.query(`
-          CREATE OR REPLACE ${createType} ${sqlEscapeIdentifier(tableName)} AS
-          SELECT * FROM read_json('${sqlEscapeString(fileName)}', auto_detect=true, ignore_errors=true)
-        `);
-      } else {
-        await connection.query(`
-          CREATE OR REPLACE ${createType} ${sqlEscapeIdentifier(tableName)} AS
-          SELECT * FROM read_${fileType.toLowerCase()}('${sqlEscapeString(fileName)}')
-        `);
+      // Excel can hold mixed-type columns (numbers + text like "CEB472" or
+      // "电量-202601"). read_xlsx's type sniffer throws on those. Try normal
+      // inference first; when a mixed column trips the sniffer, fall back to
+      // reading every column as text so the import still lands.
+      const runImport = (xlsxAllVarchar: boolean) =>
+        connection.query(
+          buildImportTable(
+            createType,
+            tableName,
+            fileName,
+            kind,
+            kind === "csv" ? buildCsvReadOptions(options.csv || {}) : undefined,
+            isXlsx ? { allVarchar: xlsxAllVarchar } : undefined
+          )
+        );
+
+      try {
+        await runImport(false);
+      } catch (error) {
+        if (!isXlsx) throw error;
+        // Only the type sniffer's mixed-column failures warrant the fallback.
+        // Anything else (corrupt file, permissions, ...) must surface as-is
+        // rather than be swallowed by a pointless varchar retry.
+        const message = error instanceof Error ? error.message : String(error);
+        if (!/could not convert|cast|type|unable to parse/i.test(message)) throw error;
+        await runImport(true);
       }
-      // `database` ("memory") is the CATALOG, not the schema — the old query
-      // filtered table_schema by it and always counted 0, which the previous
-      // undefined === 0 row access silently masked.
-      const verification = await connection.query(`
-        SELECT COUNT(*) AS count
-        FROM information_schema.tables
-        WHERE table_name = '${sqlEscapeString(tableName)}'
-          AND table_catalog = '${sqlEscapeString(database)}'
-      `);
+      // 运行时获取当前 catalog 名（memory 或 OPFS 数据库名）
+      const catalogResult = await connection.query("SELECT current_catalog AS cat");
+      const catalog = String(catalogResult.toArray()[0]?.cat ?? "memory");
+      console.log(`catalog: ${catalog}`);
+      const verification = await connection.query(buildImportVerification(tableName, catalog));
       if (Number(verification.toArray()[0]?.count ?? 0) === 0) {
         throw new Error(`${createType} creation verification failed`);
       }
       await get().fetchDatabasesAndTablesInfo();
     } catch (error) {
       await get().fetchDatabasesAndTablesInfo();
-      throw new Error(`Import failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+      throw new Error(
+        tr("error.importFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     }
   },
 });

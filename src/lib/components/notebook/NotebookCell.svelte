@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import { keymap } from '@codemirror/view'
   import { Prec } from '@codemirror/state'
   import { Play, Trash2, ChevronUp, ChevronDown, ChevronRight, Code, Type, Plus, Square, SquareTerminal } from 'lucide-svelte'
@@ -45,7 +46,7 @@
   const statusColor = $derived(
     running ? 'bg-info animate-pulse' : hasError ? 'bg-danger' : hasResult ? 'bg-success' : 'bg-fg-4',
   )
-  const statusLabel = $derived(running ? 'Running' : hasError ? 'Failed' : hasResult ? 'Has output' : 'Not run')
+  const statusLabel = $derived(running ? $t('notebook.cell.status.running') : hasError ? $t('notebook.cell.status.failed') : hasResult ? $t('notebook.cell.status.hasOutput') : $t('notebook.cell.status.notRun'))
   const markdownHtml = $derived(cellType === 'markdown' && cell.content.trim() ? renderMarkdown(cell.content) : '')
 
   let editor: CodeEditor | undefined = $state()
@@ -131,18 +132,18 @@
       type="button"
       class="ds-badge cursor-pointer border border-edge bg-transparent text-[10px] hover:bg-hover"
       onclick={cycleType}
-      title="Change cell type"
-      aria-label="Cell type {cellType}. Click to change"
+      title={$t('notebook.changeCellType')}
+      aria-label={$t('notebook.cellTypeBadge', { values: { type: cellType } })}
     >
       {#if cellType === 'sql'}
         <Code size={12} />
-        SQL
+        {$t('notebook.cell.badge.sql')}
       {:else if cellType === 'python'}
         <SquareTerminal size={12} />
-        PY
+        {$t('notebook.cell.badge.python')}
       {:else if cellType === 'markdown'}
         <Type size={12} />
-        MD
+        {$t('notebook.cell.badge.markdown')}
       {:else}
         {cellType.toUpperCase()}
       {/if}
@@ -162,16 +163,16 @@
         type="button"
         class="inline-flex h-6 shrink-0 items-center gap-1 rounded-md px-2 text-[10px] font-medium text-danger transition-colors hover:bg-danger-soft"
         onclick={() => oninterrupt(cell.id)}
-        title="Stop this run. Restarts the Python kernel; variables are lost."
+        title={$t('notebook.stopRun')}
       >
         <Square size={12} />
-        Interrupt
+        {$t('notebook.cell.interrupt')}
       </button>
     {/if}
 
     <div class="flex items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
       {#if isCode}
-        <button type="button" class={ICON_BUTTON} onclick={run} disabled={running} aria-label="Run cell" title="Run cell (Shift+Enter)">
+        <button type="button" class={ICON_BUTTON} onclick={run} disabled={running} aria-label={$t('notebook.runCell')} title={$t('notebook.runCell')}>
           {#if running}
             <Spinner size="sm" class="h-3 w-3" />
           {:else}
@@ -185,7 +186,7 @@
           type="button"
           class={ICON_BUTTON}
           onclick={() => duckActions().toggleNotebookCellCollapsed(tabId, cell.id)}
-          aria-label={cell.collapsed ? 'Expand output' : 'Collapse output'}
+          aria-label={cell.collapsed ? $t('notebook.expand') : $t('notebook.collapse')}
           aria-expanded={!cell.collapsed}
         >
           <ChevronRight size={13} class="transition-transform {cell.collapsed ? '' : 'rotate-90'}" />
@@ -197,7 +198,7 @@
         class={ICON_BUTTON}
         onclick={() => duckActions().moveNotebookCell(tabId, cell.id, 'up')}
         disabled={cellIndex === 0}
-        aria-label="Move cell up"
+        aria-label={$t('notebook.moveUp')}
       >
         <ChevronUp size={13} />
       </button>
@@ -206,7 +207,7 @@
         class={ICON_BUTTON}
         onclick={() => duckActions().moveNotebookCell(tabId, cell.id, 'down')}
         disabled={cellIndex === totalCells - 1}
-        aria-label="Move cell down"
+        aria-label={$t('notebook.moveDown')}
       >
         <ChevronDown size={13} />
       </button>
@@ -215,7 +216,7 @@
         class="{ICON_BUTTON} text-danger hover:bg-danger-soft hover:text-danger"
         onclick={() => duckActions().removeNotebookCell(tabId, cell.id)}
         disabled={totalCells <= 1}
-        aria-label="Delete cell"
+        aria-label={$t('notebook.cell.delete')}
       >
         <Trash2 size={13} />
       </button>
@@ -231,14 +232,14 @@
         runOnShiftEnter
         showLineNumbers
         autoHeight={AUTO_HEIGHT}
-        ariaLabel="{cellType === 'sql' ? 'SQL' : 'Python'} cell {cellIndex + 1}"
+        ariaLabel={$t('notebook.cellTypeAria', { values: { type: cellType === 'sql' ? 'SQL' : 'Python', index: cellIndex + 1 } })}
         onchange={saveContent}
         onrun={run}
       />
     {:else if !isKnownCellType(cellType)}
       <div class="p-3">
         <p class="mb-2 text-xs text-fg-3">
-          Unsupported cell type "{cellType}" (likely from a newer Duck-UI). Shown read-only.
+          {$t('notebook.unsupported', { values: { type: cellType } })}
         </p>
         <pre class="whitespace-pre-wrap break-words font-mono text-xs text-fg-2">{cell.content}</pre>
       </div>
@@ -251,8 +252,8 @@
           runOnShiftEnter
           showLineNumbers={false}
           autoHeight={AUTO_HEIGHT}
-          placeholder="Write markdown here..."
-          ariaLabel="Markdown cell {cellIndex + 1}"
+          placeholder={$t('notebook.markdownPlaceholder')}
+          ariaLabel={$t('notebook.cellTypeAria', { values: { type: 'Markdown', index: cellIndex + 1 } })}
           extensions={markdownKeys}
           onchange={saveContent}
           onrun={stopEditing}
@@ -263,14 +264,14 @@
         class="cursor-pointer p-3"
         role="button"
         tabindex="0"
-        aria-label="Edit markdown cell {cellIndex + 1}"
+        aria-label={$t('notebook.cellTypeAria', { values: { type: 'Markdown', index: cellIndex + 1 } })}
         onclick={onRenderedClick}
         onkeydown={onRenderedKeydown}
       >
         {#if markdownHtml}
           <div class="prose-panel max-w-none text-[13px] text-fg">{@html markdownHtml}</div>
         {:else}
-          <p class="px-1 text-[13px] italic text-fg-3">Empty markdown cell. Click to edit.</p>
+          <p class="px-1 text-[13px] italic text-fg-3">{$t('notebook.cell.emptyMarkdown')}</p>
         {/if}
       </div>
     {/if}
@@ -286,7 +287,7 @@
         <CellResults result={sqlResult} chartConfig={cell.chartConfig} onchartconfigchange={onChartConfigChange} />
       {:else}
         <div class="px-3 py-2 text-xs text-fg-3">
-          Query executed successfully. {sqlResult.rowCount} rows returned.
+          {$t('notebook.querySuccess', { values: { count: sqlResult.rowCount } })}
         </div>
       {/if}
     </div>
@@ -312,7 +313,7 @@
     <AddCellMenu
       onadd={(type) => onaddcell(cell.id, type)}
       align="center"
-      ariaLabel="Add cell below"
+      ariaLabel={$t('notebook.addCellBelow')}
       class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-edge bg-surface text-fg-3 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100 aria-expanded:opacity-100 hover:border-edge-strong hover:text-fg"
     >
       <Plus size={12} />

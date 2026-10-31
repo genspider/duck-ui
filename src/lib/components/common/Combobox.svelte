@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { tick } from 'svelte'
   import { Search, ChevronDown, Check } from 'lucide-svelte'
 
@@ -143,7 +144,7 @@
           bind:value={query}
           class="w-full bg-transparent text-[13px] text-fg placeholder:text-fg-4 outline-none"
           type="text"
-          placeholder="Type to search"
+          placeholder={$t('common.typeToSearch')}
         />
       </div>
 

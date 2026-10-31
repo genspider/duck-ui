@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { ChevronDown, ChevronUp } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
@@ -22,12 +23,11 @@
   }
 </script>
 
-<!-- Column include/rename/type editor shown under the URL preview. -->
 <div class="rounded-md border border-edge bg-surface p-3">
   <div class="flex items-center justify-between gap-3">
     <div>
-      <h4 class="text-[13px] font-semibold text-fg">Schema customization</h4>
-      <p class="text-xs text-fg-3">Customize column names, types, and visibility before importing</p>
+      <h4 class="text-[13px] font-semibold text-fg">{$t('importer.schemaTitle')}</h4>
+      <p class="text-xs text-fg-3">{$t('importer.schemaDesc')}</p>
     </div>
     <Button
       variant="ghost"
@@ -37,10 +37,10 @@
     >
       {#if url.isSchemaCustomizing}
         <ChevronUp size={14} />
-        Hide
+        {$t('importer.hide')}
       {:else}
         <ChevronDown size={14} />
-        Customize
+        {$t('importer.customize')}
       {/if}
     </Button>
   </div>
@@ -51,10 +51,10 @@
         <table class="ds-table">
           <thead>
             <tr class="ds-table-head-row">
-              <th class="ds-table-th-compact w-14">Include</th>
-              <th class="ds-table-th-compact">Original name</th>
-              <th class="ds-table-th-compact">New name</th>
-              <th class="ds-table-th-compact w-44">Type</th>
+              <th class="ds-table-th-compact w-14">{$t('importer.include')}</th>
+              <th class="ds-table-th-compact">{$t('importer.originalName')}</th>
+              <th class="ds-table-th-compact">{$t('importer.newName')}</th>
+              <th class="ds-table-th-compact w-44">{$t('importer.type')}</th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +65,7 @@
                     type="checkbox"
                     class="ds-checkbox ds-checkbox-sm"
                     checked={col.included}
-                    aria-label="Include {col.originalName}"
+                    aria-label={$t('importer.includeColumn', { values: { name: col.originalName } })}
                     onchange={() => url.handleToggleColumn(col.originalName)}
                   />
                 </td>
@@ -77,7 +77,7 @@
                     size="sm"
                     mono
                     value={col.newName}
-                    placeholder="Column name"
+                    placeholder={$t('importer.columnNamePlaceholder')}
                     disabled={!col.included}
                     oninput={(e) => url.handleRenameColumn(col.originalName, e.currentTarget.value)}
                   />
@@ -97,7 +97,7 @@
         </table>
       </div>
       <p class="bg-surface-2 px-3 py-2 text-xs text-fg-3">
-        {includedCount} of {url.schemaColumns.length} columns will be imported
+        {$t('importer.columnsImported', { values: { count: includedCount, total: url.schemaColumns.length } })}
       </p>
     </div>
   {/if}

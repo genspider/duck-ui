@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import { onMount } from 'svelte'
   import { FolderOpen, FolderPlus } from 'lucide-svelte'
   import Button from '../common/Button.svelte'
@@ -6,10 +7,10 @@
   import ImportOptionsPopover from './ImportOptionsPopover.svelte'
   import MountedFolderNode from './MountedFolderNode.svelte'
   import { duck, duckActions } from '../../stores/duck.svelte'
-  import { success, error as toastError } from '../../stores/toast.svelte'
+  import { success, error as toastError, info as toastInfo } from '../../stores/toast.svelte'
   import { getUiConfig } from '@/lib/appConfig'
   import { fileSystemService, type FileEntry } from '@/lib/fileSystem'
-  import { importFolderFile, quickImportTableName, type ImportOptions } from '@/lib/fileImporter/folderImport'
+  import { importFolderFile, quickImportTableName, listFolderChildren, type ImportOptions } from '@/lib/fileImporter/folderImport'
   import type { TreeActions } from './tree'
 
   interface Props {
@@ -66,6 +67,39 @@
     menu: (items, x, y) => (menu = { items, x, y }),
     quickImport: (folderId, file) =>
       runImport(folderId, file, { tableName: quickImportTableName(file.name), importMode: 'table' }),
+    quickImportFolder: async (folderId, folder) => {
+      // BFS to collect all importable files under the folder
+      const found: FileEntry[] = []
+      const queue = [folder]
+      while (queue.length) {
+        const children = await listFolderChildren(queue.shift()!)
+        for (const c of children) {
+          if (c.type === 'folder') queue.push(c)
+          else found.push(c)
+        }
+      }
+      void bulkImport(folderId, found)
+    },
+    quickImportMountedFolder: async (folderId) => {
+      try {
+        // Recursively lists every supported file under the mounted folder.
+        const files = await fileSystemService.listFiles(folderId, { recursive: true, filterSupported: true })
+        await bulkImport(folderId, files.filter((f): f is FileEntry => f.type === 'file'))
+      } catch (error) {
+        console.error('Failed to bulk import mounted folder:', error)
+      }
+    },
+  }
+
+  /** Importing every collected file as a table, with a no-files guard. */
+  async function bulkImport(folderId: string, files: FileEntry[]) {
+    if (files.length === 0) {
+      toastInfo($t('folder.noFiles'))
+      return
+    }
+    for (const file of files) {
+      await runImport(folderId, file, { tableName: quickImportTableName(file.name), importMode: 'table' })
+    }
   }
 
   async function requestPermission(folderId: string) {
@@ -73,12 +107,12 @@
       const granted = await fileSystemService.requestPermission(folderId)
       if (granted) {
         await duckActions().refreshFolderPermissions()
-        success('Permission granted')
+        success($t('folder.permissionGranted'))
       } else {
-        toastError('Permission denied')
+        toastError($t('folder.permissionDenied'))
       }
     } catch {
-      toastError('Failed to request permission')
+      toastError($t('folder.permissionFailed'))
     }
   }
 
@@ -90,17 +124,13 @@
 {#if canImport}
   {#if !isFileSystemSupported}
     <div class="p-3 text-center {cls}">
-      <p class="text-xs text-fg-3">
-        File System Access not supported.
-        <br />
-        Use Chrome or Edge 86+.
-      </p>
+      <p class="text-xs text-fg-3">{$t('folder.fsNotSupported')}</p>
     </div>
   {:else}
     <div class={cls}>
       <div class="flex h-7 items-center justify-between pl-3 pr-1.5">
-        <span class="text-[11px] font-medium uppercase tracking-wider text-fg-3">Files</span>
-        <Button icon variant="ghost" size="xs" onclick={mountFolder} title="Add folder" aria-label="Add folder">
+        <span class="text-[11px] font-medium uppercase tracking-wider text-fg-3">{$t('folder.title')}</span>
+        <Button icon variant="ghost" size="xs" onclick={mountFolder} title={$t('folder.addFolder')} aria-label={$t('folder.addFolder')}>
           <FolderPlus size={14} />
         </Button>
       </div>
@@ -119,10 +149,10 @@
       {:else}
         <div class="px-3 py-4 text-center">
           <FolderOpen size={20} strokeWidth={1.5} class="mx-auto mb-2 text-fg-4" />
-          <p class="mb-2 text-xs text-fg-3">No folders mounted</p>
+          <p class="mb-2 text-xs text-fg-3">{$t('folder.noFolders')}</p>
           <Button variant="outline" size="sm" onclick={mountFolder}>
             <FolderPlus size={13} />
-            Add folder
+            {$t('folder.addFolderAction')}
           </Button>
         </div>
       {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import PageHeader from '../common/PageHeader.svelte'
   import PageBody from '../common/PageBody.svelte'
   import AISettings from './AISettings.svelte'
@@ -10,10 +11,10 @@
   import { sectionsFor } from '@/lib/routes'
 
   const section = $derived(getSection() ?? 'profile')
-  const label = $derived(sectionsFor('settings').find((s) => s.id === section)?.label ?? '')
+  const label = $derived(sectionsFor('settings').find((s) => s.id === section)?.labelKey ?? '')
 </script>
 
-<PageHeader title="Settings" subtitle={label} />
+<PageHeader title={$t('settings.title')} subtitle={label ? $t(label) : ''} />
 
 <PageBody>
   <div class="max-w-3xl">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ChartColumn, Table2 } from 'lucide-svelte'
+  import { t } from 'svelte-i18n'
   import Tabs from '../common/Tabs.svelte'
   import ResultGrid from '../editor/ResultGrid.svelte'
   import ChartView from '../charts/ChartView.svelte'
@@ -20,10 +21,11 @@
   const GRID_CHROME = 34 + 32 + 2
   const MAX_TABLE_HEIGHT = 320
 
-  const VIEWS = [
-    { id: 'table', label: 'Table', icon: Table2 },
-    { id: 'chart', label: 'Chart', icon: ChartColumn },
-  ]
+  // $derived so labels follow a locale change.
+  const VIEWS = $derived([
+    { id: 'table', label: $t('notebook.view.table'), icon: Table2 },
+    { id: 'chart', label: $t('notebook.view.chart'), icon: ChartColumn },
+  ])
 
   let view = $state('table')
 
@@ -35,9 +37,9 @@
 
 {#snippet failed(error: unknown, reset: () => void)}
   <div class="p-3 text-center">
-    <p class="mb-2 text-xs text-danger" role="alert">{error instanceof Error ? error.message : 'Render error'}</p>
+    <p class="mb-2 text-xs text-danger" role="alert">{error instanceof Error ? error.message : $t('notebook.renderError')}</p>
     <button type="button" class="rounded bg-surface-2 px-2 py-1 text-xs text-fg-2 hover:bg-active" onclick={reset}>
-      Retry
+      {$t('common.retry')}
     </button>
   </div>
 {/snippet}

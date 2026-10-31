@@ -25,7 +25,7 @@
     class="w-full resize-none rounded-md border border-edge bg-surface px-2.5 py-2 font-mono text-xs leading-relaxed text-fg transition-colors hover:border-edge-strong focus:border-accent focus:outline-none"
     onfocus={(e) => e.currentTarget.select()}
   ></textarea>
-  <Button icon class="h-auto w-10" onclick={oncopy} disabled={busy} loading={busy} aria-label="Copy {label}">
+  <Button icon class="h-auto w-10" onclick={oncopy} disabled={busy} loading={busy} aria-label={label}>
     <!-- While busy the button shows its own spinner. -->
     {#if copied}
       <Check size={14} />

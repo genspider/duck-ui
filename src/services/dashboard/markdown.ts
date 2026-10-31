@@ -26,6 +26,8 @@
  * failure mode a document editor can have.
  */
 
+import { tr } from "@/lib/i18n/translate";
+
 /** A named query declared in the document. */
 export interface DashboardQuery {
   name: string;
@@ -375,15 +377,15 @@ export const toQueryName = (title: string, taken: Set<string>): string => {
 /** The starter document a new dashboard opens with. */
 export const starterSource = (name: string): string => `# ${name}
 
-Write markdown here. Add a query:
+${tr("dashboard.starter.writeIntro")}
 
 \`\`\`sql my_query
 SELECT 'hello' AS greeting, 42 AS answer
 \`\`\`
 
-Then show it:
+${tr("dashboard.starter.thenShow")}
 
 <DataTable data={my_query}/>
 
-Charts bind the same way: \`<BarChart data={my_query} x=greeting y=answer/>\`
+${tr("dashboard.starter.chartsBind")} 
 `;

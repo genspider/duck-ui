@@ -1,4 +1,5 @@
 import * as toast from "@/lib/stores/toast.svelte";
+import { tr } from "@/lib/i18n/translate";
 import {
   errorMessageOf,
   runImportQuery,
@@ -16,12 +17,12 @@ export function createQueryImport(ctx: ImporterContext) {
 
   const handleQueryImport = async () => {
     if (!queryInput.trim()) {
-      toast.error("Please enter a SQL query");
+      toast.error(tr("fileImporter.enterSqlQuery"));
       return;
     }
 
     if (!queryTableName.trim()) {
-      toast.error("Please enter a table name");
+      toast.error(tr("fileImporter.enterTableName"));
       return;
     }
 
@@ -42,14 +43,16 @@ export function createQueryImport(ctx: ImporterContext) {
 
       await runImportQuery(buildCreateAs(createType, queryTableName, userQuery));
 
-      toast.success(`Successfully created ${resultType} '${queryTableName}' from query result`);
+      toast.success(
+        tr("fileImporter.createdFromResult", { type: resultType, name: queryTableName })
+      );
       queryInput = "";
       queryTableName = "";
       ctx.close();
     } catch (e) {
       const errorMessage = errorMessageOf(e);
       ctx.setErrors([toUploadError(errorMessage)]);
-      toast.error(`Failed to execute query: ${errorMessage}`);
+      toast.error(tr("fileImporter.queryFailed", { message: errorMessage }));
     } finally {
       isQueryImporting = false;
     }

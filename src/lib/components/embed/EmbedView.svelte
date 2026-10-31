@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { t } from 'svelte-i18n'
+  import { tr } from '@/lib/i18n/translate'
   import { ChartColumn, DatabaseZap, ExternalLink, Table, TriangleAlert } from 'lucide-svelte'
   import Tabs from '../common/Tabs.svelte'
   import Spinner from '../common/Spinner.svelte'
@@ -29,8 +31,8 @@
    * link back to Duck-UI.
    */
   const VIEWS = [
-    { id: 'table', label: 'Table', icon: Table },
-    { id: 'charts', label: 'Chart', icon: ChartColumn },
+    { id: 'table', label: $t('embed.table'), icon: Table },
+    { id: 'charts', label: $t('embed.chart'), icon: ChartColumn },
   ]
 
   const initialized = $derived(duck((s) => s.isInitialized))
@@ -89,7 +91,7 @@
       }
 
       try {
-        if (!session) throw new Error('No active connection')
+        if (!session) throw new Error(tr('embed.noConnection'))
         const result = await runQuery(session, sql, 'embed', { maxRows })
         if (cancelled) return
         if (result.error) throw new Error(result.error)
@@ -135,7 +137,7 @@
         />
       {/if}
       <Tabs items={VIEWS} value={view} onchange={(id) => (view = id)} size="sm" class="shrink-0 px-3" />
-      <div class="min-h-0 flex-1" role="tabpanel" aria-label={view === 'charts' ? 'Chart' : 'Table'}>
+      <div class="min-h-0 flex-1" role="tabpanel" aria-label={view === 'charts' ? $t('embed.chart') : $t('embed.table')}>
         {#if view === 'charts'}
           <ChartView
             result={embed.result}
@@ -151,27 +153,25 @@
     <div class="flex min-h-0 flex-1 flex-col items-center justify-center p-6 text-center">
       {#if embed.status === 'loading' && engineError}
         <TriangleAlert size={28} class="text-danger" />
-        <p class="mt-3 text-[13px] font-medium text-fg">DuckDB failed to start</p>
+        <p class="mt-3 text-[13px] font-medium text-fg">{$t('embed.failedToStart')}</p>
         <p class="mt-1 max-w-md font-mono text-xs text-fg-3" role="alert">{engineError}</p>
       {:else if embed.status === 'loading'}
         <Spinner />
-        <p class="mt-3 text-[13px] text-fg-3">Running analysis...</p>
+        <p class="mt-3 text-[13px] text-fg-3">{$t('embed.running')}</p>
       {:else if embed.status === 'no-share' || embed.status === 'invalid'}
         <TriangleAlert size={28} class="text-fg-3" />
         <p class="mt-3 text-[13px] text-fg-3">
-          {embed.status === 'no-share' ? 'No analysis to display.' : 'This shared link is invalid or corrupted.'}
+          {embed.status === 'no-share' ? $t('embed.noShare') : $t('embed.invalidShare')}
         </p>
       {:else if embed.status === 'needs-data'}
         <DatabaseZap size={28} class="text-accent" />
-        <p class="mt-3 text-[13px] font-medium text-fg">This analysis needs data that isn't public</p>
+        <p class="mt-3 text-[13px] font-medium text-fg">{$t('embed.needsData')}</p>
         <p class="mt-1 max-w-sm text-xs text-fg-3">
-          The shared link carries the query, not the data. It reads from a table that was imported locally, so it
-          can't reproduce here. Analyses that read from a URL (for example
-          <code class="font-mono">read_parquet('https://...')</code>) embed fully.
+          {$t('embed.needsDataDesc')}
         </p>
       {:else if embed.status === 'error'}
         <TriangleAlert size={28} class="text-danger" />
-        <p class="mt-3 text-[13px] font-medium text-fg">Query error</p>
+        <p class="mt-3 text-[13px] font-medium text-fg">{$t('embed.queryError')}</p>
         <p class="mt-1 max-w-md font-mono text-xs text-fg-3" role="alert">{embed.message}</p>
       {/if}
     </div>
@@ -185,7 +185,7 @@
       class="flex items-center gap-1.5 text-xs text-fg-3 transition-colors hover:text-fg"
     >
       <img src={logo} alt="" class="h-4 w-4" />
-      Powered by Duck-UI
+      {$t('embed.poweredBy')}
     </a>
     <a
       href={forkUrl}
@@ -193,7 +193,7 @@
       rel="noopener noreferrer"
       class="flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
     >
-      Open in Duck-UI
+      {$t('embed.openInDuckUI')}
       <ExternalLink size={12} />
     </a>
   </footer>

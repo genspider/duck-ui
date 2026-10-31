@@ -1,4 +1,5 @@
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import { useDuckStore } from "@/store";
 import { fileSystemService } from "@/lib/fileSystem";
 import {
@@ -30,7 +31,7 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       type: "text/csv;charset=utf-8;",
     });
     triggerDownload(blob, `duck-ui-export-${new Date().toISOString().slice(0, 19)}.csv`);
-    toast.success("Exported to CSV");
+    toast.success(tr("export.exportedCsv"));
   };
 
   const exportToJSON = () => {
@@ -43,7 +44,7 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
     const blob = new Blob([jsonString], { type: "application/json" });
     triggerDownload(blob, `duck-ui-export-${new Date().toISOString().slice(0, 19)}.json`);
 
-    toast.success("Exported to JSON");
+    toast.success(tr("export.exportedJson"));
   };
 
   const exportToXLSX = async () => {
@@ -61,10 +62,10 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       });
       triggerDownload(blob, `duck-ui-export-${new Date().toISOString().slice(0, 19)}.xlsx`);
 
-      toast.success("Exported to Excel");
+      toast.success(tr("export.exportedExcel"));
     } catch (error) {
       console.error("XLSX export failed:", error);
-      toast.error("Failed to export to Excel");
+      toast.error(tr("export.exportFailedExcel"));
     }
   };
 
@@ -72,7 +73,7 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
     if (!data || !data.length) return;
 
     try {
-      toast.info("Preparing DuckDB export...");
+      toast.info(tr("export.preparingParquet"));
 
       const dataToExport = table.getFilteredRows();
 
@@ -101,11 +102,13 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       const blob = new Blob([arrayBuffer], { type: "application/octet-stream" });
       triggerDownload(blob, fileName);
 
-      toast.success("Exported to Parquet (DuckDB format)");
+      toast.success(tr("export.exportedParquet"));
     } catch (error) {
       console.error("DuckDB export failed:", error);
       toast.error(
-        "Failed to export: " + (error instanceof Error ? error.message : "Unknown error")
+        tr("export.exportFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
       );
     }
   };
@@ -125,10 +128,14 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       const fileName = `export-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.csv`;
 
       await fileSystemService.saveFile(folderId, fileName, content);
-      toast.success(`Saved to ${folderName}/${fileName}`);
+      toast.success(tr("export.savedToFolder", { folder: folderName, file: fileName }));
     } catch (error) {
       console.error("Save to folder failed:", error);
-      toast.error("Failed to save: " + (error instanceof Error ? error.message : "Unknown error"));
+      toast.error(
+        tr("export.saveFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     }
   };
 
@@ -141,10 +148,14 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
 
       const fileName = `export-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`;
       await fileSystemService.saveFile(folderId, fileName, jsonString);
-      toast.success(`Saved to ${folderName}/${fileName}`);
+      toast.success(tr("export.savedToFolder", { folder: folderName, file: fileName }));
     } catch (error) {
       console.error("Save to folder failed:", error);
-      toast.error("Failed to save: " + (error instanceof Error ? error.message : "Unknown error"));
+      toast.error(
+        tr("export.saveFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     }
   };
 
@@ -159,10 +170,14 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       const fileName = `export-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.xlsx`;
 
       await fileSystemService.saveFile(folderId, fileName, xlsxBuffer);
-      toast.success(`Saved to ${folderName}/${fileName}`);
+      toast.success(tr("export.savedToFolder", { folder: folderName, file: fileName }));
     } catch (error) {
       console.error("Save to folder failed:", error);
-      toast.error("Failed to save: " + (error instanceof Error ? error.message : "Unknown error"));
+      toast.error(
+        tr("export.saveFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     }
   };
 
@@ -194,10 +209,14 @@ export const createTableExporters = (data: DataRow[], table: ExportTableView) =>
       const arrayBuffer = new ArrayBuffer(buffer.byteLength);
       new Uint8Array(arrayBuffer).set(buffer);
       await fileSystemService.saveFile(folderId, fileName, arrayBuffer);
-      toast.success(`Saved to ${folderName}/${fileName}`);
+      toast.success(tr("export.savedToFolder", { folder: folderName, file: fileName }));
     } catch (error) {
       console.error("Save to folder failed:", error);
-      toast.error("Failed to save: " + (error instanceof Error ? error.message : "Unknown error"));
+      toast.error(
+        tr("export.saveFailed", {
+          message: error instanceof Error ? error.message : tr("common.unknownError"),
+        })
+      );
     }
   };
 

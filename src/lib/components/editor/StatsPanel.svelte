@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n'
   import type { ColumnStats } from '../../utils/stats'
   import { formatNumber } from '../../utils/format'
 
@@ -23,16 +24,16 @@
   <table class="w-full text-sm border-collapse">
     <thead class="sticky top-0 z-10 bg-surface">
       <tr class="border-b border-edge">
-        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">Name</th>
-        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">Type</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Count</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Nulls</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Null%</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Min</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Max</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Avg</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Sum</th>
-        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">Distinct</th>
+        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.name')}</th>
+        <th class="px-3 py-1.5 text-left text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.type')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.count')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.nulls')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.nullPct')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.min')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.max')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.avg')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.sum')}</th>
+        <th class="px-3 py-1.5 text-right text-xs font-medium uppercase tracking-wider text-fg-3">{$t('stats.distinct')}</th>
       </tr>
     </thead>
     <tbody>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { t } from 'svelte-i18n'
   import Button from '../common/Button.svelte'
   import Input from '../common/Input.svelte'
   import FormField from '../common/FormField.svelte'
@@ -55,14 +56,14 @@
 </script>
 
 <form class="flex flex-col gap-4 text-left" onsubmit={submit}>
-  <FormField controlWidth="full" label="Avatar">
-    <div class="flex flex-wrap gap-1" role="radiogroup" aria-label="Avatar">
+  <FormField controlWidth="full" label={$t('profile.avatar')}>
+    <div class="flex flex-wrap gap-1" role="radiogroup" aria-label={$t('profile.avatar')}>
       {#each AVATAR_OPTIONS as option}
         <button
           type="button"
           role="radio"
           aria-checked={avatarEmoji === option}
-          aria-label={option === 'logo' ? 'Duck-UI logo' : option}
+          aria-label={option === 'logo' ? $t('profile.duckuiLogo') : option}
           class="inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors {avatarEmoji === option ? 'border-accent bg-accent-soft' : 'border-transparent hover:bg-hover'}"
           onclick={() => (avatarEmoji = option)}
         >
@@ -72,35 +73,35 @@
     </div>
   </FormField>
 
-  <FormField controlWidth="full" label="Name" for="profile-name">
-    <Input id="profile-name" bind:value={name} placeholder="Your name" maxlength={50} required autocomplete="off" />
+  <FormField controlWidth="full" label={$t('profile.nameField')} for="profile-name">
+    <Input id="profile-name" bind:value={name} placeholder={$t('profile.namePlaceholder')} maxlength={50} required autocomplete="off" />
   </FormField>
 
   {#if mode === 'create'}
     <label class="ds-checkbox-label">
       <input type="checkbox" class="ds-checkbox" bind:checked={passwordEnabled} />
-      Password protection
+      {$t('profile.passwordProtection')}
     </label>
 
     {#if passwordEnabled}
-      <FormField controlWidth="full" label="Password" for="profile-password" error={passwordTooShort ? `At least ${MIN_PASSWORD_LENGTH} characters` : ''}>
+      <FormField controlWidth="full" label={$t('common.password')} for="profile-password" error={passwordTooShort ? $t('profile.minPassword', { values: { count: MIN_PASSWORD_LENGTH } }) : ''}>
         <Input id="profile-password" type="password" bind:value={password} invalid={passwordTooShort} autocomplete="new-password" />
       </FormField>
-      <FormField controlWidth="full" label="Confirm password" for="profile-password-confirm" error={passwordMismatch ? 'Passwords do not match' : ''}>
+      <FormField controlWidth="full" label={$t('profile.confirmPassword')} for="profile-password-confirm" error={passwordMismatch ? $t('profile.passwordMismatch') : ''}>
         <Input id="profile-password-confirm" type="password" bind:value={confirmPassword} invalid={passwordMismatch} autocomplete="new-password" />
       </FormField>
       <p class="text-xs text-fg-3">
-        The password encrypts saved credentials and API keys. It cannot be recovered if lost.
+        {$t('profile.passwordHint')}
       </p>
     {/if}
   {/if}
 
   <div class="flex justify-end gap-2 pt-1">
     {#if oncancel}
-      <Button variant="ghost" onclick={oncancel}>Cancel</Button>
+      <Button variant="ghost" onclick={oncancel}>{$t('common.cancel')}</Button>
     {/if}
     <Button type="submit" disabled={!valid} {loading}>
-      {mode === 'create' ? 'Create profile' : 'Save'}
+      {mode === 'create' ? $t('profile.createProfile') : $t('common.save')}
     </Button>
   </div>
 </form>

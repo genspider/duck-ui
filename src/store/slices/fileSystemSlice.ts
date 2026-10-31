@@ -1,5 +1,6 @@
 import type { StateCreator } from "@/store/createStore";
 import { toast } from "svelte-sonner";
+import { tr } from "@/lib/i18n/translate";
 import type { DuckStoreState, FileSystemSlice, MountedFolderInfo } from "../types";
 
 export const createFileSystemSlice: StateCreator<DuckStoreState, [], [], FileSystemSlice> = (
@@ -31,7 +32,7 @@ export const createFileSystemSlice: StateCreator<DuckStoreState, [], [], FileSys
       set({ mountedFolders: folderInfos, isFileSystemSupported: true });
     } catch (error) {
       console.error("Failed to initialize file system:", error);
-      toast.error("Failed to initialize file system access");
+      toast.error(tr("fileSystem.initFailed"));
     }
   },
 
@@ -39,7 +40,7 @@ export const createFileSystemSlice: StateCreator<DuckStoreState, [], [], FileSys
     const { fileSystemService, isFileSystemAccessSupported } = await import("@/lib/fileSystem");
 
     if (!isFileSystemAccessSupported()) {
-      toast.error("File System Access API is not supported in this browser");
+      toast.error(tr("fileSystem.apiUnsupported"));
       return null;
     }
 
@@ -58,14 +59,14 @@ export const createFileSystemSlice: StateCreator<DuckStoreState, [], [], FileSys
         mountedFolders: [...state.mountedFolders, folderInfo],
       }));
 
-      toast.success(`Folder "${folder.name}" mounted successfully`);
+      toast.success(tr("fileSystem.mounted", { name: folder.name }));
       return folderInfo;
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         return null;
       }
       console.error("Failed to mount folder:", error);
-      toast.error("Failed to mount folder");
+      toast.error(tr("fileSystem.mountFailed"));
       return null;
     }
   },
@@ -80,10 +81,10 @@ export const createFileSystemSlice: StateCreator<DuckStoreState, [], [], FileSys
         mountedFolders: state.mountedFolders.filter((f) => f.id !== id),
       }));
 
-      toast.success("Folder unmounted");
+      toast.success(tr("fileSystem.unmounted"));
     } catch (error) {
       console.error("Failed to unmount folder:", error);
-      toast.error("Failed to unmount folder");
+      toast.error(tr("fileSystem.unmountFailed"));
     }
   },
 
